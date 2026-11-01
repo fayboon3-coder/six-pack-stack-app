@@ -6,8 +6,16 @@ from rembg import remove
 
 src = json.load(open('tools/sources.json'))
 os.makedirs('assets/img', exist_ok=True)
+os.makedirs('assets/raw', exist_ok=True)
 for name, url in src.items():
     if not url.startswith('http'):
+        continue
+    if name.startswith('raw:'):
+        out = 'assets/raw/' + name[4:]
+        if not os.path.exists(out):
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            open(out, 'wb').write(urllib.request.urlopen(req, timeout=60).read())
+            print('saved', out)
         continue
     out = 'assets/img/' + name.replace('_src', '').rsplit('.', 1)[0] + '.png'
     if os.path.exists(out):
