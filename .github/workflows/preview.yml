@@ -1,0 +1,26 @@
+name: Publish preview to Expo Go
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Set up Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Link the Expo project
+        run: eas init --non-interactive --force
+      - name: Publish update
+        run: eas update --branch main --message "${{ github.event.head_commit.message || 'manual' }}" --non-interactive --platform ios
