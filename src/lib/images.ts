@@ -21,6 +21,8 @@ export const IMG = {
   roller: require('../../assets/img/roller.png'),
   watch: require('../../assets/img/watch.png'),
   scale: require('../../assets/img/scale.png'),
+  ag1: require('../../assets/img/ag1.png'),
+  coffee: require('../../assets/img/coffee.png'),
 } as const;
 
 const RULES: [RegExp, keyof typeof IMG][] = [
@@ -39,6 +41,8 @@ const RULES: [RegExp, keyof typeof IMG][] = [
   [/nugenix|test(osterone)? booster/i, 'nugenix'],
   [/collagen|vital proteins/i, 'collagen'],
   [/ozempic|semaglutide|glp/i, 'ozempic'],
+  [/\bag1\b|athletic greens|greens powder/i, 'ag1'],
+  [/coffee|caffeine|espresso/i, 'coffee'],
 ];
 
 /** Product photo for a supplement name, if we have one. */

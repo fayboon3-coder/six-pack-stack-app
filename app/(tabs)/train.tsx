@@ -9,7 +9,7 @@ import NoPlan from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 
-const HERO_IMG = require('../../assets/hero/dumbbells.jpg');
+const HERO_IMG = require('../../assets/hero/train.jpg');
 import { CheckIcon } from '../../src/components/icons';
 import { exercises, phaseOf, plain, todayIndex, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';

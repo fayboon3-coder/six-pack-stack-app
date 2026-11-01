@@ -10,7 +10,7 @@ import { WHATSAPP } from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 
-const HERO_IMG = require('../../assets/hero/tested.jpg');
+const HERO_IMG = require('../../assets/hero/boon.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -29,7 +29,7 @@ export default function Boon() {
     <Screen header={
       <View style={{ gap: 18 }}>
         <PageHeader kicker="Your coach" title="Boon" subtitle="225 to 175 lbs. No sponsors, no affiliate links. Just what works." right={<View />} />
-        <HeroCard image={HERO_IMG} badge="I tested it so you don't have to" title="Ask me anything"
+        <HeroCard image={HERO_IMG} badge="Your coach" title="Ask me anything"
           subtitle="Stuck, hungry, sore or not sure? Text me. I answer every message myself." cta="Text Boon on WhatsApp"
           onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
       </View>

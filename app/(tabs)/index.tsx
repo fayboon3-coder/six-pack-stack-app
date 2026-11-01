@@ -14,7 +14,7 @@ import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } fro
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
 
-const HERO_IMG = require('../../assets/hero/dumbbells.jpg');
+const HERO_IMG = require('../../assets/hero/today.jpg');
 
 export default function Today() {
   const { profile, plan, session, refresh } = useAuth();
