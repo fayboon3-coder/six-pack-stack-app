@@ -100,7 +100,7 @@ export default function CheckinScreen() {
               <BackIcon />
             </Pressable>
           </View>
-          <View style={{ paddingHorizontal: 20, gap: 6 }}>
+          <View style={{ paddingHorizontal: 20, gap: 6, marginBottom: 8 }}>
             <Text style={st.kicker}>Week {week}{photoWeek ? ' · Photo week' : ''}</Text>
             <Text style={st.title} accessibilityRole="header">Sunday check-in</Text>
             <Text style={st.hint}>Two minutes. Boon reviews every answer.</Text>

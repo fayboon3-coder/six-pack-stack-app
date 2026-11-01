@@ -9,6 +9,10 @@ import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
 import PageHeader from '../../src/components/PageHeader';
 import Pills from '../../src/components/Pills';
+import HeroCard from '../../src/components/HeroCard';
+
+const PLAN_IMG = require('../../assets/hero/plan.jpg');
+const STACK_IMG = require('../../assets/hero/stack.jpg');
 import { productImage } from '../../src/lib/images';
 
 const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
@@ -23,7 +27,17 @@ export default function PlanTab() {
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
 
   return (
-    <Screen header={<View style={{ gap: 14 }}><PageHeader kicker="Your plan" title="Plan" subtitle={plain(plan.goal_short).toLowerCase().replace(/^./, (c) => c.toUpperCase())} /><Pills items={TABS} value={tab} onChange={setTab} /></View>}>
+    <Screen header={
+      <View style={{ gap: 18 }}>
+        <PageHeader kicker="Your plan" title="Plan" />
+        {tab === 'Stack'
+          ? <HeroCard image={STACK_IMG} badge="Your stack" title={saved > 0 ? `$${saved}/mo saved` : 'Only what works'}
+              subtitle={`${(plan.stack || []).length} products to take. Everything else, cut.`} />
+          : <HeroCard image={PLAN_IMG} badge="Your goal" title={plain(plan.goal_short)}
+              subtitle={`${plan.kcal} calories · ${plan.protein}g protein · ${plan.steps} steps a day`} />}
+        <Pills items={TABS} value={tab} onChange={setTab} />
+      </View>
+    }>
 
 
       {tab === 'Overview' && (
@@ -33,7 +47,7 @@ export default function PlanTab() {
             <View style={st.grid}>
               <Num v={plan.kcal} l="calories" /><Num v={`${plan.protein} g`} l="protein" />
               {!!plan.fat && <Num v={`${plan.fat} g`} l="fat" />}{!!plan.carbs && <Num v={`${plan.carbs} g`} l="carbs" />}
-              <Num v={plan.steps} l="steps" /><Num v={plan.days || `${plan.train.d.length} days`} l="training" />
+              <Num v={plan.steps} l="steps" /><Num v={`${plan.train.d.length} days`} l="training" />
             </View>
           </Card>
           {!!plan.goal_long && <Card><Text style={ui.label}>Your goal</Text><Body>{plain(plan.goal_long)}</Body></Card>}

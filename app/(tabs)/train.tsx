@@ -7,6 +7,9 @@ import { Body, Card, s as ui } from '../../src/components/ui';
 import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
+import HeroCard from '../../src/components/HeroCard';
+
+const HERO_IMG = require('../../assets/hero/dumbbells.jpg');
 import { CheckIcon } from '../../src/components/icons';
 import { exercises, phaseOf, plain, todayIndex, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';
@@ -30,9 +33,16 @@ export default function Train() {
 
   return (
     <Screen header={
-      <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This week"
-        subtitle={`${doneCount} of ${plan.train.d.length} workouts done`} week={week} />
+      <View style={{ gap: 18 }}>
+        <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This week"
+          subtitle={`${doneCount} of ${plan.train.d.length} workouts done`} week={week} />
+        <HeroCard image={HERO_IMG} badge={`Up next · ${plan.train.d[index].t.split('·')[0].trim()}`}
+          title={(plan.train.d[index].t.split('·')[1] || plan.train.d[index].t).trim()}
+          subtitle={`${plan.train.d[index].x.length} exercises · about 45 min`} cta="Start workout"
+          onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })} />
+      </View>
     }>
+      <Text style={st.listTitle}>All workouts</Text>
       {plan.train.d.map((d, k) => {
         const [name, type] = d.t.split('·').map((x) => x.trim());
         const isDone = done.has(d.t);
@@ -74,5 +84,6 @@ const st = StyleSheet.create({
   dayText: { fontFamily: F.black, fontSize: 13, color: C.white, letterSpacing: 0.5 },
   type: { fontFamily: F.black, fontSize: 20, color: C.white },
   meta: { fontFamily: F.semi, fontSize: 13, color: C.white },
+  listTitle: { fontFamily: F.black, fontSize: 21, color: C.white, marginTop: 8 },
   chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
 });

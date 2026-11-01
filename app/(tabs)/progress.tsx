@@ -11,6 +11,9 @@ import NoPlan from '../../src/components/NoPlan';
 import { daysToSunday, weekOf } from '../../src/lib/program';
 import type { Checkin } from '../../src/lib/types';
 import PageHeader from '../../src/components/PageHeader';
+import HeroCard from '../../src/components/HeroCard';
+
+const HERO_IMG = require('../../assets/hero/progress.jpg');
 
 const W = 320, H = 90;
 
@@ -40,7 +43,15 @@ export default function Progress() {
   const toSunday = daysToSunday();
 
   return (
-    <Screen header={<PageHeader kicker={`Week ${week} of 12`} title="Progress" subtitle="Your trend, not one weigh-in, tells the story." week={week} />}>
+    <Screen header={
+      <View style={{ gap: 18 }}>
+        <PageHeader kicker={`Week ${week} of 12`} title="Progress" subtitle="Your trend, not one weigh-in, tells the story." week={week} />
+        <HeroCard image={HERO_IMG} badge={toSunday === 0 ? 'Check-in is open' : `Check-in in ${toSunday} day${toSunday > 1 ? 's' : ''}`}
+          title={weights.length ? `${latest} lbs` : 'Start your trend'}
+          subtitle={weights.length > 1 ? `${fmt(latest - first)} lbs since you started` : 'Weigh in each morning. Send your average on Sunday.'}
+          cta={toSunday === 0 ? 'Do your check-in' : 'Open check-in'} onPress={() => router.push('/checkin')} />
+      </View>
+    }>
 
       <Card>
         {weights.length ? (
@@ -66,7 +77,7 @@ export default function Progress() {
         )}
       </Card>
 
-      <Button title={toSunday === 0 ? 'Do your Sunday check-in' : `Check-in · Sunday (${toSunday} days)`} onPress={() => router.push('/checkin')} />
+
 
       {[...rows].reverse().map((r) => (
         <Card key={r.id}>

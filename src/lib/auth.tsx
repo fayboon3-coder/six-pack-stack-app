@@ -34,6 +34,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (process.env.EXPO_PUBLIC_DEMO === '1') {
+      // Design preview only: a fake signed-in client with the sample plan.
+      const demo = require('../data/samplePlan.json');
+      setSession({ user: { id: 'demo', email: 'demo@example.com' } } as unknown as Session);
+      setProfile({ id: 'demo', email: 'demo@example.com', first_name: 'Boon', role: 'client', tier: 'coached', start_date: null });
+      setPlan({ ...demo, name: 'Boon', train: { ...demo.train, s: '2026-11-01' } });
+      setLoading(false);
+      return;
+    }
     supabase.auth.getSession().then(async ({ data }) => {
       setSession(data.session);
       await load(data.session);

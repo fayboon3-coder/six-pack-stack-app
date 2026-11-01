@@ -1,19 +1,18 @@
 import React, { useCallback, useState } from 'react';
-import { ImageBackground, Pressable, ScrollView, StyleSheet, Text, View, RefreshControl } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
-import { Card, s as ui } from '../../src/components/ui';
 import NoPlan from '../../src/components/NoPlan';
 import Poster from '../../src/components/Poster';
-import { CheckIcon, FlameIcon, PlayIcon } from '../../src/components/icons';
+import PageHeader from '../../src/components/PageHeader';
+import HeroCard from '../../src/components/HeroCard';
+import { CheckIcon } from '../../src/components/icons';
 import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
-import PageHeader from '../../src/components/PageHeader';
 
 const HERO_IMG = require('../../assets/hero/dumbbells.jpg');
 
@@ -21,7 +20,7 @@ export default function Today() {
   const { profile, plan, session, refresh } = useAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const [doneThisWeek, setDoneThisWeek] = useState(0);
+  const [doneDays, setDoneDays] = useState<Set<string>>(new Set());
   const [taken, setTaken] = useState<Record<string, boolean>>({});
   const today = isoDate();
 
@@ -30,7 +29,7 @@ export default function Today() {
     await flushQueue();
     const sunday = new Date(); sunday.setDate(sunday.getDate() - sunday.getDay());
     const rows = await loggedDays(session.user.id, isoDate(sunday));
-    setDoneThisWeek(new Set(rows.map((r) => r.logged_on)).size);
+    setDoneDays(new Set(rows.map((r) => r.day_label)));
     try { setTaken(JSON.parse((await AsyncStorage.getItem('sps:stack:' + today)) || '{}')); } catch { setTaken({}); }
   }, [session, today]);
 
@@ -43,12 +42,13 @@ export default function Today() {
   const { index, isToday } = todayIndex(plan);
   const day = plan.train.d[index];
   const [dayName, dayType] = day.t.split('·').map((x) => x.trim());
+  const doneToday = doneDays.has(day.t) && isToday;
   const toSunday = daysToSunday();
   const photoWeek = PHOTO_WEEKS.includes(week);
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening';
   const stack = plan.stack || [];
-  const perWeek = plan.train.d.length;
+  const takenCount = stack.filter((x) => taken[x.product]).length;
 
   const toggle = async (k: string) => {
     const next = { ...taken, [k]: !taken[k] };
@@ -56,71 +56,58 @@ export default function Today() {
     await AsyncStorage.setItem('sps:stack:' + today, JSON.stringify(next));
   };
 
+  // The ONE thing to do right now, in order of priority.
+  const checkinDue = toSunday === 0;
+
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.navy }}>
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 40 }}
+      <ScrollView contentContainerStyle={{ paddingBottom: 48 }}
         refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.white}
-          onRefresh={async () => { setRefreshing(true); await refresh(); await load(); setRefreshing(false); }} />}
-      >
-        <PageHeader kicker={`Week ${week} · ${phase.name}`} title={`${greet}, ${plan.name}`} subtitle={isToday ? "Today's a training day. Let's go." : `Rest day. Next workout: ${dayName}.`} week={week} />
-        <View style={{ height: 14 }} />
+          onRefresh={async () => { setRefreshing(true); await refresh(); await load(); setRefreshing(false); }} />}>
 
-        {/* Hero: today's workout */}
-        <Pressable accessibilityRole="button" accessibilityLabel={`${isToday ? 'Start' : 'Preview'} ${day.t}`}
-          onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })} style={st.heroWrap}>
-          <ImageBackground source={HERO_IMG} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
-            <LinearGradient colors={['rgba(13,27,51,0.05)', 'rgba(13,27,51,0.55)', 'rgba(13,27,51,0.97)']} locations={[0, 0.45, 1]} style={[StyleSheet.absoluteFill, { borderRadius: 24 }]} />
-            <View style={st.badge}><Text style={st.badgeText}>{isToday ? "Today's workout" : `Next · ${dayName}`}</Text></View>
-            <View style={{ gap: 6 }}>
-              <Text style={st.heroTitle}>{dayType || dayName}</Text>
-              <Text style={st.heroSub}>{day.x.length} exercises · about 45 min · starts with {exercises[day.x[0][0]]?.name || day.x[0][0]}</Text>
-              <View style={st.heroBtn}>
-                <PlayIcon size={16} />
-                <Text style={st.heroBtnText}>{isToday ? 'Start workout' : 'Preview workout'}</Text>
-              </View>
+        <PageHeader kicker={`Week ${week} of 12 · ${phase.name}`} title={`${greet}, ${plan.name}`} week={week} />
+        <View style={{ height: 18 }} />
+
+        {checkinDue && (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/checkin')} style={st.alert}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={st.alertKicker}>It's Sunday{photoWeek ? ' · photo week' : ''}</Text>
+              <Text style={st.alertTitle}>Do your check-in (2 min)</Text>
             </View>
-          </ImageBackground>
-        </Pressable>
+            <Text style={st.alertArrow}>→</Text>
+          </Pressable>
+        )}
 
-        {/* Scoreboard */}
-        <View style={st.score}>
-          <Score big={`${week}`} small="of 12" label="Week" />
-          <View style={st.div} />
-          <Score big={`${doneThisWeek}`} small={`of ${perWeek}`} label="Workouts" />
-          <View style={st.div} />
-          <Score big={toSunday === 0 ? 'Today' : `${toSunday}`} small={toSunday === 0 ? '' : toSunday === 1 ? 'day' : 'days'} label="Check-in" />
+        <HeroCard
+          image={HERO_IMG}
+          badge={doneToday ? 'Done today ✓' : isToday ? "Today's workout" : `Next workout · ${dayName}`}
+          title={dayType || dayName}
+          subtitle={`${day.x.length} exercises · about 45 min · starts with ${exercises[day.x[0][0]]?.name || day.x[0][0]}`}
+          cta={doneToday ? 'Review workout' : isToday ? 'Start workout' : 'Preview workout'}
+          onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })}
+        />
+
+        <Section title="Hit these today" />
+        <View style={st.targets}>
+          <Target value={plan.kcal} label="Calories" />
+          <Target value={`${plan.protein}g`} label="Protein" />
+          <Target value={plan.steps} label="Steps" />
         </View>
 
-        {/* Targets */}
-        <View style={{ paddingHorizontal: 20 }}>
-          <Card>
-            <Text style={ui.label}>Hit these every day</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Target value={plan.kcal} label="calories" />
-              <Target value={`${plan.protein}g`} label="protein" />
-              <Target value={plan.steps} label="steps" />
-            </View>
-          </Card>
-        </View>
-
-        {/* Stack carousel */}
         {stack.length > 0 && (
           <>
-            <View style={st.rowHead}>
-              <Text style={st.rowTitle}>Your stack today</Text>
-              <Text style={st.rowHint}>Tap when taken</Text>
-            </View>
+            <Section title="Your stack" right={`${takenCount}/${stack.length} taken`} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
               {stack.map((x) => {
                 const k = x.product; const on = !!taken[k];
                 return (
-                  <Pressable key={k} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={k} onPress={() => toggle(k)} style={{ width: 130, gap: 8 }}>
-                    <Poster source={productImage(k)} label={k} size={130}>
-                      <View style={[st.check, on && { backgroundColor: C.green, borderColor: C.green }]}>{on && <CheckIcon size={12} />}</View>
+                  <Pressable key={k} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={`${k}, tap when taken`}
+                    onPress={() => toggle(k)} style={{ width: 140, gap: 8 }}>
+                    <Poster source={productImage(k)} label={k} size={140} style={on ? { borderColor: C.green, borderWidth: 2 } : undefined}>
+                      <View style={[st.check, on && { backgroundColor: C.green, borderColor: C.green }]}>{on && <CheckIcon size={13} />}</View>
                     </Poster>
                     <Text style={st.posterName} numberOfLines={1}>{k.split('(')[0].trim()}</Text>
-                    <Text style={st.posterSub} numberOfLines={1}>{x.dose} · {x.when}</Text>
+                    <Text style={st.posterSub} numberOfLines={1}>{on ? 'Taken ✓' : `${x.dose} · tap when taken`}</Text>
                   </Pressable>
                 );
               })}
@@ -128,76 +115,65 @@ export default function Today() {
           </>
         )}
 
-        {/* Check-in + phase */}
-        <View style={{ paddingHorizontal: 20, gap: 12, marginTop: 20 }}>
-          <Pressable accessibilityRole="button" onPress={() => router.push('/checkin')}>
-            <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 14, borderColor: toSunday === 0 ? C.red : C.line, borderWidth: toSunday === 0 ? 2 : 1 }}>
-              <View style={{ flex: 1, gap: 4 }}>
-                <Text style={ui.label}>Sunday check-in{photoWeek ? ' · photo week' : ''}</Text>
-                <Text style={st.cardTitle}>{toSunday === 0 ? 'Check in now' : `Opens in ${toSunday} day${toSunday > 1 ? 's' : ''}`}</Text>
-              </View>
-              <Text style={st.arrow}>→</Text>
-            </Card>
-          </Pressable>
-          <Pressable accessibilityRole="button" onPress={() => router.push('/boon')}>
-            <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={st.avatar}><Text style={st.avatarText}>B</Text></View>
+        {!checkinDue && (
+          <>
+            <Section title="Coming up" />
+            <Pressable accessibilityRole="button" onPress={() => router.push('/checkin')} style={st.row}>
+              <View style={st.rowIcon}><Text style={st.rowIconText}>{toSunday}</Text></View>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={st.tipTitle}>{week <= 4 ? 'Phase 1: build the habit' : week <= 8 ? 'Phase 2: beat last week' : 'Phase 3: finish strong'}</Text>
-                <Text style={st.tipSub}>{week <= 4 ? plan.phase1 : week <= 8 ? plan.phase2 : plan.phase3}</Text>
+                <Text style={st.rowTitle}>Sunday check-in</Text>
+                <Text style={st.rowSub}>In {toSunday} day{toSunday > 1 ? 's' : ''}{photoWeek ? ' · bring your photos' : ''}</Text>
               </View>
-            </Card>
-          </Pressable>
+              <Text style={st.chev}>›</Text>
+            </Pressable>
+          </>
+        )}
+
+        <View style={st.tip}>
+          <Text style={st.tipKicker}>Boon's focus for {phase.name.toLowerCase()} weeks</Text>
+          <Text style={st.tipText}>{week <= 4 ? plan.phase1 : week <= 8 ? plan.phase2 : plan.phase3}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const Score = ({ big, small, label }: { big: string; small: string; label: string }) => (
-  <View style={{ flex: 1, alignItems: 'center', gap: 2 }}>
-    <Text style={st.scoreBig}>{big}<Text style={st.scoreSmall}>{small ? ` ${small}` : ''}</Text></Text>
-    <Text style={st.scoreLabel}>{label}</Text>
+const Section = ({ title, right }: { title: string; right?: string }) => (
+  <View style={st.section}>
+    <Text style={st.sectionTitle}>{title}</Text>
+    {!!right && <Text style={st.sectionRight}>{right}</Text>}
   </View>
 );
 
 const Target = ({ value, label }: { value: string; label: string }) => (
-  <View style={{ flex: 1, gap: 2 }}>
+  <View style={st.target}>
     <Text style={st.targetVal}>{value}</Text>
     <Text style={st.targetLabel}>{label}</Text>
   </View>
 );
 
 const st = StyleSheet.create({
-  head: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 8, paddingBottom: 14 },
-  greet: { fontFamily: F.black, fontSize: 26, color: C.white },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 999, paddingVertical: 8, paddingHorizontal: 12 },
-  pillText: { fontFamily: F.black, fontSize: 14, color: C.white },
-  heroWrap: { paddingHorizontal: 20 },
-  hero: { height: 340, borderRadius: 24, padding: 20, justifyContent: 'space-between', overflow: 'hidden' },
-  badge: { alignSelf: 'flex-start', backgroundColor: C.red, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
-  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
-  heroTitle: { fontFamily: F.black, fontSize: 40, lineHeight: 42, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  heroSub: { fontFamily: F.bold, fontSize: 13, color: C.white, lineHeight: 18 },
-  heroBtn: { marginTop: 10, height: 54, borderRadius: 14, backgroundColor: C.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  heroBtnText: { fontFamily: F.black, fontSize: 16, color: C.white, textTransform: 'uppercase', letterSpacing: 0.6 },
-  score: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginVertical: 16, paddingVertical: 14, backgroundColor: C.navy2, borderRadius: 18, borderWidth: 1, borderColor: C.line },
-  div: { width: 1, height: 36, backgroundColor: C.line },
-  scoreBig: { fontFamily: F.black, fontSize: 24, color: C.white },
-  scoreSmall: { fontFamily: F.bold, fontSize: 12, color: C.white },
-  scoreLabel: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
+  alert: { marginHorizontal: 20, marginBottom: 14, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.green, borderRadius: 18, padding: 16 },
+  alertKicker: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.navy },
+  alertTitle: { fontFamily: F.black, fontSize: 18, color: C.navy },
+  alertArrow: { fontFamily: F.black, fontSize: 24, color: C.navy },
+  section: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 20, marginTop: 28, marginBottom: 12 },
+  sectionTitle: { fontFamily: F.black, fontSize: 21, color: C.white },
+  sectionRight: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  targets: { flexDirection: 'row', gap: 10, paddingHorizontal: 20 },
+  target: { flex: 1, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, paddingVertical: 16, paddingHorizontal: 12, gap: 2 },
   targetVal: { fontFamily: F.black, fontSize: 22, color: C.white },
-  targetLabel: { fontFamily: F.semi, fontSize: 12, color: C.white },
-  rowHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingHorizontal: 20, marginTop: 22, marginBottom: 12 },
-  rowTitle: { fontFamily: F.black, fontSize: 19, color: C.white },
-  rowHint: { fontFamily: F.bold, fontSize: 12, color: C.white },
-  check: { position: 'absolute', top: 8, right: 8, width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: C.white, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(13,27,51,0.6)' },
-  posterName: { fontFamily: F.xbold, fontSize: 13, color: C.white },
-  posterSub: { fontFamily: F.semi, fontSize: 11, color: C.white },
-  cardTitle: { fontFamily: F.black, fontSize: 18, color: C.white },
-  arrow: { fontFamily: F.black, fontSize: 22, color: C.red2 },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontFamily: F.black, fontSize: 16, color: C.white },
-  tipTitle: { fontFamily: F.xbold, fontSize: 13, color: C.white },
-  tipSub: { fontFamily: F.semi, fontSize: 12, color: C.white, lineHeight: 17 },
+  targetLabel: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  check: { position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: C.white, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(13,27,51,0.6)' },
+  posterName: { fontFamily: F.xbold, fontSize: 14, color: C.white },
+  posterSub: { fontFamily: F.semi, fontSize: 12, color: C.white },
+  row: { marginHorizontal: 20, flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 20, padding: 16 },
+  rowIcon: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  rowIconText: { fontFamily: F.black, fontSize: 18, color: C.white },
+  rowTitle: { fontFamily: F.black, fontSize: 17, color: C.white },
+  rowSub: { fontFamily: F.semi, fontSize: 13, color: C.white },
+  chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
+  tip: { marginHorizontal: 20, marginTop: 28, borderLeftWidth: 4, borderLeftColor: C.red, paddingLeft: 14, gap: 4 },
+  tipKicker: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  tipText: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
 });

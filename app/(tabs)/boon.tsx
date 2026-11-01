@@ -8,6 +8,9 @@ import { Body, Button, Card, Eyebrow, H1, s as ui } from '../../src/components/u
 import Screen from '../../src/components/Screen';
 import { WHATSAPP } from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
+import HeroCard from '../../src/components/HeroCard';
+
+const HERO_IMG = require('../../assets/hero/tested.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -23,13 +26,14 @@ export default function Boon() {
   }, [session]));
 
   return (
-    <Screen header={<PageHeader kicker="Your coach" title="Boon" subtitle="225 to 175 lbs. No sponsors, no affiliate links. Just what works." right={<View />} />}>
-
-      <Card>
-        <Text style={ui.label}>Need me now?</Text>
-        <Body>Text me any time. I answer every message myself.</Body>
-        <Button title="Text Boon on WhatsApp" onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
-      </Card>
+    <Screen header={
+      <View style={{ gap: 18 }}>
+        <PageHeader kicker="Your coach" title="Boon" subtitle="225 to 175 lbs. No sponsors, no affiliate links. Just what works." right={<View />} />
+        <HeroCard image={HERO_IMG} badge="I tested it so you don't have to" title="Ask me anything"
+          subtitle="Stuck, hungry, sore or not sure? Text me. I answer every message myself." cta="Text Boon on WhatsApp"
+          onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
+      </View>
+    }>
 
       <Eyebrow>Your weekly reviews</Eyebrow>
       {reviews.length === 0 && <Body>After your first Sunday check-in, my review for your week shows up here.</Body>}
