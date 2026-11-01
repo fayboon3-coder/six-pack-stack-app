@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
 import { Body, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
@@ -14,15 +14,16 @@ import HeroCard from '../../src/components/HeroCard';
 const PLAN_IMG = require('../../assets/hero/plan.jpg');
 const STACK_IMG = require('../../assets/hero/stack.jpg');
 import { productImage } from '../../src/lib/images';
+import { mealImage } from '../../src/lib/meals';
 
-const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
+const TABS = ['Stack', 'Meals', 'Eating out', 'Groceries', 'Overview'] as const;
 type Tab = (typeof TABS)[number];
 
 const VERDICT_COLOR: Record<string, string> = { CUT: C.red, KEEP: C.green, SWAP: '#ffffff', ADD: C.green };
 
 export default function PlanTab() {
   const { plan, profile } = useAuth();
-  const [tab, setTab] = useState<Tab>('Overview');
+  const [tab, setTab] = useState<Tab>('Stack');
   if (!plan) return <NoPlan name={profile?.first_name} />;
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
 
@@ -124,6 +125,7 @@ export default function PlanTab() {
               <View style={{ gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
+                  <FoodPhoto source={mealImage(o.name, o.detail)} />
                   <Text style={st.optName}>{o.name}</Text>
                   <Body style={{ fontSize: 13 }}>{o.detail}</Body>
                   <Text style={st.macro}>{o.kcal} cal · {o.protein} protein</Text>
@@ -137,6 +139,7 @@ export default function PlanTab() {
 
       {tab === 'Eating out' && (plan.eat_out || []).map((e, k) => (
         <Card key={k}>
+          <FoodPhoto source={mealImage(e.where, e.order)} />
           <Text style={st.item}>{e.where}</Text>
           <Body style={{ fontSize: 14 }}>{e.order}</Body>
           <Text style={st.macro}>{e.kcal} cal · {e.protein} protein</Text>
@@ -149,6 +152,14 @@ export default function PlanTab() {
     </Screen>
   );
 }
+
+/** Full-width food photo with rounded corners (hidden if we have no photo for it). */
+const FoodPhoto = ({ source }: { source: ReturnType<typeof mealImage> }) =>
+  source ? (
+    <View style={st.photo}>
+      <Image source={source} resizeMode="cover" accessibilityIgnoresInvertColors style={{ width: '100%', height: '100%' }} />
+    </View>
+  ) : null;
 
 const Num = ({ v, l }: { v: string; l: string }) => (
   <View style={{ width: '31%', gap: 2 }}><Text style={st.num}>{v}</Text><Text style={st.numL}>{l}</Text></View>
@@ -167,7 +178,8 @@ const st = StyleSheet.create({
   buy: { alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 10, backgroundColor: C.red, justifyContent: 'center' },
   buyText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase' },
   pill: { fontFamily: F.black, fontSize: 11, letterSpacing: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden', alignSelf: 'flex-start' },
-  option: { borderTopWidth: 1, borderTopColor: C.line, paddingTop: 10, gap: 4 },
+  option: { borderTopWidth: 1, borderTopColor: C.line, paddingTop: 14, gap: 4 },
+  photo: { width: '100%', aspectRatio: 16 / 10, borderRadius: 14, overflow: 'hidden', marginBottom: 8, backgroundColor: C.navy },
   optName: { fontFamily: F.xbold, fontSize: 15, color: C.white },
   macro: { fontFamily: F.xbold, fontSize: 12, color: C.green },
 });

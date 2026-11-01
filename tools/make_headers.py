@@ -132,11 +132,19 @@ def coach(out, kicker, word, tagline):
     """Boon tab: his cutout on the right, text on the left."""
     import numpy as np
     img = background(cx=0.68).convert('RGBA')
-    disc = Image.new('RGBA', (W, H), (0, 0, 0, 0))
-    ImageDraw.Draw(disc).ellipse([740, 60, 1160, 480], fill=RED + (255,))
-    img.alpha_composite(disc)
     cut = Image.open(SP + 'boon_cut.png').convert('RGBA')
     cut = cut.crop(cut.getbbox())
+    arr = np.array(cut).astype(int)
+    a = arr[..., 3]
+    edge = (a < 250) & (arr[..., 0] > arr[..., 1] + 40)
+    arr[..., 3] = np.where(edge, (a * 0.35).astype(int), a)
+    soft = a < 140
+    lim = (arr[..., 1] + arr[..., 2]) // 2 + 35
+    arr[..., 0] = np.where(soft, np.minimum(arr[..., 0], lim), arr[..., 0])
+    from PIL import ImageFilter as _F
+    cut = Image.fromarray(arr.astype('uint8'))
+    al = cut.getchannel('A').filter(_F.MinFilter(3))
+    cut.putalpha(al)
     s = 480 / cut.height; cut = cut.resize((int(cut.width * s), 480), Image.LANCZOS)
     g = Image.linear_gradient('L').resize(cut.size).point(lambda v: 255 if v < 170 else max(0, 255 - (v - 170) * 3))
     cut.putalpha(Image.fromarray(np.minimum(np.array(cut.getchannel('A')), np.array(g))))
