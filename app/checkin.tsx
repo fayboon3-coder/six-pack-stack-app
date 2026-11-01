@@ -9,6 +9,8 @@ import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1, s as ui } from '../src/components/ui';
 import { BackIcon, PlusIcon } from '../src/components/icons';
 import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
+import Banner from '../src/components/Banner';
+import { PHOTO } from '../src/lib/photos';
 
 type Angle = 'front' | 'side' | 'back';
 
@@ -92,16 +94,16 @@ export default function CheckinScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} style={{ width: 44, height: 44, justifyContent: 'center' }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+          <Banner uri={PHOTO.checkin} eyebrow={`Week ${week}${photoWeek ? ' · Photo week' : ''}`} title="Sunday check-in" height={260}>
+            <Text style={st.hint}>Two minutes. Boon reviews every answer.</Text>
+          </Banner>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} style={st.close}>
             <BackIcon />
           </Pressable>
-          <View style={{ gap: 4 }}>
-            <Eyebrow>Week {week}{photoWeek ? ' · Photo week' : ''}</Eyebrow>
-            <H1 style={{ textTransform: 'uppercase' }}>Sunday check-in</H1>
-          </View>
+          <View style={{ padding: 20, paddingTop: 4, gap: 18 }}>
 
           <Field label="Weight (7-day average, lbs)" value={weight} onChange={(t) => setWeight(t.replace(/[^\d.]/g, ''))} kb="decimal-pad" placeholder="e.g. 196.4" />
           <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -137,6 +139,7 @@ export default function CheckinScreen() {
           <Field label="Questions for Boon" value={questions} onChange={setQuestions} placeholder="Optional" multiline />
 
           <Button title="Send check-in" onPress={submit} loading={busy} />
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -150,4 +153,5 @@ const st = StyleSheet.create({
   photo: { flex: 1, height: 110, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center', gap: 6, overflow: 'hidden' },
   hint: { fontFamily: F.semi, fontSize: 12, color: C.white, lineHeight: 17 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  close: { position: 'absolute', top: 12, left: 12, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(13,27,51,0.7)', alignItems: 'center', justifyContent: 'center' },
 });

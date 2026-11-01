@@ -7,6 +7,8 @@ import { C, F } from '../../src/lib/theme';
 import { Body, Button, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
 import Screen from '../../src/components/Screen';
 import { WHATSAPP } from '../../src/components/NoPlan';
+import Banner from '../../src/components/Banner';
+import { PHOTO } from '../../src/lib/photos';
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -22,14 +24,11 @@ export default function Boon() {
   }, [session]));
 
   return (
-    <Screen>
-      <View style={st.head}>
-        <View style={st.avatar}><Text style={st.avatarText}>B</Text></View>
-        <View style={{ gap: 2 }}>
-          <H1 style={{ fontSize: 22 }}>Boon</H1>
-          <Text style={st.sub}>Your coach</Text>
-        </View>
-      </View>
+    <Screen header={
+      <Banner uri={PHOTO.coach} eyebrow="Your coach" title="Boon" height={300}>
+        <Text style={st.sub}>225 to 175 lbs. No sponsors, no affiliate links. Just what works.</Text>
+      </Banner>
+    }>
 
       <Card>
         <Text style={ui.label}>Need me now?</Text>

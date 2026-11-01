@@ -12,7 +12,8 @@ import Poster from '../../src/components/Poster';
 import { CheckIcon, FlameIcon, PlayIcon } from '../../src/components/icons';
 import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
-import { IMG, productImage } from '../../src/lib/images';
+import { productImage } from '../../src/lib/images';
+import { dayPhoto } from '../../src/lib/photos';
 
 export default function Today() {
   const { profile, plan, session, refresh } = useAuth();
@@ -74,7 +75,7 @@ export default function Today() {
         {/* Hero: today's workout */}
         <Pressable accessibilityRole="button" accessibilityLabel={`${isToday ? 'Start' : 'Preview'} ${day.t}`}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })} style={st.heroWrap}>
-          <ImageBackground source={IMG.dumbbells} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
+          <ImageBackground source={{ uri: dayPhoto(day.t) }} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
             <LinearGradient colors={['rgba(13,27,51,0.05)', 'rgba(13,27,51,0.55)', 'rgba(13,27,51,0.97)']} locations={[0, 0.45, 1]} style={[StyleSheet.absoluteFill, { borderRadius: 24 }]} />
             <View style={st.badge}><Text style={st.badgeText}>{isToday ? "Today's workout" : `Next · ${dayName}`}</Text></View>
             <View style={{ gap: 6 }}>

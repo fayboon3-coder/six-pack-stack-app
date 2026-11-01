@@ -9,6 +9,8 @@ import NoPlan from '../../src/components/NoPlan';
 import { CheckIcon, PlayIcon } from '../../src/components/icons';
 import { exercises, phaseOf, plain, todayIndex, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';
+import Banner from '../../src/components/Banner';
+import { dayPhoto, PHOTO } from '../../src/lib/photos';
 
 export default function Train() {
   const { plan, profile, session } = useAuth();
@@ -26,11 +28,7 @@ export default function Train() {
   const { index } = todayIndex(plan);
 
   return (
-    <Screen>
-      <View style={{ gap: 4, marginTop: 8 }}>
-        <Eyebrow>Week {week} · {phaseOf(week).name}</Eyebrow>
-        <H1>Your program</H1>
-      </View>
+    <Screen header={<Banner uri={PHOTO.gym} eyebrow={`Week ${week} · ${phaseOf(week).name}`} title="Your program" height={280} />}>
       {!!plan.train.note && (
         <Card style={{ borderColor: C.red }}>
           <Text style={ui.label}>Note from Boon</Text>
@@ -44,18 +42,21 @@ export default function Train() {
         return (
           <Pressable key={k} accessibilityRole="button" accessibilityLabel={`${d.t}, ${d.x.length} exercises${isDone ? ', done this week' : ''}`}
             onPress={() => router.push({ pathname: '/workout', params: { d: String(k) } })}>
-            <Card style={isNext ? { borderColor: C.red, borderWidth: 2 } : undefined}>
-              <View style={st.row}>
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text style={ui.label}>{name}</Text>
-                  <Text style={st.type}>{type || name}</Text>
+            <Card style={isNext ? { padding: 0, overflow: 'hidden', borderColor: C.red, borderWidth: 2 } : { padding: 0, overflow: 'hidden' }}>
+              <Banner uri={dayPhoto(d.t)} height={170}>
+                <View style={st.row}>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={ui.label}>{name}{isNext ? ' · up next' : ''}</Text>
+                    <Text style={st.type}>{type || name}</Text>
+                  </View>
+                  {isDone ? (
+                    <View style={[st.badge, { backgroundColor: C.green }]}><CheckIcon /></View>
+                  ) : (
+                    <View style={[st.badge, { backgroundColor: C.red }]}><PlayIcon size={14} /></View>
+                  )}
                 </View>
-                {isDone ? (
-                  <View style={[st.badge, { backgroundColor: C.green }]}><CheckIcon /></View>
-                ) : (
-                  <View style={[st.badge, { backgroundColor: isNext ? C.red : C.navy }]}><PlayIcon size={14} /></View>
-                )}
-              </View>
+              </Banner>
+              <View style={{ padding: 16, paddingTop: 4, gap: 10 }}>
               <View style={st.thumbs}>
                 {d.x.slice(0, 4).map((x, j) => {
                   const v = exercises[x[0]]?.video;
@@ -63,6 +64,7 @@ export default function Train() {
                 })}
               </View>
               <Text style={st.list} numberOfLines={2}>{d.x.map((x) => exercises[x[0]]?.name || x[0]).join(' · ')}</Text>
+              </View>
             </Card>
           </Pressable>
         );

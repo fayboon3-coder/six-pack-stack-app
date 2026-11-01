@@ -7,10 +7,16 @@ import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
 import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
+import Banner from '../../src/components/Banner';
+import { mealPhoto, PHOTO } from '../../src/lib/photos';
 import { productImage } from '../../src/lib/images';
 
 const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
 type Tab = (typeof TABS)[number];
+
+const TAB_PHOTO: Record<Tab, string> = {
+  Overview: PHOTO.plan, Stack: PHOTO.stack, Meals: PHOTO.lunch, 'Eating out': PHOTO.eatOut, Groceries: PHOTO.grocery,
+};
 
 const VERDICT_COLOR: Record<string, string> = { CUT: C.red, KEEP: C.green, SWAP: '#ffffff', ADD: C.green };
 
@@ -21,11 +27,7 @@ export default function PlanTab() {
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
 
   return (
-    <Screen>
-      <View style={{ gap: 4, marginTop: 8 }}>
-        <Eyebrow>Your plan</Eyebrow>
-        <H1>{plain(plan.goal_short)}</H1>
-      </View>
+    <Screen header={<Banner uri={TAB_PHOTO[tab]} eyebrow="Your plan" title={plain(plan.goal_short)} height={300} />}>
 
       <View style={st.tabs} accessibilityRole="tablist">
         {TABS.map((t) => (
@@ -111,12 +113,11 @@ export default function PlanTab() {
         <>
           {!!plan.meal_note && <Body>{plain(plan.meal_note)}</Body>}
           {(plan.meals || []).map((m, k) => (
-            <Card key={k}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={st.item}>{m.slot}</Text>
-                <Text style={[ui.label, { color: C.red2 }]}>Pick one</Text>
-              </View>
-              <Body style={{ fontSize: 12 }}>{m.target}</Body>
+            <Card key={k} style={{ padding: 0, overflow: 'hidden' }}>
+              <Banner uri={mealPhoto(m.slot)} height={160} eyebrow="Pick one" title={m.slot}>
+                <Text style={[ui.label, { textTransform: 'none', letterSpacing: 0 }]}>{m.target}</Text>
+              </Banner>
+              <View style={{ padding: 16, paddingTop: 0, gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
                   <Text style={st.optName}>{o.name}</Text>
@@ -124,6 +125,7 @@ export default function PlanTab() {
                   <Text style={st.macro}>{o.kcal} cal · {o.protein} protein</Text>
                 </View>
               ))}
+              </View>
             </Card>
           ))}
         </>

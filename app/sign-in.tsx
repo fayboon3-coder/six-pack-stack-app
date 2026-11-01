@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
+import Banner from '../src/components/Banner';
+import { PHOTO } from '../src/lib/photos';
 
 export default function SignIn() {
   const [mode, setMode] = useState<'in' | 'up'>('in');
@@ -42,14 +44,17 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={st.wrap} keyboardShouldPersistTaps="handled">
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <View style={st.dot} />
-            <Text style={st.brand}>Six-Pack Stack</Text>
-          </View>
-          <View style={{ gap: 10, marginTop: 36 }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+          <Banner uri={PHOTO.signIn} height={300}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <View style={st.dot} />
+              <Text style={st.brand}>Six-Pack Stack</Text>
+            </View>
+          </Banner>
+          <View style={st.wrap}>
+          <View style={{ gap: 10 }}>
             <Eyebrow>{mode === 'in' ? 'Welcome back' : 'Welcome'}</Eyebrow>
             <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
               {mode === 'in' ? 'Sign in to your plan.' : 'Create your account.'}
@@ -78,6 +83,7 @@ export default function SignIn() {
               </Pressable>
             )}
           </View>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -85,7 +91,7 @@ export default function SignIn() {
 }
 
 const st = StyleSheet.create({
-  wrap: { paddingHorizontal: 22, paddingTop: 24, paddingBottom: 40 },
+  wrap: { paddingHorizontal: 22, paddingTop: 4 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.red },
   brand: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: C.white },
   sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
