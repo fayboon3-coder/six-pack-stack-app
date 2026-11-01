@@ -100,7 +100,7 @@ create policy update_own_profile on public.profiles for update using (id = auth.
 create or replace function public.guard_profile() returns trigger
 language plpgsql security definer set search_path = public as $$
 begin
-  if coalesce(auth.role(), '') <> 'service_role' and not public.is_coach()
+  if auth.uid() is not null and not public.is_coach()
      and (new.role is distinct from old.role or new.tier is distinct from old.tier) then
     raise exception 'role and tier can only be changed by the coach';
   end if;
