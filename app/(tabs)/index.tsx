@@ -13,7 +13,9 @@ import { CheckIcon, FlameIcon, PlayIcon } from '../../src/components/icons';
 import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
-import { dayPhoto } from '../../src/lib/photos';
+import PageHeader from '../../src/components/PageHeader';
+
+const HERO_IMG = require('../../assets/hero/dumbbells.jpg');
 
 export default function Today() {
   const { profile, plan, session, refresh } = useAuth();
@@ -61,21 +63,13 @@ export default function Today() {
         refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.white}
           onRefresh={async () => { setRefreshing(true); await refresh(); await load(); setRefreshing(false); }} />}
       >
-        <View style={st.head}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={[ui.eyebrow, { color: C.red2 }]}>Week {week} · {phase.name}</Text>
-            <Text style={st.greet}>{greet}, {plan.name}</Text>
-          </View>
-          <View style={st.pill} accessibilityLabel={`${doneThisWeek} of ${perWeek} workouts this week`}>
-            <FlameIcon />
-            <Text style={st.pillText}>{doneThisWeek}/{perWeek}</Text>
-          </View>
-        </View>
+        <PageHeader kicker={`Week ${week} · ${phase.name}`} title={`${greet}, ${plan.name}`} subtitle={isToday ? "Today's a training day. Let's go." : `Rest day. Next workout: ${dayName}.`} week={week} />
+        <View style={{ height: 14 }} />
 
         {/* Hero: today's workout */}
         <Pressable accessibilityRole="button" accessibilityLabel={`${isToday ? 'Start' : 'Preview'} ${day.t}`}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })} style={st.heroWrap}>
-          <ImageBackground source={typeof dayPhoto(day.t) === 'number' ? (dayPhoto(day.t) as number) : { uri: dayPhoto(day.t) as string }} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
+          <ImageBackground source={HERO_IMG} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
             <LinearGradient colors={['rgba(13,27,51,0.05)', 'rgba(13,27,51,0.55)', 'rgba(13,27,51,0.97)']} locations={[0, 0.45, 1]} style={[StyleSheet.absoluteFill, { borderRadius: 24 }]} />
             <View style={st.badge}><Text style={st.badgeText}>{isToday ? "Today's workout" : `Next · ${dayName}`}</Text></View>
             <View style={{ gap: 6 }}>

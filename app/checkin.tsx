@@ -9,8 +9,6 @@ import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1, s as ui } from '../src/components/ui';
 import { BackIcon, PlusIcon } from '../src/components/icons';
 import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
-import Banner from '../src/components/Banner';
-import { PHOTO } from '../src/lib/photos';
 
 type Angle = 'front' | 'side' | 'back';
 
@@ -94,15 +92,19 @@ export default function CheckinScreen() {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <Banner uri={PHOTO.checkin} eyebrow={`Week ${week}${photoWeek ? ' · Photo week' : ''}`} title="Sunday check-in" height={260}>
+          <View style={st.topRow}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} style={st.close}>
+              <BackIcon />
+            </Pressable>
+          </View>
+          <View style={{ paddingHorizontal: 20, gap: 6 }}>
+            <Text style={st.kicker}>Week {week}{photoWeek ? ' · Photo week' : ''}</Text>
+            <Text style={st.title} accessibilityRole="header">Sunday check-in</Text>
             <Text style={st.hint}>Two minutes. Boon reviews every answer.</Text>
-          </Banner>
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} style={st.close}>
-            <BackIcon />
-          </Pressable>
+          </View>
           <View style={{ padding: 20, paddingTop: 4, gap: 18 }}>
 
           <Field label="Weight (7-day average, lbs)" value={weight} onChange={(t) => setWeight(t.replace(/[^\d.]/g, ''))} kb="decimal-pad" placeholder="e.g. 196.4" />
@@ -153,5 +155,8 @@ const st = StyleSheet.create({
   photo: { flex: 1, height: 110, borderRadius: 14, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center', gap: 6, overflow: 'hidden' },
   hint: { fontFamily: F.semi, fontSize: 12, color: C.white, lineHeight: 17 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  close: { position: 'absolute', top: 12, left: 12, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(13,27,51,0.7)', alignItems: 'center', justifyContent: 'center' },
+  topRow: { paddingHorizontal: 12, paddingTop: 4 },
+  close: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center' },
+  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.white, letterSpacing: -0.6 },
 });

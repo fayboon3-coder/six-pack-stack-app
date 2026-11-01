@@ -1,16 +1,15 @@
 import React, { useCallback, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
-import { Body, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
+import { Body, Card, s as ui } from '../../src/components/ui';
 import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
-import { CheckIcon, PlayIcon } from '../../src/components/icons';
+import PageHeader from '../../src/components/PageHeader';
+import { CheckIcon } from '../../src/components/icons';
 import { exercises, phaseOf, plain, todayIndex, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';
-import Banner from '../../src/components/Banner';
-import { dayPhoto, PHOTO } from '../../src/lib/photos';
 
 export default function Train() {
   const { plan, profile, session } = useAuth();
@@ -25,59 +24,55 @@ export default function Train() {
 
   if (!plan) return <NoPlan name={profile?.first_name} />;
   const week = weekOf(plan.train.s);
+  const phase = phaseOf(week);
   const { index } = todayIndex(plan);
+  const doneCount = plan.train.d.filter((d) => done.has(d.t)).length;
 
   return (
-    <Screen header={<Banner uri={PHOTO.gym} eyebrow={`Week ${week} · ${phaseOf(week).name}`} title="Your program" height={280} />}>
+    <Screen header={
+      <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This week"
+        subtitle={`${doneCount} of ${plan.train.d.length} workouts done`} week={week} />
+    }>
+      {plan.train.d.map((d, k) => {
+        const [name, type] = d.t.split('·').map((x) => x.trim());
+        const isDone = done.has(d.t);
+        const isNext = k === index && !isDone;
+        return (
+          <Pressable key={k} accessibilityRole="button"
+            accessibilityLabel={`${d.t}, ${d.x.length} exercises${isDone ? ', done this week' : ''}`}
+            onPress={() => router.push({ pathname: '/workout', params: { d: String(k) } })}
+            style={({ pressed }) => [st.row, isNext && st.rowNext, pressed && { opacity: 0.85 }]}>
+            <View style={[st.day, isDone ? { backgroundColor: C.green, borderColor: C.green } : isNext ? { backgroundColor: C.red, borderColor: C.red } : null]}>
+              {isDone ? <CheckIcon size={18} /> : <Text style={st.dayText}>{name.slice(0, 3).toUpperCase()}</Text>}
+            </View>
+            <View style={{ flex: 1, gap: 3, minWidth: 0 }}>
+              {isNext && <Text style={[ui.label, { color: C.red2 }]}>Up next</Text>}
+              <Text style={st.type}>{type || name}</Text>
+              <Text style={st.meta} numberOfLines={1}>
+                {d.x.length} exercises · ~45 min · {exercises[d.x[0][0]]?.name || d.x[0][0]}
+              </Text>
+            </View>
+            <Text style={st.chev}>›</Text>
+          </Pressable>
+        );
+      })}
+
       {!!plan.train.note && (
-        <Card style={{ borderColor: C.red }}>
+        <Card style={{ marginTop: 8 }}>
           <Text style={ui.label}>Note from Boon</Text>
           <Body>{plain(plan.train.note)}</Body>
         </Card>
       )}
-      {plan.train.d.map((d, k) => {
-        const [name, type] = d.t.split('·').map((x) => x.trim());
-        const isDone = done.has(d.t);
-        const isNext = k === index;
-        return (
-          <Pressable key={k} accessibilityRole="button" accessibilityLabel={`${d.t}, ${d.x.length} exercises${isDone ? ', done this week' : ''}`}
-            onPress={() => router.push({ pathname: '/workout', params: { d: String(k) } })}>
-            <Card style={isNext ? { padding: 0, overflow: 'hidden', borderColor: C.red, borderWidth: 2 } : { padding: 0, overflow: 'hidden' }}>
-              <Banner uri={dayPhoto(d.t)} height={170}>
-                <View style={st.row}>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={ui.label}>{name}{isNext ? ' · up next' : ''}</Text>
-                    <Text style={st.type}>{type || name}</Text>
-                  </View>
-                  {isDone ? (
-                    <View style={[st.badge, { backgroundColor: C.green }]}><CheckIcon /></View>
-                  ) : (
-                    <View style={[st.badge, { backgroundColor: C.red }]}><PlayIcon size={14} /></View>
-                  )}
-                </View>
-              </Banner>
-              <View style={{ padding: 16, paddingTop: 4, gap: 10 }}>
-              <View style={st.thumbs}>
-                {d.x.slice(0, 4).map((x, j) => {
-                  const v = exercises[x[0]]?.video;
-                  return v ? <Image key={j} source={{ uri: `https://i.ytimg.com/vi/${v}/mqdefault.jpg` }} style={st.thumb} accessibilityIgnoresInvertColors /> : null;
-                })}
-              </View>
-              <Text style={st.list} numberOfLines={2}>{d.x.map((x) => exercises[x[0]]?.name || x[0]).join(' · ')}</Text>
-              </View>
-            </Card>
-          </Pressable>
-        );
-      })}
     </Screen>
   );
 }
 
 const st = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  type: { fontFamily: F.black, fontSize: 22, color: C.white, textTransform: 'uppercase' },
-  badge: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  list: { fontFamily: F.semi, fontSize: 13, color: C.white, lineHeight: 19 },
-  thumbs: { flexDirection: 'row', gap: 6 },
-  thumb: { flex: 1, aspectRatio: 16 / 9, borderRadius: 8, backgroundColor: C.navy },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 20, padding: 16, minHeight: 88 },
+  rowNext: { borderColor: C.red, borderWidth: 2 },
+  day: { width: 52, height: 52, borderRadius: 26, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  dayText: { fontFamily: F.black, fontSize: 13, color: C.white, letterSpacing: 0.5 },
+  type: { fontFamily: F.black, fontSize: 20, color: C.white },
+  meta: { fontFamily: F.semi, fontSize: 13, color: C.white },
+  chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
 });

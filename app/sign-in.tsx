@@ -4,8 +4,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
-import Banner from '../src/components/Banner';
-import { PHOTO } from '../src/lib/photos';
 
 export default function SignIn() {
   const [mode, setMode] = useState<'in' | 'up'>('in');
@@ -44,15 +42,13 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <Banner uri={PHOTO.signIn} height={300}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <View style={st.dot} />
-              <Text style={st.brand}>Six-Pack Stack</Text>
-            </View>
-          </Banner>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 22, paddingTop: 24, paddingBottom: 40 }}>
+            <View style={st.dot} />
+            <Text style={st.brand}>Six-Pack Stack</Text>
+          </View>
           <View style={st.wrap}>
           <View style={{ gap: 10 }}>
             <Eyebrow>{mode === 'in' ? 'Welcome back' : 'Welcome'}</Eyebrow>

@@ -9,14 +9,14 @@ export default function Screen({ children, onRefresh, refreshing = false, style,
   header?: React.ReactNode;
 }) {
   return (
-    <SafeAreaView edges={header ? [] : ['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.navy }}>
       {scroll ? (
         <ScrollView
           contentContainerStyle={{ paddingBottom: 40 }}
           refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.white} /> : undefined}
         >
           {header}
-          <View style={[{ padding: 20, paddingTop: header ? 4 : 20, gap: 16 }, style]}>{children}</View>
+          <View style={[{ padding: 20, paddingTop: header ? 12 : 20, gap: 16 }, style]}>{children}</View>
         </ScrollView>
       ) : (
         <View style={[{ flex: 1, padding: 20, gap: 16 }, style]}>{children}</View>

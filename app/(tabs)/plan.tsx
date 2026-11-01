@@ -7,17 +7,12 @@ import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
 import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
-import Banner from '../../src/components/Banner';
-import { foodsIn, mealFoods, PHOTO, type Pic } from '../../src/lib/photos';
-import FoodRow from '../../src/components/FoodRow';
+import PageHeader from '../../src/components/PageHeader';
+import Pills from '../../src/components/Pills';
 import { productImage } from '../../src/lib/images';
 
 const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
 type Tab = (typeof TABS)[number];
-
-const TAB_PHOTO: Record<Tab, Pic> = {
-  Overview: PHOTO.plan, Stack: PHOTO.stack, Meals: PHOTO.meals, 'Eating out': PHOTO.eatOut, Groceries: PHOTO.grocery,
-};
 
 const VERDICT_COLOR: Record<string, string> = { CUT: C.red, KEEP: C.green, SWAP: '#ffffff', ADD: C.green };
 
@@ -28,16 +23,8 @@ export default function PlanTab() {
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
 
   return (
-    <Screen header={<Banner uri={TAB_PHOTO[tab]} eyebrow="Your plan" title={plain(plan.goal_short)} height={300} />}>
+    <Screen header={<View style={{ gap: 14 }}><PageHeader kicker="Your plan" title="Plan" subtitle={plain(plan.goal_short).toLowerCase().replace(/^./, (c) => c.toUpperCase())} /><Pills items={TABS} value={tab} onChange={setTab} /></View>}>
 
-      <View style={st.tabs} accessibilityRole="tablist">
-        {TABS.map((t) => (
-          <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: tab === t }} onPress={() => setTab(t)}
-            style={[st.tab, tab === t && { backgroundColor: C.red, borderColor: C.red }]}>
-            <Text style={st.tabText}>{t}</Text>
-          </Pressable>
-        ))}
-      </View>
 
       {tab === 'Overview' && (
         <>
@@ -120,7 +107,6 @@ export default function PlanTab() {
                 <Text style={[ui.label, { color: C.red2 }]}>Pick one</Text>
               </View>
               <Body style={{ fontSize: 12 }}>{m.target}</Body>
-              <FoodRow items={mealFoods(m.slot)} />
               <View style={{ gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
@@ -140,12 +126,11 @@ export default function PlanTab() {
           <Text style={st.item}>{e.where}</Text>
           <Body style={{ fontSize: 14 }}>{e.order}</Body>
           <Text style={st.macro}>{e.kcal} cal · {e.protein} protein</Text>
-          <FoodRow items={foodsIn(e.where + ' ' + e.order, 3)} size={72} />
         </Card>
       ))}
 
       {tab === 'Groceries' && (plan.grocery || []).map((g, k) => (
-        <Card key={k}><Text style={ui.label}>{g.aisle}</Text><FoodRow items={foodsIn(g.items, 5)} size={80} /><Body>{g.items}</Body></Card>
+        <Card key={k}><Text style={ui.label}>{g.aisle}</Text><Body>{g.items}</Body></Card>
       ))}
     </Screen>
   );

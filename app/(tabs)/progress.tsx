@@ -10,8 +10,7 @@ import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
 import { daysToSunday, weekOf } from '../../src/lib/program';
 import type { Checkin } from '../../src/lib/types';
-import Banner from '../../src/components/Banner';
-import { PHOTO } from '../../src/lib/photos';
+import PageHeader from '../../src/components/PageHeader';
 
 const W = 320, H = 90;
 
@@ -41,7 +40,7 @@ export default function Progress() {
   const toSunday = daysToSunday();
 
   return (
-    <Screen header={<Banner uri={PHOTO.progress} eyebrow={`Week ${week} of 12`} title="Your progress" height={280} />}>
+    <Screen header={<PageHeader kicker={`Week ${week} of 12`} title="Progress" subtitle="Your trend, not one weigh-in, tells the story." week={week} />}>
 
       <Card>
         {weights.length ? (
