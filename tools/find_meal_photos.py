@@ -54,12 +54,23 @@ Q = {
  'pizza': 'thin crust pizza slice', 'burger_salad': 'burger side salad', 'beer': 'light beer glass bar', 'oats': 'oatmeal bowl',
  'burrito_bowl': 'chicken burrito bowl', 'latte': 'latte coffee cup', 'salad_chicken': 'chicken salad bowl',
 }
+import sys
+extra = json.load(open('tools/meal_urls.json')) if os.path.exists('tools/meal_urls.json') else {}
+for name, url in extra.items():
+    save(name, url)
 for k, q in Q.items():
-    try:
-        d = json.loads(get('https://unsplash.com/napi/search/photos?per_page=6&orientation=landscape&query=' + urllib.parse.quote(q), {'Accept': 'application/json'}))
-        for i, r in enumerate([r for r in d['results'] if not r.get('premium') and not r.get('plus')][:4]):
-            save(f'{k}_{i}.jpg', r['urls']['raw'] + '&w=1200&h=700&fit=crop&q=80')
-            log.write(f'  credit {k}_{i}: {r["user"]["name"]} {r["links"]["html"]}\n')
+    n = 0
+    try:  # Openverse (CC-licensed photos, mostly Flickr)
+        d = json.loads(get('https://api.openverse.org/v1/images/?page_size=8&license_type=commercial&aspect_ratio=wide&size=large&q=' + urllib.parse.quote(q), {'Accept': 'application/json'}))
+        for r in d.get('results', [])[:5]:
+            save(f'{k}_o{n}.jpg', r['url']); log.write(f'  credit {k}_o{n}: {r.get("creator")} {r.get("license")} {r.get("foreign_landing_url")}\n'); n += 1
     except Exception as e:
-        log.write(f'FAIL unsplash {k} {e}\n')
+        log.write(f'FAIL openverse {k} {e}\n')
+    try:  # Wikimedia Commons
+        d = json.loads(get('https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=1200&gsrsearch=' + urllib.parse.quote(q + ' filetype:bitmap')))
+        for pg in list(d.get('query', {}).get('pages', {}).values())[:4]:
+            ii = pg['imageinfo'][0]
+            save(f'{k}_w{n}.jpg', ii.get('thumburl') or ii['url']); log.write(f'  credit {k}_w{n}: {ii["descriptionurl"]}\n'); n += 1
+    except Exception as e:
+        log.write(f'FAIL commons {k} {e}\n')
 log.close()
