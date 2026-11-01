@@ -170,7 +170,7 @@ const st = StyleSheet.create({
   progress: { flexDirection: 'row', gap: 4, paddingHorizontal: 20, paddingTop: 8 },
   seg: { flex: 1, height: 4, borderRadius: 2 },
   video: { height: 200, borderRadius: 20, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  shade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(13,27,51,0.35)' },
+  shade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(13,27,51,0.35)' },
   videoLabel: { position: 'absolute', left: 14, bottom: 12, backgroundColor: 'rgba(13,27,51,0.85)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden' },
   play: { width: 58, height: 58, borderRadius: 29, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   exName: { fontFamily: F.black, fontSize: 24, color: C.white },
