@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
@@ -56,6 +56,12 @@ export default function Train() {
                   <View style={[st.badge, { backgroundColor: isNext ? C.red : C.navy }]}><PlayIcon size={14} /></View>
                 )}
               </View>
+              <View style={st.thumbs}>
+                {d.x.slice(0, 4).map((x, j) => {
+                  const v = exercises[x[0]]?.video;
+                  return v ? <Image key={j} source={{ uri: `https://i.ytimg.com/vi/${v}/mqdefault.jpg` }} style={st.thumb} accessibilityIgnoresInvertColors /> : null;
+                })}
+              </View>
               <Text style={st.list} numberOfLines={2}>{d.x.map((x) => exercises[x[0]]?.name || x[0]).join(' · ')}</Text>
             </Card>
           </Pressable>
@@ -70,4 +76,6 @@ const st = StyleSheet.create({
   type: { fontFamily: F.black, fontSize: 22, color: C.white, textTransform: 'uppercase' },
   badge: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   list: { fontFamily: F.semi, fontSize: 13, color: C.white, lineHeight: 19 },
+  thumbs: { flexDirection: 'row', gap: 6 },
+  thumb: { flex: 1, aspectRatio: 16 / 9, borderRadius: 8, backgroundColor: C.navy },
 });

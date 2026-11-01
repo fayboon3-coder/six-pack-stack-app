@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth';
@@ -98,8 +98,10 @@ export default function Workout() {
           {!!info?.video && (
             <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${info.name}`} style={st.video}
               onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
+              <Image source={{ uri: `https://i.ytimg.com/vi/${info.video}/hqdefault.jpg` }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
+              <View style={st.shade} />
               <View style={st.play}><PlayIcon size={22} /></View>
-              <Text style={[ui.label, { position: 'absolute', left: 14, bottom: 12 }]}>Watch form video</Text>
+              <Text style={[ui.label, st.videoLabel]}>Watch form video</Text>
             </Pressable>
           )}
           <View style={{ gap: 6 }}>
@@ -167,7 +169,9 @@ const st = StyleSheet.create({
   time: { fontFamily: F.bold, fontSize: 13, color: C.white },
   progress: { flexDirection: 'row', gap: 4, paddingHorizontal: 20, paddingTop: 8 },
   seg: { flex: 1, height: 4, borderRadius: 2 },
-  video: { height: 190, borderRadius: 20, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  video: { height: 200, borderRadius: 20, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  shade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(13,27,51,0.35)' },
+  videoLabel: { position: 'absolute', left: 14, bottom: 12, backgroundColor: 'rgba(13,27,51,0.85)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden' },
   play: { width: 58, height: 58, borderRadius: 29, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   exName: { fontFamily: F.black, fontSize: 24, color: C.white },
   target: { fontFamily: F.xbold, fontSize: 13, color: C.red2 },

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../lib/auth';
 import { Linking, View } from 'react-native';
 import { Body, Button, Card, Eyebrow, H1 } from './ui';
 import Screen from './Screen';
@@ -6,8 +7,14 @@ import Screen from './Screen';
 export const WHATSAPP = '13232290609';
 
 export default function NoPlan({ name }: { name?: string | null }) {
+  const { refresh } = useAuth();
+  const [refreshing, setRefreshing] = useState(false);
+  useEffect(() => {
+    const t = setInterval(refresh, 30000); // pick up the plan as soon as it's delivered
+    return () => clearInterval(t);
+  }, [refresh]);
   return (
-    <Screen>
+    <Screen refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await refresh(); setRefreshing(false); }}>
       <View style={{ gap: 8, marginTop: 12 }}>
         <Eyebrow>Six-Pack Stack</Eyebrow>
         <H1 style={{ textTransform: 'uppercase', fontSize: 32, lineHeight: 34 }}>
