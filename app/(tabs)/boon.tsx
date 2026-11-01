@@ -45,7 +45,10 @@ export default function Boon() {
         </Card>
       ))}
 
-      <View style={{ marginTop: 24, gap: 8 }}>
+      <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium', lineHeight: 16, marginTop: 16 }]}>
+        Product names, logos and photos belong to their owners and are shown to identify the products Boon reviews. No sponsorships, no affiliate links. Not medical advice: check with your doctor before changing anything if you have a condition or take medication.
+      </Text>
+      <View style={{ marginTop: 8, gap: 8 }}>
         <Text style={st.sub}>Signed in as {profile?.email || session?.user.email}</Text>
         <Button title="Sign out" variant="ghost" onPress={signOut} />
       </View>

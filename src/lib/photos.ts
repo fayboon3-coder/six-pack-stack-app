@@ -1,43 +1,84 @@
 /**
- * Professional photos from Unsplash (free to use under the Unsplash License).
- * Swap any of these for Boon's own photos later: same keys, local files.
+ * App imagery: real product photos only (no stock photos).
+ * Hero banners are product lineups built from the same official product photos as Beyond the Label.
+ * Food and grocery tiles use each brand's official product photo.
+ * Product photos are used for identification and commentary; see the disclaimer in the app.
  */
-const u = (id: string, w = 1080) => `https://images.unsplash.com/${id}?w=${w}&q=80&auto=format&fit=crop`;
-
-export const PHOTO = {
-  signIn: u('photo-1611672585731-fa10603fb9e0'),      // man in headphones, dark gym
-  upper: u('photo-1671316149446-4da1e921c007'),       // dumbbell work, red shirt
-  lower: u('photo-1770664612843-b44e26070024'),       // barbell squat
-  lowerAbs: u('photo-1709315957145-a4bad1feef28'),    // barbell, dark gym
-  fullBody: u('photo-1517836357463-d25dfeac3438'),    // about to lift the barbell
-  gym: u('photo-1770513649465-2c60c8039806'),         // dark gym interior
-  plan: u('photo-1762631383628-77f92d18b184'),        // chicken and rice bowl
-  breakfast: u('photo-1559332167-dd24746aa6f5'),      // eggs and toast
-  lunch: u('photo-1762631383815-784c04533802'),       // chicken, rice, beans bowl
-  afternoon: u('photo-1558017487-06bf9f82613a'),      // shake over dumbbells
-  dinner: u('photo-1713742000867-404a4a32dd72'),      // steak dinner
-  eatOut: u('photo-1561758033-d89a9ad46330'),         // burger and fries
-  grocery: u('photo-1636057915164-0cc9d6a54975'),     // fresh produce
-  stack: u('photo-1774793476321-70f77d85a3a7'),       // scoop of protein powder
-  progress: u('photo-1758506971986-b0d0edebd8d5'),    // running, city
-  checkin: u('photo-1734191321941-08c5ff82c3ef'),     // physique, gym
-  coach: u('photo-1745329532588-1394a50671f0'),       // working out
+const HERO = {
+  signIn: require('../../assets/hero/signin.jpg'),
+  dumbbells: require('../../assets/hero/dumbbells.jpg'),
+  gear: require('../../assets/hero/gear.jpg'),
+  stack: require('../../assets/hero/stack.jpg'),
+  plan: require('../../assets/hero/plan.jpg'),
+  progress: require('../../assets/hero/progress.jpg'),
+  tested: require('../../assets/hero/tested.jpg'),
 };
 
-/** Hero photo for a training day label like "Monday · Upper". */
-export function dayPhoto(label: string) {
+export type Pic = number | string;
+
+export const PHOTO = {
+  signIn: HERO.signIn as Pic,
+  gym: HERO.gear as Pic,
+  plan: HERO.plan as Pic,
+  stack: HERO.stack as Pic,
+  meals: HERO.plan as Pic,
+  eatOut: HERO.plan as Pic,
+  grocery: HERO.plan as Pic,
+  progress: HERO.progress as Pic,
+  checkin: HERO.progress as Pic,
+  coach: HERO.tested as Pic,
+};
+
+/** Hero image for a training day label like "Monday · Upper". */
+export function dayPhoto(label: string): Pic {
   const t = label.toLowerCase();
-  if (t.includes('abs')) return PHOTO.lowerAbs;
-  if (t.includes('lower') || t.includes('leg')) return PHOTO.lower;
-  if (t.includes('upper') || t.includes('push') || t.includes('pull')) return PHOTO.upper;
-  return PHOTO.fullBody;
+  if (t.includes('lower') || t.includes('leg') || t.includes('abs')) return HERO.gear;
+  return HERO.dumbbells;
 }
 
-/** Photo for a meal slot. */
-export function mealPhoto(slot: string) {
+const amz = (id: string) => `https://m.media-amazon.com/images/I/${id}._AC_SL600_.jpg`;
+
+/** Official brand product photos for foods. */
+export const FOOD: Record<string, { name: string; pic: Pic }> = {
+  eggs: { name: "Eggland's Best eggs", pic: amz('61865ctzW6L') },
+  yogurt: { name: 'Chobani Greek yogurt', pic: amz('71VBo3CzSoL') },
+  bread: { name: "Dave's Killer Bread", pic: amz('81BkGDb9vnL') },
+  oats: { name: 'Quaker oats', pic: amz('81r81ajDMKL') },
+  chicken: { name: 'Tyson chicken breast', pic: amz('61dQIeBePQL') },
+  rice: { name: "Ben's Original rice", pic: amz('81vDaScb5HL') },
+  beans: { name: "Bush's black beans", pic: amz('81vMwAunu-L') },
+  milk: { name: 'fairlife milk', pic: amz('713oe7MVfQL') },
+  whey: { name: 'ON Gold Standard whey', pic: require('../../assets/img/whey.png') },
+  jerky: { name: "Jack Link's jerky", pic: amz('81PMYTxuoJL') },
+  banana: { name: 'Bananas', pic: amz('51+lZqgd9sL') },
+  steak: { name: 'Sirloin steak', pic: amz('81SSPPfF1pL') },
+  salmon: { name: 'Wild salmon', pic: amz('71GWtpyoBjL') },
+  potato: { name: 'Russet potatoes', pic: amz('71sqqaaDQJL') },
+  broccoli: { name: 'Birds Eye broccoli', pic: amz('816z58BKYIL') },
+  coffee: { name: 'Starbucks coffee', pic: amz('71w8jjfu4lL') },
+  quest: { name: 'Quest bar', pic: require('../../assets/img/quest.png') },
+};
+
+/** Foods to show for a meal slot. */
+export function mealFoods(slot: string) {
   const t = slot.toLowerCase();
-  if (t.includes('breakfast')) return PHOTO.breakfast;
-  if (t.includes('lunch')) return PHOTO.lunch;
-  if (t.includes('dinner')) return PHOTO.dinner;
-  return PHOTO.afternoon;
+  const keys = t.includes('breakfast') ? ['eggs', 'yogurt', 'bread', 'oats']
+    : t.includes('lunch') ? ['chicken', 'rice', 'beans']
+    : t.includes('dinner') ? ['steak', 'salmon', 'potato', 'broccoli']
+    : ['whey', 'milk', 'jerky', 'banana'];
+  return keys.map((k) => FOOD[k]);
+}
+
+const MATCH: [RegExp, string][] = [
+  [/egg/i, 'eggs'], [/yogurt/i, 'yogurt'], [/bread|toast/i, 'bread'], [/oat/i, 'oats'], [/chicken/i, 'chicken'],
+  [/rice/i, 'rice'], [/bean/i, 'beans'], [/milk/i, 'milk'], [/jerky/i, 'jerky'], [/banana|fruit/i, 'banana'],
+  [/steak|beef/i, 'steak'], [/salmon|fish/i, 'salmon'], [/potato/i, 'potato'], [/broccoli|veg/i, 'broccoli'],
+  [/coffee|starbucks/i, 'coffee'], [/whey|protein powder|shake/i, 'whey'], [/protein bar|quest/i, 'quest'],
+];
+
+/** Product photos that match a line of text (a grocery aisle, an eat-out order). */
+export function foodsIn(text: string, max = 4) {
+  const keys: string[] = [];
+  for (const [re, k] of MATCH) if (re.test(text) && !keys.includes(k)) keys.push(k);
+  return keys.slice(0, max).map((k) => FOOD[k]);
 }

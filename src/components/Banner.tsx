@@ -2,15 +2,17 @@ import React from 'react';
 import { ImageBackground, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../lib/theme';
+import type { Pic } from '../lib/photos';
 
-/** Full-bleed photo header with a navy fade and big title. */
+/** Full-width image header with a navy fade and big title. */
 export default function Banner({ uri, eyebrow, title, height = 260, radius = 0, style, children }: {
-  uri: string; eyebrow?: string; title?: string; height?: number; radius?: number; style?: ViewStyle; children?: React.ReactNode;
+  uri: Pic; eyebrow?: string; title?: string; height?: number; radius?: number; style?: ViewStyle; children?: React.ReactNode;
 }) {
+  const source = typeof uri === 'number' ? uri : { uri };
   return (
-    <ImageBackground source={{ uri }} style={[{ height, justifyContent: 'flex-end', overflow: 'hidden', borderRadius: radius, backgroundColor: C.navy2 }, style]}
+    <ImageBackground source={source} style={[{ height, justifyContent: 'flex-end', overflow: 'hidden', borderRadius: radius, backgroundColor: C.navy }, style]}
       imageStyle={{ borderRadius: radius }} resizeMode="cover" accessibilityIgnoresInvertColors>
-      <LinearGradient colors={['rgba(13,27,51,0.15)', 'rgba(13,27,51,0.55)', C.navy]} locations={[0, 0.5, 1]}
+      <LinearGradient colors={['rgba(13,27,51,0)', 'rgba(13,27,51,0.35)', C.navy]} locations={[0, 0.55, 1]}
         style={[StyleSheet.absoluteFill, { borderRadius: radius }]} />
       <View style={{ padding: 20, gap: 6 }}>
         {!!eyebrow && <Text style={st.eyebrow}>{eyebrow}</Text>}

@@ -8,14 +8,15 @@ import NoPlan from '../../src/components/NoPlan';
 import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
 import Banner from '../../src/components/Banner';
-import { mealPhoto, PHOTO } from '../../src/lib/photos';
+import { foodsIn, mealFoods, PHOTO, type Pic } from '../../src/lib/photos';
+import FoodRow from '../../src/components/FoodRow';
 import { productImage } from '../../src/lib/images';
 
 const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
 type Tab = (typeof TABS)[number];
 
-const TAB_PHOTO: Record<Tab, string> = {
-  Overview: PHOTO.plan, Stack: PHOTO.stack, Meals: PHOTO.lunch, 'Eating out': PHOTO.eatOut, Groceries: PHOTO.grocery,
+const TAB_PHOTO: Record<Tab, Pic> = {
+  Overview: PHOTO.plan, Stack: PHOTO.stack, Meals: PHOTO.meals, 'Eating out': PHOTO.eatOut, Groceries: PHOTO.grocery,
 };
 
 const VERDICT_COLOR: Record<string, string> = { CUT: C.red, KEEP: C.green, SWAP: '#ffffff', ADD: C.green };
@@ -113,11 +114,14 @@ export default function PlanTab() {
         <>
           {!!plan.meal_note && <Body>{plain(plan.meal_note)}</Body>}
           {(plan.meals || []).map((m, k) => (
-            <Card key={k} style={{ padding: 0, overflow: 'hidden' }}>
-              <Banner uri={mealPhoto(m.slot)} height={160} eyebrow="Pick one" title={m.slot}>
-                <Text style={[ui.label, { textTransform: 'none', letterSpacing: 0 }]}>{m.target}</Text>
-              </Banner>
-              <View style={{ padding: 16, paddingTop: 0, gap: 10 }}>
+            <Card key={k}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <Text style={st.slot}>{m.slot}</Text>
+                <Text style={[ui.label, { color: C.red2 }]}>Pick one</Text>
+              </View>
+              <Body style={{ fontSize: 12 }}>{m.target}</Body>
+              <FoodRow items={mealFoods(m.slot)} />
+              <View style={{ gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
                   <Text style={st.optName}>{o.name}</Text>
@@ -136,11 +140,12 @@ export default function PlanTab() {
           <Text style={st.item}>{e.where}</Text>
           <Body style={{ fontSize: 14 }}>{e.order}</Body>
           <Text style={st.macro}>{e.kcal} cal · {e.protein} protein</Text>
+          <FoodRow items={foodsIn(e.where + ' ' + e.order, 3)} size={72} />
         </Card>
       ))}
 
       {tab === 'Groceries' && (plan.grocery || []).map((g, k) => (
-        <Card key={k}><Text style={ui.label}>{g.aisle}</Text><Body>{g.items}</Body></Card>
+        <Card key={k}><Text style={ui.label}>{g.aisle}</Text><FoodRow items={foodsIn(g.items, 5)} size={80} /><Body>{g.items}</Body></Card>
       ))}
     </Screen>
   );
@@ -159,6 +164,7 @@ const st = StyleSheet.create({
   numL: { fontFamily: F.semi, fontSize: 12, color: C.white },
   big: { fontFamily: F.black, fontSize: 28 },
   item: { fontFamily: F.black, fontSize: 17, color: C.white },
+  slot: { fontFamily: F.black, fontSize: 22, color: C.white, textTransform: 'uppercase' },
   buy: { alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 10, backgroundColor: C.red, justifyContent: 'center' },
   buyText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase' },
   pill: { fontFamily: F.black, fontSize: 11, letterSpacing: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden', alignSelf: 'flex-start' },

@@ -75,7 +75,7 @@ export default function Today() {
         {/* Hero: today's workout */}
         <Pressable accessibilityRole="button" accessibilityLabel={`${isToday ? 'Start' : 'Preview'} ${day.t}`}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })} style={st.heroWrap}>
-          <ImageBackground source={{ uri: dayPhoto(day.t) }} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
+          <ImageBackground source={typeof dayPhoto(day.t) === 'number' ? (dayPhoto(day.t) as number) : { uri: dayPhoto(day.t) as string }} style={st.hero} imageStyle={{ borderRadius: 24 }} resizeMode="cover">
             <LinearGradient colors={['rgba(13,27,51,0.05)', 'rgba(13,27,51,0.55)', 'rgba(13,27,51,0.97)']} locations={[0, 0.45, 1]} style={[StyleSheet.absoluteFill, { borderRadius: 24 }]} />
             <View style={st.badge}><Text style={st.badgeText}>{isToday ? "Today's workout" : `Next · ${dayName}`}</Text></View>
             <View style={{ gap: 6 }}>
