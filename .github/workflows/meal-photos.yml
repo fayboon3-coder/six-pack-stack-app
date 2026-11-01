@@ -1,0 +1,10 @@
+name: Find meal photos
+on: workflow_dispatch
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 tools/find_meal_photos.py
+      - uses: actions/upload-artifact@v4
+        with: { name: cand, path: cand }
