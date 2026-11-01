@@ -1,80 +1,98 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as Linking from 'expo-linking';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
 
 export default function SignIn() {
+  const [mode, setMode] = useState<'in' | 'up'>('in');
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
+  const [note, setNote] = useState('');
 
-  const send = async () => {
-    setErr('');
+  const submit = async () => {
+    setErr(''); setNote('');
     const e = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return setErr('Enter a valid email.');
+    if (password.length < 8) return setErr('Use at least 8 characters for your password.');
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: e,
-      options: { shouldCreateUser: true, emailRedirectTo: Linking.createURL('auth') },
-    });
+    const res = mode === 'up'
+      ? await supabase.auth.signUp({ email: e, password })
+      : await supabase.auth.signInWithPassword({ email: e, password });
     setBusy(false);
-    if (error) return setErr(error.message.includes('rate') ? 'Too many tries. Wait a few minutes, then send again.' : error.message);
-    setSent(true);
+    if (res.error) {
+      const m = res.error.message.toLowerCase();
+      if (m.includes('invalid login')) return setErr('Email or password is wrong. New here? Tap "Create your account".');
+      if (m.includes('already registered')) { setMode('in'); return setErr('You already have an account. Sign in with your password.'); }
+      return setErr(res.error.message);
+    }
+    if (mode === 'up' && !res.data.session) setNote('Check your email to confirm your account, then sign in here.');
+  };
+
+  const reset = async () => {
+    setErr(''); setNote('');
+    const e = email.trim().toLowerCase();
+    if (!e) return setErr('Enter your email first.');
+    const { error } = await supabase.auth.resetPasswordForEmail(e);
+    if (error) return setErr(error.message);
+    setNote('We sent you an email to reset your password.');
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={st.wrap}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <View style={st.dot} />
-          <Text style={st.brand}>Six-Pack Stack</Text>
-        </View>
-        <View style={{ gap: 10, marginTop: 40 }}>
-          <Eyebrow>{sent ? 'Check your email' : 'Welcome'}</Eyebrow>
-          <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
-            {sent ? 'Tap the link we sent you.' : 'Sign in to your plan.'}
-          </H1>
-          <Text style={st.sub}>
-            {sent
-              ? `We sent a sign-in link to ${email.trim()}. Open it on this phone and you're in. Check spam if you don't see it.`
-              : 'Use the email you signed up with. We\'ll email you a sign-in link. No password needed.'}
-          </Text>
-        </View>
-        <View style={{ gap: 12, marginTop: 28 }}>
-          {!sent ? (
-            <>
-              <Text style={st.label} nativeID="emailLabel">Email</Text>
-              <TextInput
-                accessibilityLabelledBy="emailLabel"
-                value={email} onChangeText={setEmail} autoCapitalize="none" autoComplete="email"
-                keyboardType="email-address" textContentType="emailAddress" placeholder="you@email.com"
-                placeholderTextColor="#ffffff99" style={st.input} returnKeyType="send" onSubmitEditing={send}
-              />
-              <Button title="Email me a sign-in link" onPress={send} loading={busy} />
-            </>
-          ) : (
-            <>
-              <Button title="Send it again" variant="ghost" onPress={send} loading={busy} />
-              <Button title="Use a different email" variant="ghost" onPress={() => setSent(false)} />
-            </>
-          )}
-          {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
-        </View>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={st.wrap} keyboardShouldPersistTaps="handled">
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={st.dot} />
+            <Text style={st.brand}>Six-Pack Stack</Text>
+          </View>
+          <View style={{ gap: 10, marginTop: 36 }}>
+            <Eyebrow>{mode === 'in' ? 'Welcome back' : 'Welcome'}</Eyebrow>
+            <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
+              {mode === 'in' ? 'Sign in to your plan.' : 'Create your account.'}
+            </H1>
+            <Text style={st.sub}>Use the email you signed up for coaching with.</Text>
+          </View>
+          <View style={{ gap: 12, marginTop: 24 }}>
+            <Text style={st.label} nativeID="emailLabel">Email</Text>
+            <TextInput accessibilityLabelledBy="emailLabel" value={email} onChangeText={setEmail} autoCapitalize="none"
+              autoComplete="email" keyboardType="email-address" textContentType="emailAddress" placeholder="you@email.com"
+              placeholderTextColor="#ffffff99" style={st.input} returnKeyType="next" />
+            <Text style={st.label} nativeID="pwLabel">Password</Text>
+            <TextInput accessibilityLabelledBy="pwLabel" value={password} onChangeText={setPassword} secureTextEntry
+              autoComplete={mode === 'up' ? 'new-password' : 'current-password'}
+              textContentType={mode === 'up' ? 'newPassword' : 'password'} placeholder={mode === 'up' ? 'At least 8 characters' : 'Your password'}
+              placeholderTextColor="#ffffff99" style={st.input} returnKeyType="go" onSubmitEditing={submit} />
+            <Button title={mode === 'in' ? 'Sign in' : 'Create account'} onPress={submit} loading={busy} />
+            {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
+            {!!note && <Text style={st.note} accessibilityLiveRegion="polite">{note}</Text>}
+            <Pressable accessibilityRole="button" onPress={() => { setMode(mode === 'in' ? 'up' : 'in'); setErr(''); setNote(''); }} style={st.link}>
+              <Text style={st.linkText}>{mode === 'in' ? 'New here? Create your account' : 'Already have an account? Sign in'}</Text>
+            </Pressable>
+            {mode === 'in' && (
+              <Pressable accessibilityRole="button" onPress={reset} style={st.link}>
+                <Text style={st.linkText}>Forgot your password?</Text>
+              </Pressable>
+            )}
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const st = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 22, paddingTop: 24 },
+  wrap: { paddingHorizontal: 22, paddingTop: 24, paddingBottom: 40 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.red },
   brand: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: C.white },
   sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
   label: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
   input: { height: 56, borderRadius: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, color: C.white, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
   err: { fontFamily: F.bold, fontSize: 14, color: C.red2 },
+  note: { fontFamily: F.bold, fontSize: 14, color: C.green },
+  link: { minHeight: 44, justifyContent: 'center', alignItems: 'center' },
+  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
 });
