@@ -13,37 +13,38 @@ def save(name, url):
     except Exception as e:
         log.write(f'FAIL {name}\t{url}\t{e}\n')
 
-# Starbucks menu API
-try:
-    menu = json.loads(get('https://www.starbucks.com/bff/ordering/menu', {'Accept': 'application/json'}))
-    found = []
-    def walk(o):
-        if isinstance(o, dict):
-            if 'name' in o and isinstance(o.get('assets'), dict):
-                found.append(o)
-            for v in o.values(): walk(v)
-        elif isinstance(o, list):
-            for v in o: walk(v)
-    walk(menu)
-    for p in found:
-        n = p['name']
-        if re.search(r'egg bites|caff[eè] latte$|^cold brew', n, re.I):
-            uri = (p['assets'].get('masterImage') or {}).get('uri') or (p['assets'].get('fullSize') or {}).get('uri')
-            if uri:
-                save('sbx_' + re.sub(r'\W+', '_', n.lower())[:40] + '.jpg', uri)
-except Exception as e:
-    log.write(f'FAIL starbucks menu {e}\n')
-
-# Chipotle: scrape image urls from pages
-for page in ['https://www.chipotle.com/order/build/burrito-bowl', 'https://www.chipotle.com/', 'https://www.chipotle.com/menu']:
+if not os.environ.get('ONLY_URLS'):
+    # Starbucks menu API
     try:
-        html = get(page).decode('utf-8', 'ignore')
-        urls = sorted(set(re.findall(r'https://[^"\'\s>]+?\.(?:jpg|jpeg|png|webp)', html)))
-        log.write(f'PAGE {page} {len(urls)}\n')
-        for i, u in enumerate([u for u in urls if re.search(r'bowl|burrito|chicken|menu|meal', u, re.I)][:12]):
-            log.write(f'  {u}\n'); save(f'cmg_{i}.' + u.rsplit('.', 1)[1][:4], u)
+        menu = json.loads(get('https://www.starbucks.com/bff/ordering/menu', {'Accept': 'application/json'}))
+        found = []
+        def walk(o):
+            if isinstance(o, dict):
+                if 'name' in o and isinstance(o.get('assets'), dict):
+                    found.append(o)
+                for v in o.values(): walk(v)
+            elif isinstance(o, list):
+                for v in o: walk(v)
+        walk(menu)
+        for p in found:
+            n = p['name']
+            if re.search(r'egg bites|caff[eè] latte$|^cold brew', n, re.I):
+                uri = (p['assets'].get('masterImage') or {}).get('uri') or (p['assets'].get('fullSize') or {}).get('uri')
+                if uri:
+                    save('sbx_' + re.sub(r'\W+', '_', n.lower())[:40] + '.jpg', uri)
     except Exception as e:
-        log.write(f'FAIL {page} {e}\n')
+        log.write(f'FAIL starbucks menu {e}\n')
+
+    # Chipotle: scrape image urls from pages
+    for page in ['https://www.chipotle.com/order/build/burrito-bowl', 'https://www.chipotle.com/', 'https://www.chipotle.com/menu']:
+        try:
+            html = get(page).decode('utf-8', 'ignore')
+            urls = sorted(set(re.findall(r'https://[^"\'\s>]+?\.(?:jpg|jpeg|png|webp)', html)))
+            log.write(f'PAGE {page} {len(urls)}\n')
+            for i, u in enumerate([u for u in urls if re.search(r'bowl|burrito|chicken|menu|meal', u, re.I)][:12]):
+                log.write(f'  {u}\n'); save(f'cmg_{i}.' + u.rsplit('.', 1)[1][:4], u)
+        except Exception as e:
+            log.write(f'FAIL {page} {e}\n')
 
 # Food photography search (Unsplash), top 4 each
 Q = {
@@ -58,7 +59,7 @@ import sys
 extra = json.load(open('tools/meal_urls.json')) if os.path.exists('tools/meal_urls.json') else {}
 for name, url in extra.items():
     save(name, url)
-for k, q in Q.items():
+for k, q in ({} if os.environ.get('ONLY_URLS') else Q).items():
     n = 0
     try:  # Openverse (CC-licensed photos, mostly Flickr)
         d = json.loads(get('https://api.openverse.org/v1/images/?page_size=8&license_type=commercial&aspect_ratio=wide&size=large&q=' + urllib.parse.quote(q), {'Accept': 'application/json'}))
