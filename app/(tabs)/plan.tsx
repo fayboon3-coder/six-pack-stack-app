@@ -6,6 +6,8 @@ import { Body, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
 import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
 import { plain } from '../../src/lib/program';
+import Poster from '../../src/components/Poster';
+import { productImage } from '../../src/lib/images';
 
 const TABS = ['Overview', 'Stack', 'Meals', 'Eating out', 'Groceries'] as const;
 type Tab = (typeof TABS)[number];
@@ -72,8 +74,14 @@ export default function PlanTab() {
           <Text style={ui.label}>What you take</Text>
           {(plan.stack || []).map((x, k) => (
             <Card key={k}>
-              <Text style={st.item}>{x.product}</Text>
-              <Body style={{ fontSize: 14 }}>{x.dose} · {x.when} · {x.cost}</Body>
+              <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
+                <Poster source={productImage(x.product)} label={x.product} size={84} />
+                <View style={{ flex: 1, gap: 4 }}>
+                  <Text style={st.item}>{x.product}</Text>
+                  <Body style={{ fontSize: 13 }}>{x.dose} · {x.when}</Body>
+                  <Text style={st.macro}>{x.cost}</Text>
+                </View>
+              </View>
               <Body style={{ fontSize: 13 }}>{plain(x.why)}</Body>
               {!!x.buy && (
                 <Pressable accessibilityRole="link" onPress={() => Linking.openURL(x.buy!)} style={st.buy}><Text style={st.buyText}>Buy here →</Text></Pressable>
@@ -84,9 +92,13 @@ export default function PlanTab() {
           {!!plan.audit?.length && <Text style={ui.label}>Your audit</Text>}
           {(plan.audit || []).map((a, k) => (
             <Card key={k}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-                <Text style={[st.item, { flex: 1 }]}>{a.product}</Text>
-                <Text style={[st.pill, { backgroundColor: VERDICT_COLOR[a.verdict] || C.white, color: a.verdict === 'CUT' ? C.white : C.navy }]}>{a.verdict}</Text>
+              <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
+                <Poster source={productImage(a.product)} label={a.product} size={72} style={a.verdict === 'CUT' ? { opacity: 0.55 } : undefined} />
+                <View style={{ flex: 1, gap: 6 }}>
+                  <Text style={[st.pill, { backgroundColor: VERDICT_COLOR[a.verdict] || C.white, color: a.verdict === 'CUT' ? C.white : C.navy }]}>{a.verdict}</Text>
+                  <Text style={st.item}>{a.product}</Text>
+                  <Text style={[st.macro, { color: C.white }]}>${a.cost}/month</Text>
+                </View>
               </View>
               <Body style={{ fontSize: 13 }}>{plain(a.why)}</Body>
               {!!a.instead && <Body style={{ fontSize: 13 }}>Instead: {plain(a.instead)}</Body>}
