@@ -1,0 +1,523 @@
+{
+ "name": "Marcus",
+ "start": "November 8, 2026",
+ "end": "January 24, 2027",
+ "goal_short": "192 LBS OR VISIBLE TOP ABS BY JANUARY 24",
+ "goal_long": "<b>192 lbs</b> (from 212), <b>or visible top abs</b> in your front photo, same spot and light as week 1.",
+ "kcal": "2,400",
+ "protein": "170",
+ "fat": "65",
+ "carbs": "280",
+ "steps": "8,000",
+ "days": "Mon, Tue, Thu, Fri",
+ "stack_short": "Creatine, whey, black coffee",
+ "week1": [
+  "Stop reordering Hydroxycut, AG1 and Xtend (finish or toss what you have)",
+  "Order plain creatine monohydrate (link in your stack below) and start 5 g a day",
+  "Swap the venti caramel latte for a grande latte with no syrup, or black coffee",
+  "Eat breakfast every day (pick from your meal plan)",
+  "Open your training app, save it to your home screen, and train Mon, Tue, Thu, Fri",
+  "Weigh in every morning and note it down",
+  "Sunday: check in and send your starting photos (front, side, back)"
+ ],
+ "before": 259,
+ "after": 70,
+ "audit": [
+  {
+   "product": "Optimum Nutrition Gold Standard Whey",
+   "cost": 58,
+   "verdict": "KEEP",
+   "why": "You skip breakfast and eat out a lot, so you come up short on protein. This closes the gap.",
+   "instead": "1 scoop a day as your afternoon snack, instead of the protein bar and chips."
+  },
+  {
+   "product": "MuscleTech Platinum Creatine",
+   "cost": 25,
+   "verdict": "SWAP",
+   "why": "It's plain creatine monohydrate with a brand name on it.",
+   "instead": "Any unflavored creatine monohydrate, 5 g a day, any time. About $12."
+  },
+  {
+   "product": "C4 Original pre-workout",
+   "cost": 35,
+   "verdict": "SWAP",
+   "why": "The part that works is the caffeine. The rest is underdosed.",
+   "instead": "A black coffee 30 minutes before you train."
+  },
+  {
+   "product": "Hydroxycut Hardcore",
+   "cost": 30,
+   "verdict": "CUT",
+   "why": "Fat burners don't move the scale in any meaningful way. Mostly it's more caffeine on top of your latte and C4.",
+   "instead": "Nothing. Steps and your calorie target do this job."
+  },
+  {
+   "product": "AG1",
+   "cost": 79,
+   "verdict": "CUT",
+   "why": "A greens powder can't replace food, and your plan already has fruit and vegetables built in.",
+   "instead": "Vegetables at lunch and dinner."
+  },
+  {
+   "product": "Scivation Xtend BCAAs",
+   "cost": 32,
+   "verdict": "CUT",
+   "why": "When you hit your protein, BCAAs add nothing. Your plan gets you there.",
+   "instead": "Water during workouts."
+  }
+ ],
+ "stack": [
+  {
+   "product": "Creatine monohydrate (Nutricost, unflavored)",
+   "why": "The most proven supplement there is. Plain monohydrate is all you need.",
+   "dose": "5 g (1 scoop)",
+   "when": "Any time, every day",
+   "cost": "about $12",
+   "buy": "https://www.vitacost.com/products/nutricost-performance-creatine-monohydrate-unflavored-1-lb-454-g-145338"
+  },
+  {
+   "product": "Whey protein (your Optimum Nutrition Gold Standard)",
+   "why": "Keep the one you have. It closes your protein gap on busy days.",
+   "dose": "1 scoop",
+   "when": "Afternoon snack",
+   "cost": "about $58",
+   "buy": "https://www.vitacost.com/products/optimum-nutrition-gold-standard-100-whey-protein-french-vanilla-creme-5-lb-2-26-kg-27511"
+  },
+  {
+   "product": "Black coffee",
+   "why": "The caffeine is the part of your pre-workout that worked.",
+   "dose": "1 cup",
+   "when": "30 min before training",
+   "cost": "$0 extra",
+   "buy_text": "Your kitchen"
+  }
+ ],
+ "day": [
+  {
+   "meal": "Breakfast",
+   "what": "3 eggs, 2 slices of toast, a Greek yogurt",
+   "protein": "40 g"
+  },
+  {
+   "meal": "Lunch",
+   "what": "Chipotle bowl: double chicken, rice, beans, fajita veggies, salsa",
+   "protein": "65 g"
+  },
+  {
+   "meal": "Afternoon",
+   "what": "1 scoop whey in water or milk",
+   "protein": "25 g"
+  },
+  {
+   "meal": "Dinner",
+   "what": "Chicken teriyaki with rice and a vegetable, or steak and potatoes, or salmon and rice",
+   "protein": "45 g"
+  },
+  {
+   "meal": "Total",
+   "what": "Hits your 170 g with room for a snack",
+   "protein": "175 g"
+  }
+ ],
+ "rules": [
+  "Protein first at every meal.",
+  "Breakfast every day. Skipping it is why the 4pm chips and the big dinners happen.",
+  "The venti caramel latte becomes a grande latte with no syrup, or black coffee. That swap alone saves you hundreds of calories a day.",
+  "Weekends: pick one, a big meal or the beers, not both.",
+  "Never \"start over Monday.\" The next meal is normal."
+ ],
+ "eat_out": [
+  {
+   "where": "Chipotle",
+   "order": "Bowl, double chicken, white rice, black beans, fajita veggies, salsa. Skip sour cream and cheese.",
+   "kcal": "about 745",
+   "protein": "77 g"
+  },
+  {
+   "where": "Starbucks",
+   "order": "Grande latte no syrup (or cold brew) + 2 egg bites",
+   "kcal": "about 490",
+   "protein": "32 g"
+  },
+  {
+   "where": "Pizza night",
+   "order": "2 slices thin crust + side salad, and a protein shake earlier that day",
+   "kcal": "about 600",
+   "protein": "25 g"
+  },
+  {
+   "where": "Burger spot",
+   "order": "Single burger, side salad instead of fries, no milkshake",
+   "kcal": "about 650",
+   "protein": "35 g"
+  },
+  {
+   "where": "Beers out",
+   "order": "Light beer, max 2–3, and a protein-heavy dinner before you go",
+   "kcal": "about 100 each",
+   "protein": "0 g"
+  }
+ ],
+ "grocery": [
+  {
+   "aisle": "Protein",
+   "items": "Eggs, chicken breast or thighs, lean steak, salmon, Greek yogurt (plain or light)"
+  },
+  {
+   "aisle": "Carbs",
+   "items": "Rice, potatoes, whole-grain bread, oats, fruit (bananas, berries, apples)"
+  },
+  {
+   "aisle": "Veg",
+   "items": "Frozen stir-fry veg, bagged salad, broccoli, peppers, onions (no mushrooms)"
+  },
+  {
+   "aisle": "Extras",
+   "items": "Teriyaki sauce (light), salsa, hot sauce, olive oil spray, creatine monohydrate"
+  }
+ ],
+ "train_intro": "4 days a week, upper/lower. Warm up 5 minutes every session: 3 minutes easy cardio, then 2 light sets of the first exercise. You've been lifting 1–3 years, so 3 sets from week 1, and 4 sets on the first exercise of each day from week 5.",
+ "training": [
+  {
+   "label": "MONDAY · UPPER",
+   "ex": [
+    [
+     "Incline DB press"
+    ],
+    [
+     "Lat pulldown"
+    ],
+    [
+     "Seated cable row"
+    ],
+    [
+     "Landmine press"
+    ],
+    [
+     "Cable lateral raise"
+    ],
+    [
+     "Rope pushdown"
+    ],
+    [
+     "Cable curl"
+    ]
+   ]
+  },
+  {
+   "label": "TUESDAY · LOWER",
+   "ex": [
+    [
+     "Leg press"
+    ],
+    [
+     "Romanian deadlift"
+    ],
+    [
+     "Walking lunge"
+    ],
+    [
+     "Seated leg curl"
+    ],
+    [
+     "Calf raise"
+    ],
+    [
+     "Cable crunch"
+    ]
+   ]
+  },
+  {
+   "label": "THURSDAY · UPPER",
+   "ex": [
+    [
+     "Neutral-grip DB bench"
+    ],
+    [
+     "Chest-supported row"
+    ],
+    [
+     "Pull-up"
+    ],
+    [
+     "Landmine press"
+    ],
+    [
+     "Face pull"
+    ],
+    [
+     "Incline curl"
+    ],
+    [
+     "Rope pushdown"
+    ]
+   ]
+  },
+  {
+   "label": "FRIDAY · LOWER + ABS",
+   "ex": [
+    [
+     "Hack squat"
+    ],
+    [
+     "Hip thrust"
+    ],
+    [
+     "Leg extension"
+    ],
+    [
+     "Lying leg curl"
+    ],
+    [
+     "Hanging knee raise"
+    ],
+    [
+     "Plank"
+    ]
+   ]
+  }
+ ],
+ "phase1": "Hit all 4 sessions and your protein every day. Steps up to 8,000. Learn the moves.",
+ "phase2": "4 sets on the first exercise of each day. Keep adding weight or reps. Week 4 check: I re-set your calories to your new weight.",
+ "phase3": "Same sets, keep the weights heavy while you're leanest. Week 8 check: final re-set. Week 12: final photos and results.",
+ "signoff": "You don't need more supplements or more willpower. You need this plan and 12 Sundays. Let's go.",
+ "meals": [
+  {
+   "slot": "Breakfast",
+   "target": "about 500 calories · 40 g protein",
+   "options": [
+    {
+     "name": "Eggs, toast & yogurt",
+     "detail": "3 scrambled eggs, 2 slices whole-grain toast, 1 cup plain Greek yogurt",
+     "kcal": "about 540",
+     "protein": "45 g"
+    },
+    {
+     "name": "Greek yogurt bowl",
+     "detail": "1½ cups plain Greek yogurt, ½ cup oats, a handful of berries, 1 tsp honey",
+     "kcal": "about 450",
+     "protein": "40 g"
+    },
+    {
+     "name": "Starbucks run",
+     "detail": "2 egg bites + grande latte, no syrup",
+     "kcal": "about 490",
+     "protein": "32 g"
+    }
+   ]
+  },
+  {
+   "slot": "Lunch",
+   "target": "about 700 calories · 60 g protein",
+   "options": [
+    {
+     "name": "Chipotle bowl",
+     "detail": "Double chicken, white rice, black beans, fajita veggies, salsa (no sour cream or cheese)",
+     "kcal": "about 745",
+     "protein": "77 g"
+    },
+    {
+     "name": "Chicken teriyaki bowl",
+     "detail": "6 oz chicken, 1½ cups rice, stir-fry veg, 2 tbsp light teriyaki",
+     "kcal": "about 670",
+     "protein": "58 g"
+    },
+    {
+     "name": "Deli sandwich",
+     "detail": "Double turkey on wheat, mustard, lettuce, tomato + an apple",
+     "kcal": "about 620",
+     "protein": "48 g"
+    }
+   ]
+  },
+  {
+   "slot": "Afternoon",
+   "target": "about 300 calories · 30 g protein",
+   "options": [
+    {
+     "name": "Shake + fruit",
+     "detail": "1 scoop whey in 1 cup milk + an apple or banana",
+     "kcal": "about 335",
+     "protein": "32 g"
+    },
+    {
+     "name": "Yogurt + berries",
+     "detail": "1 cup plain Greek yogurt + berries",
+     "kcal": "about 180",
+     "protein": "22 g"
+    },
+    {
+     "name": "Jerky + fruit",
+     "detail": "2 oz beef jerky + an apple",
+     "kcal": "about 255",
+     "protein": "18 g"
+    }
+   ]
+  },
+  {
+   "slot": "Dinner",
+   "target": "about 650 calories · 45 g protein",
+   "options": [
+    {
+     "name": "Steak & potatoes",
+     "detail": "6 oz sirloin, 1 medium potato, a vegetable, 1 tsp butter",
+     "kcal": "about 585",
+     "protein": "52 g"
+    },
+    {
+     "name": "Salmon & rice",
+     "detail": "6 oz salmon, 1 cup rice, broccoli",
+     "kcal": "about 605",
+     "protein": "40 g"
+    },
+    {
+     "name": "Chicken teriyaki at home",
+     "detail": "6 oz chicken thigh, 1 cup rice, stir-fry veg, light teriyaki",
+     "kcal": "about 620",
+     "protein": "45 g"
+    }
+   ]
+  }
+ ],
+ "meal_note": "Any 4 picks land around 2,100–2,300 calories and 150–200 g protein, which leaves room for a treat or a couple of light beers on the weekend.",
+ "train": {
+  "n": "Marcus",
+  "s": "2026-11-08",
+  "e": 1,
+  "note": "Your shoulder: no overhead pressing for now. Landmine press replaces it, and both bench movements use a neutral grip. If anything feels sharp, stop that exercise and text me.",
+  "d": [
+   {
+    "t": "Monday · Upper",
+    "x": [
+     [
+      "incline_db_press",
+      "3 × 6–10",
+      "Neutral grip (palms facing)"
+     ],
+     [
+      "lat_pulldown",
+      "3 × 8–12"
+     ],
+     [
+      "seated_cable_row",
+      "3 × 8–12"
+     ],
+     [
+      "landmine_press",
+      "3 × 8–12",
+      "Replaces machine shoulder press (shoulder)"
+     ],
+     [
+      "cable_lateral_raise",
+      "2 × 12–15"
+     ],
+     [
+      "rope_pushdown",
+      "2 × 10–15"
+     ],
+     [
+      "cable_curl",
+      "2 × 10–15"
+     ]
+    ]
+   },
+   {
+    "t": "Tuesday · Lower",
+    "x": [
+     [
+      "leg_press",
+      "3 × 8–12"
+     ],
+     [
+      "rdl",
+      "3 × 8–10"
+     ],
+     [
+      "walking_lunge",
+      "2 × 10 each leg"
+     ],
+     [
+      "seated_leg_curl",
+      "3 × 10–15"
+     ],
+     [
+      "standing_calf_raise",
+      "2 × 12–15"
+     ],
+     [
+      "cable_crunch",
+      "3 × 10–15"
+     ]
+    ]
+   },
+   {
+    "t": "Thursday · Upper",
+    "x": [
+     [
+      "neutral_db_bench",
+      "3 × 6–10",
+      "Replaces flat barbell bench (shoulder)"
+     ],
+     [
+      "chest_supported_row",
+      "3 × 8–12"
+     ],
+     [
+      "pull_up",
+      "3 × 6–10",
+      "Use the assisted machine if you can't get 6"
+     ],
+     [
+      "landmine_press",
+      "2 × 8–12",
+      "Replaces dumbbell shoulder press (shoulder)"
+     ],
+     [
+      "face_pull",
+      "2 × 12–15"
+     ],
+     [
+      "incline_curl",
+      "2 × 10–15"
+     ],
+     [
+      "rope_pushdown",
+      "2 × 10–15",
+      "Replaces overhead extension (shoulder)"
+     ]
+    ]
+   },
+   {
+    "t": "Friday · Lower + Abs",
+    "x": [
+     [
+      "hack_squat",
+      "3 × 8–12",
+      "Or front-foot-elevated split squat"
+     ],
+     [
+      "hip_thrust",
+      "3 × 8–12"
+     ],
+     [
+      "leg_extension",
+      "2 × 12–15"
+     ],
+     [
+      "lying_leg_curl",
+      "2 × 10–15"
+     ],
+     [
+      "hanging_knee_raise",
+      "3 × 10–15"
+     ],
+     [
+      "plank",
+      "3 × 30–60 sec"
+     ]
+    ]
+   }
+  ]
+ },
+ "injury_note": "<b>Your shoulder:</b> no overhead pressing for now. Landmine press and neutral-grip pressing replace it (already swapped in your app). If anything feels sharp, stop that exercise and text me."
+}

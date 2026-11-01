@@ -1,25 +1,51 @@
 {
   "expo": {
-    "name": "sps-app",
-    "slug": "sps-app",
+    "name": "Six-Pack Stack",
+    "slug": "six-pack-stack",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.boonfay.sixpackstack",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Take your progress photos for your Sunday check-in.",
+        "NSPhotoLibraryUsageDescription": "Choose progress photos for your Sunday check-in.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.boonfay.sixpackstack",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Take your progress photos for your Sunday check-in.",
+          "photosPermission": "Choose progress photos for your Sunday check-in."
+        }
+      ]
+    ],
+    "scheme": "sixpackstack",
+    "backgroundColor": "#0d1b33",
+    "experiments": {
+      "typedRoutes": false
+    },
+    "splash": {
+      "backgroundColor": "#0d1b33"
     }
   }
 }

@@ -1,0 +1,515 @@
+{
+ "incline_db_press": {
+  "name": "Incline dumbbell press",
+  "video": "OC7Qs_SAO2E",
+  "cues": [
+   "Bench at 30°, feet planted, shoulder blades squeezed back",
+   "Lower until the dumbbells are level with your chest, elbows about 45° from your body",
+   "Press up and slightly in; don't clank the dumbbells"
+  ]
+ },
+ "lat_pulldown": {
+  "name": "Lat pulldown",
+  "video": "CAwf7n6Luuc",
+  "cues": [
+   "Grip just outside shoulder width, thighs locked under the pad",
+   "Lean back slightly and pull the bar to your upper chest, elbows down to your sides",
+   "Control it up until your arms are straight; no swinging"
+  ]
+ },
+ "seated_cable_row": {
+  "name": "Seated cable row",
+  "video": "oFtfkSElE0s",
+  "cues": [
+   "Sit tall, slight bend in the knees, chest up",
+   "Pull the handle to your belly button, squeeze your shoulder blades together",
+   "Let your arms straighten all the way without rounding your lower back"
+  ]
+ },
+ "machine_shoulder_press": {
+  "name": "Machine shoulder press",
+  "video": "Anu8s_nkNpM",
+  "cues": [
+   "Seat so the handles start at shoulder height",
+   "Press up without locking out hard or arching your back",
+   "Lower slowly to the start"
+  ]
+ },
+ "cable_lateral_raise": {
+  "name": "Cable lateral raise",
+  "video": "Z5FA9aq3L6A",
+  "cues": [
+   "Cable at the lowest setting, handle in the far hand",
+   "Raise out to the side to shoulder height, leading with the elbow",
+   "Lower for a slow 2 count; keep your torso still"
+  ]
+ },
+ "rope_pushdown": {
+  "name": "Triceps rope pushdown",
+  "video": "vPeQu_L-1n0",
+  "cues": [
+   "Elbows pinned to your sides",
+   "Push down and spread the rope at the bottom",
+   "Only your forearms move; control it back up"
+  ]
+ },
+ "cable_curl": {
+  "name": "Cable curl",
+  "video": "pEVXvlVKm80",
+  "cues": [
+   "Stand tall, elbows by your sides",
+   "Curl up and squeeze at the top",
+   "Lower all the way down slowly; no body swing"
+  ]
+ },
+ "leg_press": {
+  "name": "Leg press",
+  "video": "cDGOn-yfKJA",
+  "cues": [
+   "Feet shoulder width, mid-platform",
+   "Lower until your knees are around 90° without your lower back lifting off the pad",
+   "Push through your whole foot; don't lock your knees out hard"
+  ]
+ },
+ "goblet_squat": {
+  "name": "Goblet squat",
+  "video": "nfX7IFK9UNI",
+  "cues": [
+   "Hold the dumbbell at your chest, elbows down",
+   "Sit down between your heels, chest up, knees track over toes",
+   "Drive up through your whole foot"
+  ]
+ },
+ "rdl": {
+  "name": "Romanian deadlift",
+  "video": "yjqRj72AuaE",
+  "cues": [
+   "Soft knees, push your hips straight back",
+   "Bar or dumbbells slide down your thighs; stop when you feel a big hamstring stretch",
+   "Squeeze your glutes to stand; back stays flat the whole time"
+  ]
+ },
+ "walking_lunge": {
+  "name": "Walking lunge",
+  "video": "YYWhkctnP2o",
+  "cues": [
+   "Long step forward, torso tall",
+   "Back knee drops to just above the floor",
+   "Push through the front heel into the next step"
+  ]
+ },
+ "seated_leg_curl": {
+  "name": "Seated leg curl",
+  "video": "Z5pRnXaCjpM",
+  "cues": [
+   "Line your knees up with the machine's pivot, lap pad tight",
+   "Curl all the way down and squeeze",
+   "Let it back up slowly to a full stretch"
+  ]
+ },
+ "standing_calf_raise": {
+  "name": "Standing calf raise",
+  "video": "4HQ8Am9IuME",
+  "cues": [
+   "Balls of your feet on the edge, heels hanging",
+   "Drop into a deep stretch and pause 1 second",
+   "Rise as high as you can and squeeze for 1 second"
+  ]
+ },
+ "cable_crunch": {
+  "name": "Kneeling cable crunch",
+  "video": "0KEP6A1deBE",
+  "cues": [
+   "Kneel, rope by your ears, hips stay still",
+   "Curl your ribs down toward your hips by rounding your spine",
+   "Don't pull with your arms; exhale hard at the bottom"
+  ]
+ },
+ "barbell_bench": {
+  "name": "Barbell bench press",
+  "video": "rT7DgCr-3pg",
+  "cues": [
+   "Eyes under the bar, shoulder blades pinched, feet planted",
+   "Lower to your lower chest with elbows about 45°",
+   "Press back up over your shoulders"
+  ]
+ },
+ "db_bench": {
+  "name": "Dumbbell bench press",
+  "video": "5Y3VZsLb1Ys",
+  "cues": [
+   "Kick the dumbbells up, shoulder blades back and down",
+   "Lower to chest level, elbows about 45°",
+   "Press up and slightly in"
+  ]
+ },
+ "neutral_db_bench": {
+  "name": "Neutral-grip dumbbell bench press",
+  "video": "5Y3VZsLb1Ys",
+  "cues": [
+   "Palms face each other the whole set (easier on the shoulder)",
+   "Lower to chest level with elbows tucked",
+   "Press up; stop if the shoulder pinches"
+  ]
+ },
+ "chest_supported_row": {
+  "name": "Chest-supported row",
+  "video": "QpLTp2AJ_cI",
+  "cues": [
+   "Chest stays on the pad the whole set",
+   "Pull your elbows back past your body",
+   "Pause, then let your arms fully straighten"
+  ]
+ },
+ "chest_supported_db_row": {
+  "name": "Chest-supported dumbbell row",
+  "video": "ro2vfHfD0DQ",
+  "cues": [
+   "Lie chest-down on an incline bench",
+   "Row the dumbbells to your hips, squeeze your shoulder blades",
+   "Lower to a full stretch"
+  ]
+ },
+ "pull_up": {
+  "name": "Pull-up",
+  "video": "Y44dJcTEhJE",
+  "cues": [
+   "Hands just outside shoulders, start from a dead hang",
+   "Pull your chest to the bar, elbows down",
+   "Lower all the way under control; stop 1–2 reps short of failure"
+  ]
+ },
+ "assisted_pull_up": {
+  "name": "Assisted pull-up",
+  "video": "gnElpp3Fm50",
+  "cues": [
+   "Pick assistance that lets you hit the rep range",
+   "Full hang at the bottom, chest to the bar at the top",
+   "Use less assistance as you get stronger"
+  ]
+ },
+ "db_shoulder_press": {
+  "name": "Seated dumbbell shoulder press",
+  "video": "WKEl69bIGus",
+  "cues": [
+   "Back against an upright bench",
+   "Press from shoulder height to just above your head",
+   "Lower to ear level under control"
+  ]
+ },
+ "landmine_press": {
+  "name": "Landmine press",
+  "video": "7eb_ziZFduE",
+  "cues": [
+   "Bar end at shoulder height, staggered stance",
+   "Press up and forward along the bar's path",
+   "Shoulder-friendly swap for overhead pressing; lower slowly"
+  ]
+ },
+ "face_pull": {
+  "name": "Face pull",
+  "video": "eTCBSFlCJ_s",
+  "cues": [
+   "Rope at face height, thumbs toward you",
+   "Pull to your forehead, elbows high and wide",
+   "Pause and squeeze the back of your shoulders"
+  ]
+ },
+ "incline_curl": {
+  "name": "Incline dumbbell curl",
+  "video": "t24mTZKfpGg",
+  "cues": [
+   "Bench at 45–60°, arms hang straight down",
+   "Curl without letting your elbows drift forward",
+   "Lower all the way to a full stretch"
+  ]
+ },
+ "oh_cable_ext": {
+  "name": "Overhead cable triceps extension",
+  "video": "AUsSlsBu5eg",
+  "cues": [
+   "Face away from the cable, rope behind your head",
+   "Extend your arms overhead, elbows pointing forward",
+   "Lower to a deep stretch behind your head"
+  ]
+ },
+ "hack_squat": {
+  "name": "Hack squat",
+  "video": "-lAnEGH2blE",
+  "cues": [
+   "Back flat on the pad, feet mid-platform",
+   "Lower as deep as you can with heels down",
+   "Drive up; don't lock your knees hard"
+  ]
+ },
+ "ffe_split_squat": {
+  "name": "Front-foot-elevated split squat",
+  "video": "gpqdz-4g8n4",
+  "cues": [
+   "Front foot on a small plate or step",
+   "Drop the back knee straight down toward the floor",
+   "Push through the front foot; torso tall"
+  ]
+ },
+ "hip_thrust": {
+  "name": "Hip thrust",
+  "video": "eutQE64svRE",
+  "cues": [
+   "Upper back on the bench edge, bar padded on your hips",
+   "Drive through your heels until your hips are level with your knees",
+   "Chin tucked, squeeze your glutes 1 second at the top"
+  ]
+ },
+ "leg_extension": {
+  "name": "Leg extension",
+  "video": "xAUvXdHu1sI",
+  "cues": [
+   "Knees line up with the machine's pivot",
+   "Kick up until your legs are straight, squeeze your quads",
+   "Lower slowly"
+  ]
+ },
+ "lying_leg_curl": {
+  "name": "Lying leg curl",
+  "video": "SbSNUXPRkc8",
+  "cues": [
+   "Hips pressed into the pad",
+   "Curl your heels toward your glutes",
+   "Slow on the way down"
+  ]
+ },
+ "hanging_knee_raise": {
+  "name": "Hanging knee raise",
+  "video": "FxbUkA7jhsM",
+  "cues": [
+   "Dead hang, no swinging",
+   "Curl your knees up toward your chest by tilting your pelvis",
+   "Lower under control"
+  ]
+ },
+ "plank": {
+  "name": "Plank",
+  "video": "mwlp75MS6Rg",
+  "cues": [
+   "Elbows under shoulders",
+   "Squeeze your glutes and brace your abs; body in one straight line",
+   "Breathe; stop when your hips sag"
+  ]
+ },
+ "one_arm_db_row": {
+  "name": "One-arm dumbbell row",
+  "video": "vbechsUCn24",
+  "cues": [
+   "Hand and knee on a bench, back flat",
+   "Row the dumbbell to your hip",
+   "Lower to a full stretch"
+  ]
+ },
+ "band_pulldown": {
+  "name": "Band pulldown",
+  "video": "94A3JVWqpdg",
+  "cues": [
+   "Anchor the band high",
+   "Pull elbows down to your sides",
+   "Control the band back up"
+  ]
+ },
+ "db_lateral_raise": {
+  "name": "Dumbbell lateral raise",
+  "video": "ssAo_xwFt5c",
+  "cues": [
+   "Slight bend in the elbows",
+   "Raise out to the side to shoulder height",
+   "Lower slowly; no swinging"
+  ]
+ },
+ "db_curl": {
+  "name": "Dumbbell curl",
+  "video": "93R8V6uvwHc",
+  "cues": [
+   "Elbows by your sides",
+   "Curl and squeeze at the top",
+   "Lower all the way down slowly"
+  ]
+ },
+ "oh_db_ext": {
+  "name": "Overhead dumbbell extension",
+  "video": "O7e8j8K3cJo",
+  "cues": [
+   "Hold one dumbbell overhead with both hands",
+   "Lower behind your head, elbows pointing forward",
+   "Extend back up"
+  ]
+ },
+ "db_rdl": {
+  "name": "Dumbbell Romanian deadlift",
+  "video": "hQgFixeXdZo",
+  "cues": [
+   "Soft knees, hips back",
+   "Dumbbells slide down your thighs to a deep hamstring stretch",
+   "Squeeze your glutes to stand"
+  ]
+ },
+ "bulgarian_split_squat": {
+  "name": "Bulgarian split squat",
+  "video": "VPhhE6bBzZE",
+  "cues": [
+   "Back foot on a bench, front foot far enough out",
+   "Drop straight down, front knee over the toes",
+   "Push through the front foot"
+  ]
+ },
+ "sl_hip_thrust": {
+  "name": "Single-leg hip thrust",
+  "video": "kpkg8r7dex4",
+  "cues": [
+   "Upper back on the bench, one foot planted",
+   "Drive the hips up through the heel",
+   "Squeeze at the top, keep hips level"
+  ]
+ },
+ "sl_calf_raise": {
+  "name": "Single-leg calf raise",
+  "video": "IphGZ8OlfYg",
+  "cues": [
+   "Ball of one foot on a step, hold something for balance",
+   "Deep stretch at the bottom",
+   "Rise high and squeeze"
+  ]
+ },
+ "dead_bug": {
+  "name": "Dead bug",
+  "video": "bxn9FBrt4-A",
+  "cues": [
+   "Lower back pressed into the floor",
+   "Lower opposite arm and leg slowly",
+   "Exhale and return; lower back never lifts"
+  ]
+ },
+ "push_up": {
+  "name": "Push-up",
+  "video": "WDIpL0pjun0",
+  "cues": [
+   "Hands under shoulders, body in one line",
+   "Lower your chest to just above the floor",
+   "Push the floor away; elevate your hands if needed"
+  ]
+ },
+ "chin_up": {
+  "name": "Chin-up",
+  "video": "53kV7Ou7oZo",
+  "cues": [
+   "Palms facing you, shoulder width",
+   "Pull your chest to the bar",
+   "Lower all the way down"
+  ]
+ },
+ "band_row": {
+  "name": "Band row",
+  "video": "LSkyinhmA8k",
+  "cues": [
+   "Anchor the band at chest height",
+   "Row the elbows back past your body",
+   "Control it forward"
+  ]
+ },
+ "arnold_press": {
+  "name": "Arnold press",
+  "video": "TUHL8dXFvTg",
+  "cues": [
+   "Start with palms facing you at chin height",
+   "Rotate the palms out as you press up",
+   "Reverse on the way down"
+  ]
+ },
+ "rear_delt_fly": {
+  "name": "Rear-delt fly",
+  "video": "Lec8GC1SiS8",
+  "cues": [
+   "Hinge forward, flat back",
+   "Raise the dumbbells out wide with soft elbows",
+   "Squeeze the back of your shoulders"
+  ]
+ },
+ "hammer_curl": {
+  "name": "Hammer curl",
+  "video": "CFBZ4jN1CMI",
+  "cues": [
+   "Palms face each other",
+   "Curl without swinging",
+   "Lower slowly"
+  ]
+ },
+ "close_grip_push_up": {
+  "name": "Close-grip push-up",
+  "video": "rG-rAMxA9Lo",
+  "cues": [
+   "Hands just inside shoulder width",
+   "Elbows brush your ribs on the way down",
+   "Press up through your triceps"
+  ]
+ },
+ "db_reverse_lunge": {
+  "name": "Dumbbell reverse lunge",
+  "video": "Q2k3kYbtOcI",
+  "cues": [
+   "Step back into the lunge",
+   "Back knee drops toward the floor",
+   "Push through the front heel to stand"
+  ]
+ },
+ "db_hip_thrust": {
+  "name": "Dumbbell hip thrust",
+  "video": "nIkB9vckPHU",
+  "cues": [
+   "Dumbbell on your hips, upper back on the bench",
+   "Drive up through your heels",
+   "Squeeze 1 second at the top"
+  ]
+ },
+ "db_step_up": {
+  "name": "Dumbbell step-up",
+  "video": "9ZknEYboBOQ",
+  "cues": [
+   "Whole foot on the box",
+   "Drive through the top leg; don't push off the bottom foot",
+   "Lower slowly"
+  ]
+ },
+ "sl_db_deadlift": {
+  "name": "Dumbbell stiff-leg deadlift",
+  "video": "KE2A7G_nDc8",
+  "cues": [
+   "Legs nearly straight, soft knees",
+   "Hinge at the hips to a deep hamstring stretch",
+   "Back flat; squeeze glutes to stand"
+  ]
+ },
+ "lying_leg_raise": {
+  "name": "Lying leg raise",
+  "video": "SuIxXbKnwx4",
+  "cues": [
+   "Lower back pressed into the floor",
+   "Raise straight legs to vertical",
+   "Lower slowly without your back arching"
+  ]
+ },
+ "back_extension": {
+  "name": "Back extension",
+  "video": "vx0jZBEmZcE",
+  "cues": [
+   "Pad just below your hips",
+   "Lower with a flat back",
+   "Squeeze your glutes to come up to a straight line"
+  ]
+ },
+ "box_squat": {
+  "name": "Goblet box squat",
+  "video": "Aub3U8uHNQk",
+  "cues": [
+   "Box at a depth that's pain-free",
+   "Sit back to touch the box lightly",
+   "Stand up through your whole foot"
+  ]
+ }
+}
