@@ -1,34 +1,29 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as Linking from 'expo-linking';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
-  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
-  const sendCode = async () => {
+  const send = async () => {
     setErr('');
     const e = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return setErr('Enter a valid email.');
     setBusy(true);
-    const { error } = await supabase.auth.signInWithOtp({ email: e, options: { shouldCreateUser: true } });
+    const { error } = await supabase.auth.signInWithOtp({
+      email: e,
+      options: { shouldCreateUser: true, emailRedirectTo: Linking.createURL('auth') },
+    });
     setBusy(false);
-    if (error) return setErr(error.message);
-    setStep('code');
-  };
-
-  const verify = async () => {
-    setErr('');
-    setBusy(true);
-    const { error } = await supabase.auth.verifyOtp({ email: email.trim().toLowerCase(), token: code.trim(), type: 'email' });
-    setBusy(false);
-    if (error) setErr('That code didn\'t work. Check it or send a new one.');
+    if (error) return setErr(error.message.includes('rate') ? 'Too many tries. Wait a few minutes, then send again.' : error.message);
+    setSent(true);
   };
 
   return (
@@ -39,40 +34,32 @@ export default function SignIn() {
           <Text style={st.brand}>Six-Pack Stack</Text>
         </View>
         <View style={{ gap: 10, marginTop: 40 }}>
-          <Eyebrow>{step === 'email' ? 'Welcome' : 'Check your email'}</Eyebrow>
+          <Eyebrow>{sent ? 'Check your email' : 'Welcome'}</Eyebrow>
           <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
-            {step === 'email' ? 'Sign in to your plan.' : 'Enter your code.'}
+            {sent ? 'Tap the link we sent you.' : 'Sign in to your plan.'}
           </H1>
           <Text style={st.sub}>
-            {step === 'email'
-              ? 'Use the email you signed up with. We\'ll send you a 6-digit code. No password needed.'
-              : `We sent a 6-digit code to ${email.trim()}.`}
+            {sent
+              ? `We sent a sign-in link to ${email.trim()}. Open it on this phone and you're in. Check spam if you don't see it.`
+              : 'Use the email you signed up with. We\'ll email you a sign-in link. No password needed.'}
           </Text>
         </View>
         <View style={{ gap: 12, marginTop: 28 }}>
-          {step === 'email' ? (
+          {!sent ? (
             <>
               <Text style={st.label} nativeID="emailLabel">Email</Text>
               <TextInput
                 accessibilityLabelledBy="emailLabel"
                 value={email} onChangeText={setEmail} autoCapitalize="none" autoComplete="email"
                 keyboardType="email-address" textContentType="emailAddress" placeholder="you@email.com"
-                placeholderTextColor="#ffffff99" style={st.input} returnKeyType="send" onSubmitEditing={sendCode}
+                placeholderTextColor="#ffffff99" style={st.input} returnKeyType="send" onSubmitEditing={send}
               />
-              <Button title="Send my code" onPress={sendCode} loading={busy} />
+              <Button title="Email me a sign-in link" onPress={send} loading={busy} />
             </>
           ) : (
             <>
-              <Text style={st.label} nativeID="codeLabel">6-digit code</Text>
-              <TextInput
-                accessibilityLabelledBy="codeLabel"
-                value={code} onChangeText={(t) => setCode(t.replace(/\D/g, '').slice(0, 6))}
-                keyboardType="number-pad" textContentType="oneTimeCode" autoComplete="one-time-code"
-                placeholder="123456" placeholderTextColor="#ffffff99"
-                style={[st.input, { letterSpacing: 8, fontSize: 24, textAlign: 'center' }]}
-              />
-              <Button title="Sign in" onPress={verify} loading={busy} disabled={code.length < 6} />
-              <Button title="Use a different email" variant="ghost" onPress={() => { setStep('email'); setCode(''); }} />
+              <Button title="Send it again" variant="ghost" onPress={send} loading={busy} />
+              <Button title="Use a different email" variant="ghost" onPress={() => setSent(false)} />
             </>
           )}
           {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
