@@ -11,6 +11,8 @@ export const isLocked = (p: Profile | null | undefined, week: number) => isFree(
 
 export const TERMS_URL = 'https://six-pack-stack.vercel.app/terms';
 export const PRIVACY_URL = 'https://six-pack-stack.vercel.app/privacy';
+/** The free 60-second Stack Score (website lead magnet: Kit report email, then Nurture). */
+export const STACK_SCORE_URL = 'https://six-pack-stack.vercel.app/stack-score?src=app';
 export const BTL_URL = 'https://boon-fay.kit.com/a9cb0690c3';
 /** Six-Pack Stack 1:1 coaching landing page (its Apply button goes to the same application form). */
 export const COACHING_URL = 'https://six-pack-stack.vercel.app/?src=app';

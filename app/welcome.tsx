@@ -5,19 +5,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../src/lib/theme';
 import type { Want } from '../src/lib/lead';
-import { BTL_URL, COACHING_URL } from '../src/lib/access';
+import { BTL_URL, COACHING_URL, STACK_SCORE_URL } from '../src/lib/access';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
 
-const PLAN = require('../assets/img/tile_plan.jpg');
+const PLAN = require('../assets/img/cover_free.jpg');
+const SCORE = require('../assets/img/cover_score.jpg');
 const APP = require('../assets/img/cover_program.jpg');
 const BTL = require('../assets/img/btl_cover.jpg');
 const COACH = require('../assets/img/cover_coaching.jpg');
 const LOGO = require('../assets/logo-b.png');
 
 
-const PATHS: { want: Want; img: ImageSourcePropType; tag: string; price: string; title: string; line: string; contain?: boolean }[] = [
+const PATHS: { want: Want | 'score'; img: ImageSourcePropType; tag: string; price: string; title: string; line: string; contain?: boolean }[] = [
   { want: 'plan', img: PLAN, tag: 'Start here', price: 'Free', title: 'The Free Stack', line: 'Your first 2 weeks free: your calories, your meals and your training, built from a 2-minute quiz.' },
+  { want: 'score', img: SCORE, tag: 'Free audit', price: 'Free', title: 'Stack Score', line: '60 seconds: what to cut, keep and swap in your stack, and what it\'s costing you.' },
   { want: 'btl', img: BTL, tag: 'The guide', price: '$39.99', title: 'Beyond the Label', line: '47 supplements and gadgets investigated: what actually works, and what\'s just marketing.' },
   { want: 'sub', img: APP, tag: 'Best value', price: '$19.99/mo', title: 'The Full Stack', line: 'All 12 weeks: everything you need to finish on your own. Or $99 a year ($1.90 a week).' },
   { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'By application', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
@@ -47,7 +49,7 @@ export default function Welcome() {
         {PATHS.map((p, i) => (
           <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
             <Pressable accessibilityRole="button" accessibilityLabel={`${p.title}, ${p.price}`}
-              onPress={() => (p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
+              onPress={() => (p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : p.want === 'score' ? Linking.openURL(STACK_SCORE_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
               style={({ pressed }) => [st.card, p.want === 'sub' && st.cardSub, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               <View style={st.thumb}>
                 <Image source={p.img} style={{ width: 100, height: 126 }} resizeMode="cover" accessibilityIgnoresInvertColors />

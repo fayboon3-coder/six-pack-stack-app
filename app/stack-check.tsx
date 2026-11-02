@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { C, F } from '../src/lib/theme';
 import { BackIcon, SearchIcon } from '../src/components/icons';
 import AskBoonCard from '../src/components/AskBoonCard';
+import { STACK_SCORE_URL } from '../src/lib/access';
 import Poster from '../src/components/Poster';
 import { imageFor, KIND, search, Verdict, VERDICTS } from '../src/lib/stackcheck';
 import Backdrop from '../src/components/Backdrop';
@@ -37,6 +38,13 @@ export default function StackCheck() {
             <Text style={st.k}>Stack Check</Text>
             <Text style={st.h}>{twoTone('Before you buy it,| check it.')}</Text>
             <Text style={st.body}>{VERDICTS.length} products I investigated for Beyond the Label. Type a brand or what it claims to do.</Text>
+            <Pressable accessibilityRole="link" onPress={() => Linking.openURL(STACK_SCORE_URL)} style={st.score}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={st.scoreK}>Free · 60 seconds</Text>
+                <Text style={st.scoreT}>Score your whole stack: what to cut, keep and swap</Text>
+              </View>
+              <Text style={st.scoreChev}>›</Text>
+            </Pressable>
             <View style={st.search}>
               <SearchIcon color={C.white} />
               <TextInput accessibilityLabel="Search supplements" value={q} onChangeText={setQ} placeholder="AG1, C4, fat burner, creatine…"
@@ -81,6 +89,10 @@ export default function StackCheck() {
 }
 
 const st = StyleSheet.create({
+  score: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: C.green, borderRadius: 16, padding: 14, backgroundColor: 'rgba(63,191,127,0.08)' },
+  scoreK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.green },
+  scoreT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.white },
+  scoreChev: { fontFamily: F.bold, fontSize: 28, color: C.white, marginTop: -4 },
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
   h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
