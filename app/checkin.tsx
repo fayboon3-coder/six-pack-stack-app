@@ -222,7 +222,7 @@ export default function CheckinScreen() {
               </View>
             )}
 
-            <Section n={photoWeek ? 3 : 2} title="Your week" sub="Be honest. A rough week tells me exactly what to fix." done={done.week}>
+            <Section n={photoWeek ? 3 : 2} title="Your week" sub={isCoached(profile) ? 'Be honest. A rough week tells me exactly what to fix.' : 'Be honest. A rough week shows you exactly what to fix.'} done={done.week}>
               <Scale icon={<DumbbellIcon color={C.red2} size={18} />} label="Workouts done" n={nDays} value={workouts} onChange={setWorkouts} />
               <Scale icon={<ForkIcon color={C.red2} />} label="Days you hit your food" n={7} value={nutrition} onChange={setNutrition} />
               <Scale icon={<BoltIcon color={C.red2} />} label="Energy" n={10} from={1} value={energy} onChange={setEnergy} low="Drained" high="Fired up" />

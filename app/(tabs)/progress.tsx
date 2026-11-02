@@ -4,6 +4,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Line, Polyline, Text as SvgText } from 'react-native-svg';
 import { useAuth } from '../../src/lib/auth';
+import { isCoached } from '../../src/lib/access';
 import { supabase } from '../../src/lib/supabase';
 import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
@@ -126,7 +127,7 @@ export default function Progress() {
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={st.ctaKicker}>{checkinOpen ? 'Check-in is open' : `Next check-in in ${toSunday} day${toSunday > 1 ? 's' : ''}`}</Text>
             <Text style={st.ctaTitle}>{checkinOpen ? 'Do your check-in now' : 'Open your check-in'}</Text>
-            <Text style={st.ctaSub}>2 minutes · Boon replies within 24 hours</Text>
+            <Text style={st.ctaSub}>{isCoached(profile) ? '2 minutes · Boon replies within 24 hours' : '2 minutes · it updates your trend'}</Text>
           </View>
           <View style={st.ctaBtn}><PlayIcon size={16} /></View>
         </Pressable>

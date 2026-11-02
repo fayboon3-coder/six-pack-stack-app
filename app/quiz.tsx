@@ -39,7 +39,7 @@ const STEPS: Step[] = [
   { id: 'struggle', kind: 'one', q: "What's been the hardest part so far?", opts: ['Cravings and snacking', 'Weekends', 'No time', "Not knowing what to eat", 'Staying consistent'] },
   { id: 'story', kind: 'story' },
   { id: 'start_timing', kind: 'one', q: 'When do you want to start?', opts: ['Today', 'This week', 'Within a month', 'Just looking'] },
-  { id: 'ready_to_invest', kind: 'one', q: 'If I coached you 1:1, would you invest in yourself?', sub: "Your free plan doesn't depend on this. It helps me know who to help first.", opts: ['Yes', 'Yes, with a payment plan', 'Not right now'] },
+  { id: 'ready_to_invest', kind: 'one', q: 'If I coached you 1:1, would you invest in yourself?', sub: "The Free Stack doesn't depend on this. It helps me know who to help first.", opts: ['Yes', 'Yes, with a payment plan', 'Not right now'] },
   { id: 'chart', kind: 'chart' },
   { id: 'account', kind: 'account' },
 ];
@@ -211,7 +211,7 @@ function SpendStep({ spend, tried, onNext }: { spend: string; tried: string[]; o
       <Text style={st.q}>That's roughly what you spend on supplements in a year.</Text>
       <Text style={st.sub}>
         {junk.length
-          ? `${junk.map((j, k) => (k ? j.toLowerCase() : j)).join(junk.length > 2 ? ', ' : ' and ').replace(/, ([^,]*)$/, ' and $1')}: these are the products I've spent years investigating, and most of what's in them is marketing, not results. Your plan keeps only what's proven to work and costs about $12 a month.`
+          ? `I've spent years investigating ${junk.map((j) => j.toLowerCase()).join(junk.length > 2 ? ', ' : ' and ').replace(/, ([^,]*)$/, ' and $1')}. Most of what you're paying for is marketing, not results. Your plan keeps only what's proven to work, for about $12 a month.`
           : "Your plan keeps only what's proven to work: about $12 a month. Everything else is optional."}
       </Text>
       <Button title="Next" onPress={onNext} />

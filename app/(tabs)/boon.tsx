@@ -14,7 +14,6 @@ import { COACHING_URL, isCoached, isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 
-const HERO_IMG = require('../../assets/hero/boon.jpg');
 const FACE_IMG = require('../../assets/hero/boon_jacked.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
@@ -45,7 +44,7 @@ export default function Boon() {
               : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
             cta="See how coaching works" onPress={() => Linking.openURL(COACHING_URL)} />
         ) : (
-          <HeroCard image={HERO_IMG} badge="Replies within 24 hours" title="I've got you"
+          <HeroCard image={FACE_IMG} imageRatio={16 / 9} badge="Replies within 24 hours" title="I've got you"
             subtitle="Stuck, hungry, sore, or staring at a supplement you saw online? Send it. I read and answer every message myself." cta="Text Boon on WhatsApp"
             onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
         )}
@@ -86,7 +85,7 @@ export default function Boon() {
       </Text>
       <View style={{ marginTop: 8, gap: 8 }}>
         <Text style={st.sub}>Signed in as {profile?.email || session?.user.email}</Text>
-        <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium' }]}>App update: Nov 1 · Stack Check, streaks, reminders</Text>
+        <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium' }]}>App update: Nov 2 · The Free Stack, The Full Stack, new exercise photos</Text>
         <Button title="Sign out" variant="ghost" onPress={signOut} />
       </View>
     </Screen>

@@ -25,8 +25,8 @@ const SAMPLE_QUIZ: any = { goal: 'Lose fat and see my abs', sex: 'Male', age: '2
 function previewProfilePlan(real: Profile, v: ViewAs): { profile: Profile; plan: Plan } {
   const fp = buildFreePlan(SAMPLE_QUIZ);
   const profile = { ...real, role: 'client', tier: v, first_name: 'Jake', quiz: SAMPLE_QUIZ } as Profile;
-  if (v === 'free') return { profile, plan: fp };
-  // Paid tiers: the full sample plan, starting the same week as the free one.
+  if (v !== 'coached') return { profile, plan: fp }; // Free and Full Stack: the quiz-built plan
+  // Coaching client: the full 1:1 sample plan (audit, Boon's notes), same start week.
   const demo = require('../data/samplePlan.json');
   return { profile, plan: { ...demo, name: 'Jake', train: { ...demo.train, s: fp.train.s } } };
 }

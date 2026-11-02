@@ -59,7 +59,7 @@ export default function Btl() {
           <Text style={st.linkText}>Not sure yet? Check a product free in Stack Check</Text>
         </Pressable>
         <Pressable accessibilityRole="button" onPress={() => router.replace('/welcome')} style={st.link}>
-          <Text style={st.linkText}>Or get your free 12-week plan</Text>
+          <Text style={st.linkText}>Or start The Free Stack (2 weeks free)</Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>
