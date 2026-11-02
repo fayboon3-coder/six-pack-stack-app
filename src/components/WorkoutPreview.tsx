@@ -10,9 +10,10 @@ import { MuscleChips, Stat } from './WorkoutBits';
  * The big workout card: form-video still on top, the stats, every exercise
  * (thumbnail, sets × reps, muscle), then one button to start.
  */
-export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, maxRows = 99 }: {
-  meta: DayMeta; badge: string; cta: string; done?: boolean; onPress: () => void; maxRows?: number;
+export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, maxRows = 99, cover = 0 }: {
+  meta: DayMeta; badge: string; cta: string; done?: boolean; onPress: () => void; maxRows?: number; cover?: number;
 }) {
+  const coverItem = w.items[Math.min(cover, w.items.length - 1)] || w.items[0];
   const { width } = useWindowDimensions();
   const cw = Math.min(width, 520) - 40;
   const ih = Math.round(cw * 9 / 16);
@@ -22,7 +23,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
     <Pressable accessibilityRole="button" accessibilityLabel={`${cta}: ${w.type}, ${w.items.length} exercises`}
       onPress={onPress} style={({ pressed }) => [st.card, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       <View style={{ width: cw, height: ih }}>
-        {!!w.items[0]?.video && <Image source={thumb(w.items[0].video, 'hq')} style={{ width: cw, height: ih }} resizeMode="cover" accessibilityIgnoresInvertColors />}
+        {!!coverItem?.video && <Image source={thumb(coverItem.video, 'hq')} style={{ width: cw, height: ih }} resizeMode="cover" accessibilityIgnoresInvertColors />}
         <LinearGradient colors={['rgba(13,27,51,0.15)', 'rgba(13,27,51,0.35)', C.navy2]} locations={[0, 0.5, 1]}
           style={{ position: 'absolute', left: 0, top: 0, width: cw, height: ih }} />
         <View style={[st.badge, done && { backgroundColor: C.green }]}><Text style={st.badgeText}>{badge}</Text></View>

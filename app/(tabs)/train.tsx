@@ -61,7 +61,7 @@ export default function Train() {
         </View>
 
         <WorkoutPreview meta={metas[index]} badge={isToday ? "Today's workout" : `Up next · ${metas[index].day}`}
-          cta={isToday ? 'Start workout' : 'Preview workout'} onPress={() => go(index)} maxRows={4} />
+          cta={isToday ? 'Start workout' : 'Preview workout'} onPress={() => go(index)} maxRows={4} cover={1} />
       </View>
     }>
       <Text style={st.listTitle}>All {plan.train.d.length} workouts</Text>
