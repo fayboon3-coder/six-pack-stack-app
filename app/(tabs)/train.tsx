@@ -13,6 +13,8 @@ import { CheckIcon, ChevronIcon, ClockIcon, DumbbellIcon, LayersIcon, PlayIcon }
 import { phaseOf, plain, todayIndex, weekOf } from '../../src/lib/program';
 import { dayMeta, thumb } from '../../src/lib/workoutMeta';
 import { isoDate, loggedDays } from '../../src/lib/logs';
+import { isLocked } from '../../src/lib/access';
+import { LockedWeek } from '../../src/components/Offers';
 
 const WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -33,7 +35,8 @@ export default function Train() {
   const { index, isToday } = todayIndex(plan);
   const metas = plan.train.d.map(dayMeta);
   const doneCount = plan.train.d.filter((d) => done.has(d.t)).length;
-  const go = (k: number) => router.push({ pathname: '/workout', params: { d: String(k) } });
+  const locked = isLocked(profile, week);
+  const go = (k: number) => locked ? router.push('/unlock') : router.push({ pathname: '/workout', params: { d: String(k) } });
   const todayDow = new Date().getDay();
 
   return (
@@ -60,8 +63,8 @@ export default function Train() {
           })}
         </View>
 
-        <WorkoutPreview meta={metas[index]} badge={isToday ? "Today's workout" : `Up next · ${metas[index].day}`}
-          cta={isToday ? 'Start workout' : 'Preview workout'} onPress={() => go(index)} maxRows={4} cover={1} />
+        {locked ? <LockedWeek week={week} onUnlock={() => router.push('/unlock')} /> : <WorkoutPreview meta={metas[index]} badge={isToday ? "Today's workout" : `Up next · ${metas[index].day}`}
+          cta={isToday ? 'Start workout' : 'Preview workout'} onPress={() => go(index)} maxRows={4} cover={1} />}
       </View>
     }>
       <Text style={st.listTitle}>All {plan.train.d.length} workouts</Text>

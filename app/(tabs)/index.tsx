@@ -14,6 +14,8 @@ import { CheckIcon } from '../../src/components/icons';
 import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
+import { isFree, isLocked, FREE_WEEKS } from '../../src/lib/access';
+import { LockedWeek } from '../../src/components/Offers';
 
 
 export default function Today() {
@@ -78,12 +80,22 @@ export default function Today() {
           </Pressable>
         )}
 
-        <WorkoutPreview
+        {isLocked(profile, week) ? <LockedWeek week={week} onUnlock={() => router.push('/unlock')} /> : <WorkoutPreview
           meta={dayMeta(day)}
           badge={doneToday ? 'Done today ✓' : isToday ? "Today's workout" : `Next up · ${dayName}`}
           cta={doneToday ? 'Review workout' : isToday ? 'Start workout' : 'Preview workout'}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })}
-        />
+        />}
+
+        {isFree(profile) && !isLocked(profile, week) && (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/unlock')} style={st.free}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={st.freeK}>Free plan · week {week} of {FREE_WEEKS}</Text>
+              <Text style={st.freeT}>{FREE_WEEKS - week + 1 === 1 ? 'Last free week. Unlock weeks 3–12' : 'Weeks 3–12: see your options'}</Text>
+            </View>
+            <Text style={st.chev}>›</Text>
+          </Pressable>
+        )}
 
         <Section title="Hit these today" />
         <View style={st.targets}>
@@ -171,6 +183,9 @@ const st = StyleSheet.create({
   rowTitle: { fontFamily: F.black, fontSize: 17, color: C.white },
   rowSub: { fontFamily: F.semi, fontSize: 13, color: C.white },
   chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
+  free: { marginHorizontal: 20, marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, padding: 14 },
+  freeK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  freeT: { fontFamily: F.black, fontSize: 16, color: C.white },
   tip: { marginHorizontal: 20, marginTop: 28, borderLeftWidth: 4, borderLeftColor: C.red, paddingLeft: 14, gap: 4 },
   tipKicker: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
   tipText: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
 
 export default function SignIn() {
+  const router = useRouter();
   const [mode, setMode] = useState<'in' | 'up'>('in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,7 +57,7 @@ export default function SignIn() {
             <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
               {mode === 'in' ? 'Sign in to your plan.' : 'Create your account.'}
             </H1>
-            <Text style={st.sub}>Use the email you signed up for coaching with.</Text>
+            <Text style={st.sub}>{mode === 'up' ? 'Use the email you bought coaching with. Your plan attaches to it automatically.' : 'Welcome back. Your plan is right where you left it.'}</Text>
           </View>
           <View style={{ gap: 12, marginTop: 24 }}>
             <Text style={st.label} nativeID="emailLabel">Email</Text>
@@ -71,7 +73,10 @@ export default function SignIn() {
             {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
             {!!note && <Text style={st.note} accessibilityLiveRegion="polite">{note}</Text>}
             <Pressable accessibilityRole="button" onPress={() => { setMode(mode === 'in' ? 'up' : 'in'); setErr(''); setNote(''); }} style={st.link}>
-              <Text style={st.linkText}>{mode === 'in' ? 'New here? Create your account' : 'Already have an account? Sign in'}</Text>
+              <Text style={st.linkText}>{mode === 'in' ? 'Coaching client, first time here? Create your account' : 'Already have an account? Sign in'}</Text>
+            </Pressable>
+            <Pressable accessibilityRole="button" onPress={() => router.replace('/quiz')} style={st.link}>
+              <Text style={st.linkText}>Not a client yet? Get your free 12-week plan</Text>
             </Pressable>
             {mode === 'in' && (
               <Pressable accessibilityRole="button" onPress={reset} style={st.link}>

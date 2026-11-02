@@ -18,9 +18,9 @@ function Gate() {
   useEffect(() => {
     if (loading) return;
     const seg = segments[0] as string | undefined;
-    const inAuth = seg === 'sign-in' || seg === 'auth';
-    if (!session && !inAuth) router.replace('/sign-in');
-    if (session && seg === 'sign-in') router.replace('/');
+    const open = ['sign-in', 'auth', 'welcome', 'quiz'].includes(seg || '');
+    if (!session && !open) router.replace('/welcome');
+    if (session && (seg === 'sign-in' || seg === 'welcome')) router.replace('/');
   }, [session, loading, segments, router]);
 
   if (loading) {
@@ -33,6 +33,11 @@ function Gate() {
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.navy } }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="welcome" />
+      <Stack.Screen name="quiz" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ready" options={{ gestureEnabled: false }} />
+      <Stack.Screen name="apply" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="unlock" options={{ presentation: 'modal' }} />
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="auth" />
       <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />

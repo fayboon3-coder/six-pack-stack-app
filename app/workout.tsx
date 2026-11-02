@@ -9,6 +9,7 @@ import { Button, s as ui } from '../src/components/ui';
 import { BackIcon, CheckIcon, PlayIcon } from '../src/components/icons';
 import { exercises, repsOf, setsFor, weekOf } from '../src/lib/program';
 import { isoDate, lastSession, saveSet } from '../src/lib/logs';
+import { isLocked } from '../src/lib/access';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -16,7 +17,7 @@ const ACC = 'setInputs';
 
 export default function Workout() {
   const { d } = useLocalSearchParams<{ d: string }>();
-  const { plan, session } = useAuth();
+  const { plan, session, profile } = useAuth();
   const router = useRouter();
   const dayIdx = Number(d || 0);
   const day = plan?.train.d[dayIdx];
@@ -29,6 +30,9 @@ export default function Workout() {
   const [now, setNow] = useState(Date.now());
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [kb, setKb] = useState(false);
+
+  // Free plan past week 2: send them to the offers instead of the workout.
+  useEffect(() => { if (isLocked(profile, week)) router.replace('/unlock'); }, [profile, week]);
 
   // Hide the bottom buttons while typing so they never jump up over the keyboard.
   useEffect(() => {

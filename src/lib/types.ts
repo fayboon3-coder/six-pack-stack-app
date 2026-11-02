@@ -5,6 +5,7 @@ export type Profile = {
   role: 'client' | 'coach';
   tier: 'free' | 'self' | 'coached';
   start_date: string | null;
+  quiz?: Record<string, any> | null;
 };
 
 export type TrainDay = { t: string; x: [string, string, string?][] };
