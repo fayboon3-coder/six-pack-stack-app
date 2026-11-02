@@ -17,7 +17,7 @@ import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
 import Backdrop from '../src/components/Backdrop';
 
-const BOON = require('../assets/hero/boon_wide.jpg');
+const BOON = require('../assets/hero/boon_quiz.jpg');
 
 type Step =
   | { id: keyof Quiz; kind: 'one'; q: string; sub?: string; opts: string[] }
