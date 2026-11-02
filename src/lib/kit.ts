@@ -3,11 +3,15 @@
  * API key (safe to ship, it can only add subscribers, tags and form entries).
  */
 const KIT_API_KEY = 'rWMhWOuYNu8lJKKWoWIfsg';
-export const KIT_FORMS = { application: '10079550' };
+export const KIT_FORMS = { application: '10079550', guide: '10034224' };
 export const KIT_TAGS: Record<string, string> = {
   'app-quiz-done': '25301547',
   'app-free': '25301548',
   'src-app': '25301550',
+  'app-lead': '25303714',
+  'app-want-plan': '25303711',
+  'app-want-btl': '25303712',
+  'app-want-coaching': '25303713',
 };
 
 type Fields = Record<string, string>;

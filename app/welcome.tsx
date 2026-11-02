@@ -1,42 +1,73 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import FullHero from '../src/components/FullHero';
+import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../src/lib/theme';
-import { Button } from '../src/components/ui';
-import { CalendarIcon, DumbbellIcon, ForkIcon, ShieldIcon } from '../src/components/icons';
+import type { Want } from '../src/lib/lead';
 
-const HERO = require('../assets/hero/progress_full.jpg');
+const HERO = require('../assets/hero/boon_jacked.jpg');
+const PLAN = require('../assets/hero/plan_full.jpg');
+const BTL = require('../assets/img/btl_cover.jpg');
+const COACH = require('../assets/hero/progress_full.jpg');
+const LOGO = require('../assets/logo-b.png');
 
-const Row = ({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) => (
-  <View style={st.row}>
-    <View style={st.icon}>{icon}</View>
-    <View style={{ flex: 1, gap: 2 }}>
-      <Text style={st.rowTitle}>{title}</Text>
-      <Text style={st.rowSub}>{sub}</Text>
-    </View>
-  </View>
-);
+const PATHS: { want: Want; img: ImageSourcePropType; tag: string; price: string; title: string; line: string; contain?: boolean }[] = [
+  { want: 'plan', img: PLAN, tag: 'Start here', price: 'Free', title: 'My free 12-week plan', line: 'Your calories, your meals and a 4-day program with form videos. Built from a 2-minute quiz.' },
+  { want: 'btl', img: BTL, tag: 'The guide', price: '$39.99', title: 'Beyond the Label', line: 'What actually works out of 40+ supplements and gadgets, and what\'s marketing.', contain: true },
+  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'Apply', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
+];
 
-/** The front door: everyone who isn't signed in lands here. */
+/** The front door: pick what you're here for. */
 export default function Welcome() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const w = Math.min(width, 640);
+  const fade = useRef(PATHS.map(() => new Animated.Value(0))).current;
+  useEffect(() => {
+    Animated.stagger(110, fade.map((v) => Animated.timing(v, { toValue: 1, duration: 420, useNativeDriver: true }))).start();
+  }, []);
+
   return (
     <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
-        <FullHero image={HERO} pills={[{ text: 'Free 12-week plan' }, { text: 'No supplements needed', tone: 'green' }]}
-          title="Build the body. Skip the BS."
-          lede="Answer a few questions and get a 12-week plan built around your body, your gym and the food you actually eat." />
-        <View style={{ paddingHorizontal: 20, gap: 14, marginTop: 18 }}>
-          <Row icon={<DumbbellIcon color={C.red2} size={20} />} title="Push, Pull, Legs, Upper" sub="Every exercise with a form video, sets, reps and your last numbers." />
-          <Row icon={<ForkIcon color={C.red2} size={20} />} title="Your calories and protein" sub="Real meals, eating-out orders and a grocery list. No meal-prep cult." />
-          <Row icon={<ShieldIcon color={C.red2} size={18} />} title="Only supplements that work" sub="From someone who wasted years and hundreds of dollars on the ones that don't." />
-          <Row icon={<CalendarIcon color={C.red2} size={20} />} title="Your goal date" sub="See exactly when you hit your number, before you start." />
-          <Button title="Get my free plan" onPress={() => router.push('/quiz')} style={{ marginTop: 8 }} />
-          <Text style={st.small}>Takes about 2 minutes.</Text>
+        <View style={st.brand}>
+          <Image source={LOGO} style={{ width: 34, height: 34 }} />
+          <Text style={st.brandText}>SIX-PACK STACK</Text>
+        </View>
+        <View style={{ width: w, height: w * 0.95, alignSelf: 'center' }}>
+          <Image source={HERO} style={{ width: w, height: w * 0.95 }} resizeMode="cover" accessibilityIgnoresInvertColors />
+          <LinearGradient colors={['rgba(13,27,51,0.55)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.75)', C.navy]} locations={[0, 0.25, 0.65, 1]} style={StyleSheet.absoluteFill} />
+          <View style={st.heroText}>
+            <Text style={st.kicker}>225 → 175 lbs. No magic pills.</Text>
+            <Text style={st.h} accessibilityRole="header">Build the body.{'\n'}Skip the BS.</Text>
+          </View>
+        </View>
+
+        <View style={{ paddingHorizontal: 20, gap: 14 }}>
+          <Text style={st.pick}>What are you here for?</Text>
+          {PATHS.map((p, i) => (
+            <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`${p.title}, ${p.price}`}
+                onPress={() => router.push({ pathname: '/lead', params: { want: p.want } })}
+                style={({ pressed }) => [st.card, i === 0 && st.cardHot, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+                <View style={st.thumb}>
+                  <Image source={p.img} style={p.contain ? { width: '82%', height: '92%' } : { width: 88, height: 104 }} resizeMode={p.contain ? 'contain' : 'cover'} accessibilityIgnoresInvertColors />
+                </View>
+                <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={st.tag}>{p.tag}</Text>
+                    <View style={[st.price, p.price === 'Free' && { backgroundColor: C.green }]}><Text style={[st.priceText, p.price === 'Free' && { color: C.navy }]}>{p.price}</Text></View>
+                  </View>
+                  <Text style={st.title}>{p.title}</Text>
+                  <Text style={st.line}>{p.line}</Text>
+                </View>
+                <Text style={st.chev}>›</Text>
+              </Pressable>
+            </Animated.View>
+          ))}
           <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} style={st.link}>
-            <Text style={st.linkText}>Already have an account or coaching with Boon? Sign in</Text>
+            <Text style={st.linkText}>Already have an account? Sign in</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -45,11 +76,21 @@ export default function Welcome() {
 }
 
 const st = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 14, alignItems: 'center', backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 14 },
-  icon: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(226,67,59,0.15)', borderWidth: 1, borderColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  rowTitle: { fontFamily: F.black, fontSize: 16, color: C.white },
-  rowSub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.white },
-  small: { fontFamily: F.semi, fontSize: 13, color: C.white, textAlign: 'center' },
-  link: { minHeight: 48, justifyContent: 'center', alignItems: 'center' },
-  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline', textAlign: 'center' },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingTop: 58, paddingBottom: 12, backgroundColor: '#08142a' },
+  brandText: { fontFamily: F.black, fontSize: 14, letterSpacing: 2.4, color: C.white },
+  heroText: { position: 'absolute', left: 20, right: 20, bottom: 6, gap: 8 },
+  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
+  h: { fontFamily: F.black, fontSize: 40, lineHeight: 42, color: C.white, textTransform: 'uppercase', letterSpacing: -0.8 },
+  pick: { fontFamily: F.black, fontSize: 20, color: C.white, marginTop: 10 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.line, borderRadius: 22, padding: 12 },
+  cardHot: { borderColor: C.red },
+  thumb: { width: 88, height: 104, borderRadius: 14, overflow: 'hidden', backgroundColor: '#e9edf4', alignItems: 'center', justifyContent: 'center' },
+  tag: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  price: { backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  priceText: { fontFamily: F.black, fontSize: 10, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
+  title: { fontFamily: F.black, fontSize: 17, lineHeight: 21, color: C.white },
+  line: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.white },
+  chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
+  link: { minHeight: 48, justifyContent: 'center', alignItems: 'center', marginTop: 4 },
+  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
 });

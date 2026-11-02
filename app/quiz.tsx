@@ -11,6 +11,7 @@ import { BackIcon, CheckIcon } from '../src/components/icons';
 import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '../src/lib/quiz';
 import { kitTag } from '../src/lib/kit';
 import { useAuth } from '../src/lib/auth';
+import { readLead } from '../src/lib/lead';
 
 const BOON = require('../assets/hero/boon_jacked.jpg');
 
@@ -51,13 +52,19 @@ const EMPTY: Quiz = {
 
 export default function QuizScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ src?: string }>();
+  const params = useLocalSearchParams<{ src?: string; name?: string; email?: string }>();
   const [i, setI] = useState(0);
   const [a, setA] = useState<Quiz>(EMPTY);
   const [err, setErr] = useState('');
   const step = STEPS[i];
   const asked = STEPS.filter((s) => !['spend', 'story', 'chart'].includes(s.kind)).length;
   const n = STEPS.slice(0, i + 1).filter((s) => !['spend', 'story', 'chart'].includes(s.kind)).length;
+
+  // Name and email from the welcome screen (or a saved lead)
+  useEffect(() => {
+    if (params.name || params.email) { setA((x) => ({ ...x, first_name: params.name || x.first_name, email: params.email || x.email })); return; }
+    readLead().then((l) => { if (l) setA((x) => ({ ...x, first_name: x.first_name || l.first_name, email: x.email || l.email })); });
+  }, [params.name, params.email]);
 
   // Which video sent them: ?src=<video> on the app link (kept for Kit)
   useEffect(() => {

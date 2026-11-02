@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { readLead } from '../src/lib/lead';
 import { useAuth } from '../src/lib/auth';
 import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
@@ -21,12 +22,13 @@ const DAYS = ['0', '1–2', '3–4', '5+'];
 export default function Apply() {
   const { profile, session } = useAuth();
   const router = useRouter();
-  const q = profile?.quiz || {};
+  const params = useLocalSearchParams<{ name?: string; email?: string; src?: string }>();
+  const q = profile?.quiz || (params.src ? { src: params.src } : {});
   const quizStart = q.start_timing === 'Today' ? 'This week' : q.start_timing;
   const quizDays = q.days === '3 days' ? '3–4' : q.days === '4 days' ? '3–4' : '';
   const [f, setF] = useState({
-    name: profile?.first_name || q.first_name || '',
-    email: profile?.email || session?.user.email || '',
+    name: profile?.first_name || q.first_name || params.name || '',
+    email: profile?.email || session?.user.email || params.email || '',
     phone: '',
     age: q.age || '', height: q.height_ft ? `${q.height_ft}'${q.height_in || 0}"` : '', current_weight: q.weight || '',
     goal_12_weeks: '', cost_of_staying: '',
@@ -37,6 +39,11 @@ export default function Apply() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  // Came from the welcome screen without params (e.g. reopened): use the saved lead
+  React.useEffect(() => {
+    if (f.email) return;
+    readLead().then((l) => { if (l) setF((x) => ({ ...x, name: x.name || l.first_name, email: x.email || l.email })); });
+  }, []);
   const set = (k: keyof typeof f, v: string) => { setErr(''); setF((x) => ({ ...x, [k]: v })); };
 
   const submit = async () => {
@@ -66,7 +73,8 @@ export default function Apply() {
         <Text style={st.h}>Got it, {f.name.trim()}. Your application is in.</Text>
         <Text style={st.body}>I read every application myself, within 24 hours. Watch your inbox at {f.email.trim()}. If we're a fit, you'll get a short video I recorded for you and a link to claim your spot.</Text>
         <Text style={st.body}>Check your spam or promotions folder and move my email to your main inbox so you don't miss it.</Text>
-        <Button title="Back to my plan" onPress={() => router.back()} />
+        {session ? <Button title="Back to my plan" onPress={() => router.back()} />
+          : <Button title="Get my free plan while you wait" onPress={() => router.replace('/quiz')} />}
       </SafeAreaView>
     );
   }
@@ -75,7 +83,7 @@ export default function Apply() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
             <BackIcon />
           </Pressable>
           <Text style={st.k}>1:1 coaching application</Text>
