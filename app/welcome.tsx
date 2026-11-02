@@ -8,9 +8,9 @@ import { CheckIcon } from '../src/components/icons';
 import type { Want } from '../src/lib/lead';
 
 const PLAN = require('../assets/img/tile_plan.jpg');
-const APP = require('../assets/img/tile_app.jpg');
+const APP = require('../assets/img/cover_program.jpg');
 const BTL = require('../assets/img/btl_cover.jpg');
-const COACH = require('../assets/img/tile_coach.jpg');
+const COACH = require('../assets/img/cover_coaching.jpg');
 const LOGO = require('../assets/logo-b.png');
 
 const INCLUDED = [

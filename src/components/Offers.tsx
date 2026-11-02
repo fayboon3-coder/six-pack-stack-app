@@ -6,6 +6,11 @@ import { BTL_URL } from '../lib/access';
 import { CheckIcon, LockIcon } from './icons';
 
 const BTL_IMG = require('../../assets/img/btl_cover.jpg');
+const PROGRAM_IMG = require('../../assets/img/cover_program.jpg');
+const COACH_IMG = require('../../assets/img/cover_coaching.jpg');
+const Cover = ({ src }: { src: any }) => (
+  <Image source={src} style={{ width: 132, height: 171, borderRadius: 6, alignSelf: 'center' }} resizeMode="cover" accessibilityIgnoresInvertColors />
+);
 
 const Tick = ({ children }: { children: string }) => (
   <View style={st.tick}>
@@ -30,6 +35,7 @@ export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'mon
   };
   return (
     <View style={[st.card, { borderColor: C.red }]}>
+      <Cover src={PROGRAM_IMG} />
       <Text style={st.kicker}>The full app</Text>
       <Text style={st.title}>The Full 12-Week Program</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -55,6 +61,7 @@ export function CoachingCard() {
   const router = useRouter();
   return (
     <View style={st.card}>
+      <Cover src={COACH_IMG} />
       <Text style={st.kicker}>1:1 with Boon</Text>
       <Text style={st.title}>Six-Pack Stack Coaching</Text>
       <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. 12 weeks, with a results guarantee.</Text>
@@ -68,9 +75,9 @@ export function CoachingCard() {
 
 export function BtlCard() {
   return (
-    <View style={[st.card, { padding: 0, overflow: 'hidden' }]}>
-      <Image source={BTL_IMG} style={{ width: '100%', aspectRatio: 800 / 1035 }} resizeMode="cover" accessibilityIgnoresInvertColors />
-      <View style={{ padding: 18, gap: 10 }}>
+    <View style={st.card}>
+      <Cover src={BTL_IMG} />
+      <View style={{ gap: 10 }}>
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>
         <Text style={st.body}>My full investigation of 40+ fitness products. Check anything before you buy it.</Text>
