@@ -22,7 +22,7 @@ const PATHS: { want: Want | 'score'; img: ImageSourcePropType; tag: string; pric
   { want: 'score', img: SCORE, tag: 'Free audit', price: 'Free', title: 'Stack Score', line: '60 seconds: what to cut, keep and swap in your stack, and what it\'s costing you.' },
   { want: 'btl', img: BTL, tag: 'The guide', price: '$39.99', title: 'Beyond the Label', line: '47 supplements and gadgets investigated: what actually works, and what\'s just marketing.' },
   { want: 'sub', img: APP, tag: 'Best value', price: '$19.99/mo', title: 'The Full Stack', line: 'All 12 weeks: everything you need to finish on your own. Or $99 a year ($1.90 a week).' },
-  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'By application', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
+  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'Apply', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
 ];
 
 /** The front door: pick what you're here for. */
@@ -55,8 +55,8 @@ export default function Welcome() {
                 <Image source={p.img} style={{ width: 100, height: 126 }} resizeMode="cover" accessibilityIgnoresInvertColors />
               </View>
               <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Text style={st.tag}>{p.tag}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
+                  <Text style={st.tag} numberOfLines={1}>{p.tag}</Text>
                   <View style={[st.price, p.price === 'Free' && { backgroundColor: C.green }]}><Text style={[st.priceText, p.price === 'Free' && { color: C.navy }]}>{p.price}</Text></View>
                 </View>
                 <Text style={st.title}>{p.title}</Text>
