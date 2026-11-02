@@ -42,9 +42,9 @@ export default function Welcome() {
           <Text style={st.brandText}>SIX-PACK STACK</Text>
         </View>
         <View style={{ gap: 10, marginTop: 18, marginBottom: 8 }}>
-          <Text style={st.kicker}>Build the body. Skip the BS.</Text>
-          <Text style={st.h} accessibilityRole="header">{twoTone('What are you|\nhere for?')}</Text>
-          <Text style={st.sub}>Pick one to start. The others are always here.</Text>
+          <Text style={st.kicker}>By Boon Fay · 225 to 175 lbs</Text>
+          <Text style={st.h} accessibilityRole="header">{twoTone('Lose the gut.|\nSee your abs.')}</Text>
+          <Text style={st.sub}>No fat burners. No guesswork. Start free in 2 minutes, or pick what fits you below.</Text>
         </View>
         {PATHS.map((p, i) => (
           <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
