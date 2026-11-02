@@ -4,6 +4,7 @@ import { supabase } from './supabase';
 import type { Plan, Profile } from './types';
 import { buildFreePlan, clearPendingQuiz, readPendingQuiz } from './quiz';
 import { setPreviewing, type ViewAs } from './preview';
+import { setupPurchases } from './purchases';
 
 type Ctx = {
   session: Session | null;
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const load = useCallback(async (s: Session | null) => {
     if (!s) { setProfile(null); setPlan(null); return; }
     const uid = s.user.id;
+    setupPurchases(uid).catch(() => {});
     const [{ data: p }, { data: pl }] = await Promise.all([
       supabase.from('profiles').select('*').eq('id', uid).maybeSingle(),
       supabase.from('plans').select('data').eq('user_id', uid).eq('active', true)

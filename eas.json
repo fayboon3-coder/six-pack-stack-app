@@ -2,7 +2,18 @@
   "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
   "build": {
     "preview": { "distribution": "internal", "channel": "main" },
-    "production": { "channel": "production", "autoIncrement": true }
+    "production": {
+      "channel": "production",
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_RC_IOS_KEY": "PASTE_REVENUECAT_PUBLIC_IOS_KEY",
+        "EXPO_PUBLIC_RC_ANDROID_KEY": ""
+      }
+    }
   },
-  "submit": { "production": {} }
+  "submit": {
+    "production": {
+      "ios": { "ascAppId": "PASTE_APP_STORE_CONNECT_APP_ID" }
+    }
+  }
 }

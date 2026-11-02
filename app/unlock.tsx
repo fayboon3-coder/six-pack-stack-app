@@ -10,7 +10,7 @@ import { coachingFirst } from '../src/lib/access';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
 
-/** The offers screen. Payments (trial, yearly, monthly) are wired in phase 3. */
+/** The offers screen: The Full Stack (App Store subscription), coaching and Beyond the Label. */
 export default function Unlock() {
   const { profile, plan } = useAuth();
   const router = useRouter();

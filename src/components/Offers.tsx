@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C, F } from '../lib/theme';
-import { BTL_URL, COACHING_URL } from '../lib/access';
+import { BTL_URL, COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
+import { useAuth } from '../lib/auth';
+import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, type Offer } from '../lib/purchases';
 import { CheckIcon, LockIcon } from './icons';
 
 const BTL_IMG = require('../../assets/img/btl_cover.jpg');
@@ -19,28 +21,56 @@ const Tick = ({ children }: { children: string }) => (
   </View>
 );
 
-/** The full app (subscription): yearly or monthly. Purchases switch on with payments (phase 3). */
-export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'monthly') => void }) {
+/** The full app (subscription): yearly with a 7-day free trial, or monthly. Sold through the App Store. */
+export function SubscriptionCard() {
+  const { refresh } = useAuth();
   const [plan, setPlan] = useState<'yearly' | 'monthly'>('yearly');
-  const Opt = ({ id, title, price, per, note, best }: { id: 'yearly' | 'monthly'; title: string; price: string; per: string; note: string; best?: boolean }) => {
+  const [offers, setOffers] = useState<Record<'yearly' | 'monthly', Offer> | null>(null);
+  const [busy, setBusy] = useState<'' | 'buy' | 'restore'>('');
+  const [msg, setMsg] = useState('');
+  const live = purchasesEnabled();
+  useEffect(() => { if (live) getOffers().then(setOffers); }, [live]);
+  const price = (id: 'yearly' | 'monthly') => offers?.[id].price || FALLBACK_PRICES[id];
+
+  const start = async () => {
+    if (!offers) return;
+    setBusy('buy'); setMsg('');
+    const r = await buy(offers[plan]);
+    if (r.ok) { await refresh(); setMsg("You're in. Weeks 3–12 are unlocked."); }
+    else if (r.reason === 'unavailable') setMsg('The App Store is not responding. Try again in a minute.');
+    else if (r.reason === 'failed') setMsg('That didn’t go through. You haven’t been charged.');
+    setBusy('');
+  };
+  const doRestore = async () => {
+    setBusy('restore'); setMsg('');
+    const found = await restore();
+    if (found) await refresh();
+    setMsg(found ? 'Restored. Weeks 3–12 are unlocked.' : 'No active subscription found on this Apple ID.');
+    setBusy('');
+  };
+
+  const Opt = ({ id, title, per, note, best }: { id: 'yearly' | 'monthly'; title: string; per: string; note: string; best?: boolean }) => {
     const on = plan === id;
     return (
       <Pressable accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setPlan(id)} style={[st.opt, on && st.optOn]}>
         {best && <View style={st.best}><Text style={st.bestText}>Best value</Text></View>}
         <Text style={st.optTitle}>{title}</Text>
-        <Text style={st.optPrice}>{price}<Text style={st.per}>{per}</Text></Text>
+        <Text style={st.optPrice}>{price(id)}<Text style={st.per}>{per}</Text></Text>
         <Text style={st.small}>{note}</Text>
       </Pressable>
     );
   };
+  const label = !live ? 'Opens with the App Store launch'
+    : busy === 'buy' ? 'One second…'
+    : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly';
   return (
     <View style={[st.card, { borderColor: C.red }]}>
       <Cover src={PROGRAM_IMG} />
       <Text style={st.kicker}>All 12 weeks</Text>
       <Text style={st.title}>The Full Stack</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Opt id="yearly" title="Yearly" price="$99" per="/yr" note="$1.90 a week · 7-day free trial" best />
-        <Opt id="monthly" title="Monthly" price="$19.99" per="/mo" note="Cancel anytime" />
+        <Opt id="yearly" title="Yearly" per="/yr" note="$1.90 a week · 7-day free trial" best />
+        <Opt id="monthly" title="Monthly" per="/mo" note="Cancel anytime" />
       </View>
       <View style={{ gap: 8 }}>
         <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>
@@ -50,9 +80,25 @@ export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'mon
         <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
-      <Pressable accessibilityRole="button" onPress={() => onStart?.(plan)} disabled={!onStart} style={[st.btn, !onStart && { opacity: 0.55 }]}>
-        <Text style={st.btnText}>{!onStart ? 'Opens with the App Store launch' : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly'}</Text>
+      <Pressable accessibilityRole="button" onPress={start} disabled={!live || !offers || !!busy} style={[st.btn, (!live || !offers || !!busy) && { opacity: 0.55 }]}>
+        {busy === 'buy' ? <ActivityIndicator color={C.white} /> : <Text style={st.btnText}>{label}</Text>}
       </Pressable>
+      {!!msg && <Text style={[st.small, { fontFamily: F.bold }]}>{msg}</Text>}
+      {live && (
+        <>
+          <Text style={st.legal}>
+            {plan === 'yearly'
+              ? `Free for 7 days, then ${price('yearly')} a year.`
+              : `${price('monthly')} a month.`}{' '}
+            Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.
+          </Text>
+          <View style={st.links}>
+            <Pressable accessibilityRole="button" onPress={doRestore} disabled={!!busy} hitSlop={8}><Text style={st.link}>{busy === 'restore' ? 'Restoring…' : 'Restore purchases'}</Text></Pressable>
+            <Pressable accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} hitSlop={8}><Text style={st.link}>Terms</Text></Pressable>
+            <Pressable accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} hitSlop={8}><Text style={st.link}>Privacy</Text></Pressable>
+          </View>
+        </>
+      )}
     </View>
   );
 }
@@ -121,6 +167,9 @@ const st = StyleSheet.create({
   tickDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   tickText: { flex: 1, fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.white },
   btn: { height: 54, borderRadius: 14, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
+  legal: { fontFamily: F.semi, fontSize: 11, lineHeight: 16, color: 'rgba(255,255,255,0.6)', textAlign: 'center' },
+  links: { flexDirection: 'row', justifyContent: 'center', gap: 22 },
+  link: { fontFamily: F.bold, fontSize: 12, color: C.white, textDecorationLine: 'underline' },
   btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white, textAlign: 'center' },
   locked: { marginHorizontal: 20, backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.red, borderRadius: 24, padding: 20, gap: 10 },
   lockIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
