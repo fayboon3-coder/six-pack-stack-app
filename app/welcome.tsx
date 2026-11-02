@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { Animated, Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, ImageSourcePropType, Linking, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../src/lib/theme';
 import type { Want } from '../src/lib/lead';
+import { BTL_URL, COACHING_URL } from '../src/lib/access';
 
 const PLAN = require('../assets/img/tile_plan.jpg');
 const APP = require('../assets/img/cover_program.jpg');
@@ -43,7 +44,7 @@ export default function Welcome() {
         {PATHS.map((p, i) => (
           <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
             <Pressable accessibilityRole="button" accessibilityLabel={`${p.title}, ${p.price}`}
-              onPress={() => router.push({ pathname: '/lead', params: { want: p.want } })}
+              onPress={() => (p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
               style={({ pressed }) => [st.card, p.want === 'sub' && st.cardSub, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               <View style={st.thumb}>
                 <Image source={p.img} style={{ width: 100, height: 126 }} resizeMode="cover" accessibilityIgnoresInvertColors />
