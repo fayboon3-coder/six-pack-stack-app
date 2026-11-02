@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Image, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Image, InputAccessoryView, Keyboard, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth';
@@ -12,6 +12,7 @@ import { isoDate, lastSession, saveSet } from '../src/lib/logs';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
+const ACC = 'setInputs';
 
 export default function Workout() {
   const { d } = useLocalSearchParams<{ d: string }>();
@@ -27,6 +28,14 @@ export default function Workout() {
   const [startedAt] = useState(Date.now());
   const [now, setNow] = useState(Date.now());
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [kb, setKb] = useState(false);
+
+  // Hide the bottom buttons while typing so they never jump up over the keyboard.
+  useEffect(() => {
+    const show = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow', () => setKb(true));
+    const hide = Keyboard.addListener(Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide', () => setKb(false));
+    return () => { show.remove(); hide.remove(); };
+  }, []);
 
   useEffect(() => {
     if (!day || !session) return;
@@ -80,7 +89,7 @@ export default function Workout() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <View style={{ flex: 1 }}>
         <View style={st.top}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={st.icon}><BackIcon /></Pressable>
           <View style={{ alignItems: 'center' }}>
@@ -95,7 +104,8 @@ export default function Workout() {
           ))}
         </View>
 
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 24 }} keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
           {!!info?.video && (
             <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${info.name}`} style={st.video}
               onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
@@ -113,30 +123,31 @@ export default function Workout() {
           </View>
 
           <View style={st.table}>
-            <View style={st.row}>
-              <Text style={[ui.label, { width: 36 }]}>Set</Text>
-              <Text style={[ui.label, { flex: 1 }]}>Last time</Text>
-              <Text style={[ui.label, { flex: 1.4 }]}>Today (lbs × reps)</Text>
-              <View style={{ width: 36 }} />
+            <View style={st.head}>
+              <Text style={[st.h, { width: 34 }]}>Set</Text>
+              <Text style={[st.h, { flex: 1 }]}>Last time</Text>
+              <Text style={[st.h, { width: 72, textAlign: 'center' }]}>lbs</Text>
+              <Text style={[st.h, { width: 58, textAlign: 'center' }]}>Reps</Text>
+              <View style={{ width: 40 }} />
             </View>
             {list.map((e, k) => {
               const p = p0[k];
               const active = k === nextUndone;
               return (
-                <View key={k} style={[st.row, st.rowLine]}>
-                  <Text style={[st.cell, { width: 36, color: active ? C.red2 : C.white }]}>{k + 1}</Text>
-                  <Text style={[st.cell, { flex: 1 }]}>{p ? `${p.weight ?? '–'} × ${p.reps ?? '–'}` : '–'}</Text>
-                  <View style={{ flex: 1.4, flexDirection: 'row', gap: 6 }}>
-                    <TextInput value={e.w} onChangeText={(t) => update(k, { w: t.replace(/[^\d.]/g, '') })} keyboardType="decimal-pad"
-                      placeholder={p?.weight != null ? String(p.weight) : 'lbs'} placeholderTextColor="#ffffff80"
-                      accessibilityLabel={`Set ${k + 1} weight`} style={[st.input, active && { borderColor: C.red }]} />
-                    <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
-                      placeholder={p?.reps != null ? String(p.reps) : 'reps'} placeholderTextColor="#ffffff80"
-                      accessibilityLabel={`Set ${k + 1} reps`} style={st.input} />
+                <View key={k} style={[st.setRow, active && st.setRowActive, e.done && st.setRowDone]}>
+                  <View style={[st.setNo, active && { backgroundColor: C.red, borderColor: C.red }, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
+                    <Text style={st.setNoText}>{k + 1}</Text>
                   </View>
-                  <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Set ${k + 1} done`}
-                    onPress={() => tick(k)} style={[st.tick, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
-                    {e.done && <CheckIcon />}
+                  <Text style={st.last} numberOfLines={1}>{p ? `${p.weight ?? '–'} × ${p.reps ?? '–'}` : '—'}</Text>
+                  <TextInput value={e.w} onChangeText={(t) => update(k, { w: t.replace(/[^\d.]/g, '') })} keyboardType="decimal-pad"
+                    placeholder={p?.weight != null ? String(p.weight) : '0'} placeholderTextColor="#ffffff55" returnKeyType="done"
+                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 72 }, active && { borderColor: C.red }]} />
+                  <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
+                    placeholder={p?.reps != null ? String(p.reps) : '0'} placeholderTextColor="#ffffff55" returnKeyType="done"
+                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 58 }]} />
+                  <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Set ${k + 1} done`} hitSlop={6}
+                    onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
+                    <CheckIcon color={e.done ? C.navy : '#ffffff55'} size={16} />
                   </Pressable>
                 </View>
               );
@@ -154,11 +165,20 @@ export default function Workout() {
           )}
         </ScrollView>
 
-        <View style={{ padding: 20, paddingTop: 0, flexDirection: 'row', gap: 10 }}>
+        {Platform.OS === 'ios' && (
+          <InputAccessoryView nativeID={ACC}>
+            <View style={st.acc}>
+              <Text style={st.accText}>{info?.name}</Text>
+              <Pressable accessibilityRole="button" onPress={() => Keyboard.dismiss()} hitSlop={10} style={st.accBtn}><Text style={st.accBtnText}>Done</Text></Pressable>
+            </View>
+          </InputAccessoryView>
+        )}
+
+        {!kb && <View style={st.footer}>
           {i > 0 && <Button title="Back" variant="ghost" onPress={() => setI(i - 1)} style={{ flex: 1 }} />}
           <Button title={last ? 'Finish workout' : 'Next exercise'} onPress={() => (last ? router.back() : setI(i + 1))} style={{ flex: 2 }} />
-        </View>
-      </KeyboardAvoidingView>
+        </View>}
+      </View>
     </SafeAreaView>
   );
 }
@@ -178,12 +198,25 @@ const st = StyleSheet.create({
   target: { fontFamily: F.xbold, fontSize: 13, color: C.red2 },
   note: { fontFamily: F.bold, fontSize: 13, color: C.white },
   cue: { fontFamily: F.semi, fontSize: 14, color: C.white, lineHeight: 20 },
-  table: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 6 },
+  table: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 10, gap: 8 },
+  head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 6, paddingTop: 4 },
+  h: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.navy, borderRadius: 14, borderWidth: 1, borderColor: C.line, padding: 6 },
+  setRowActive: { borderColor: C.red },
+  setRowDone: { borderColor: 'rgba(63,191,127,0.6)', backgroundColor: 'rgba(63,191,127,0.08)' },
+  setNo: { width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  setNoText: { fontFamily: F.black, fontSize: 14, color: C.white },
+  last: { flex: 1, minWidth: 0, fontFamily: F.bold, fontSize: 13, color: C.white },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
   rowLine: { borderTopWidth: 1, borderTopColor: C.line, paddingVertical: 10 },
   cell: { fontFamily: F.xbold, fontSize: 15, color: C.white },
-  input: { flex: 1, height: 44, borderRadius: 10, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy, color: C.white, fontFamily: F.xbold, fontSize: 16, textAlign: 'center' },
-  tick: { width: 36, height: 36, borderRadius: 9, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  input: { height: 44, borderRadius: 10, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy2, color: C.white, fontFamily: F.black, fontSize: 17, textAlign: 'center', paddingHorizontal: 4 },
+  tick: { width: 40, height: 40, borderRadius: 12, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   rest: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(63,191,127,0.12)', borderWidth: 1, borderColor: 'rgba(63,191,127,0.4)', borderRadius: 14, padding: 14 },
+  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8, flexDirection: 'row', gap: 10, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.navy },
+  acc: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: C.navy2, borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 16, paddingVertical: 8 },
+  accText: { fontFamily: F.xbold, fontSize: 13, color: C.white, flex: 1 },
+  accBtn: { backgroundColor: C.red, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8 },
+  accBtnText: { fontFamily: F.black, fontSize: 14, color: C.white },
   restTime: { fontFamily: F.black, fontSize: 22, color: C.white },
 });
