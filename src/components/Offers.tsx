@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C, F } from '../lib/theme';
 import { BTL_URL } from '../lib/access';
 import { CheckIcon, LockIcon } from './icons';
 
-const BTL_IMG = require('../../assets/hero/stack_full.jpg');
+const BTL_IMG = require('../../assets/img/btl_cover.jpg');
 
 const Tick = ({ children }: { children: string }) => (
   <View style={st.tick}>
@@ -14,23 +14,37 @@ const Tick = ({ children }: { children: string }) => (
   </View>
 );
 
-/** The full 12 weeks (subscription). Purchases switch on with payments (phase 3). */
-export function SubscriptionCard({ onStart }: { onStart?: () => void }) {
+/** The full app (subscription): yearly or monthly. Purchases switch on with payments (phase 3). */
+export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'monthly') => void }) {
+  const [plan, setPlan] = useState<'yearly' | 'monthly'>('yearly');
+  const Opt = ({ id, title, price, per, note, best }: { id: 'yearly' | 'monthly'; title: string; price: string; per: string; note: string; best?: boolean }) => {
+    const on = plan === id;
+    return (
+      <Pressable accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setPlan(id)} style={[st.opt, on && st.optOn]}>
+        {best && <View style={st.best}><Text style={st.bestText}>Best value</Text></View>}
+        <Text style={st.optTitle}>{title}</Text>
+        <Text style={st.optPrice}>{price}<Text style={st.per}>{per}</Text></Text>
+        <Text style={st.small}>{note}</Text>
+      </Pressable>
+    );
+  };
   return (
     <View style={[st.card, { borderColor: C.red }]}>
-      <View style={st.badge}><Text style={st.badgeText}>Most popular</Text></View>
-      <Text style={st.title}>All 12 weeks</Text>
-      <Text style={st.price}>$99<Text style={st.per}> / year</Text>  <Text style={st.small}>($1.90 a week)</Text></Text>
+      <Text style={st.kicker}>The full app</Text>
+      <Text style={st.title}>All 12 weeks + Stack Check</Text>
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Opt id="yearly" title="Yearly" price="$99" per="/yr" note="$1.90 a week · 7-day free trial" best />
+        <Opt id="monthly" title="Monthly" price="$19.99" per="/mo" note="Cancel anytime" />
+      </View>
       <View style={{ gap: 8 }}>
         <Tick>Weeks 3–12 of your program, with re-sets at weeks 4 and 8</Tick>
         <Tick>Your meal plan, swaps and eating-out orders</Tick>
         <Tick>Every supplement verdict from Beyond the Label</Tick>
         <Tick>Progress photos, trends and weekly check-ins</Tick>
       </View>
-      <Pressable accessibilityRole="button" onPress={onStart} disabled={!onStart} style={[st.btn, !onStart && { opacity: 0.55 }]}>
-        <Text style={st.btnText}>{onStart ? 'Start 7-day free trial' : 'Opens with the App Store launch'}</Text>
+      <Pressable accessibilityRole="button" onPress={() => onStart?.(plan)} disabled={!onStart} style={[st.btn, !onStart && { opacity: 0.55 }]}>
+        <Text style={st.btnText}>{!onStart ? 'Opens with the App Store launch' : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly'}</Text>
       </Pressable>
-      <Text style={st.small}>Or $19.99 a month. Cancel anytime.</Text>
     </View>
   );
 }
@@ -53,7 +67,7 @@ export function CoachingCard() {
 export function BtlCard() {
   return (
     <View style={[st.card, { padding: 0, overflow: 'hidden' }]}>
-      <Image source={BTL_IMG} style={{ width: '100%', aspectRatio: 1200 / 1104 }} resizeMode="cover" accessibilityIgnoresInvertColors />
+      <Image source={BTL_IMG} style={{ width: '100%', aspectRatio: 800 / 1035 }} resizeMode="cover" accessibilityIgnoresInvertColors />
       <View style={{ padding: 18, gap: 10 }}>
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>
@@ -79,6 +93,12 @@ export function LockedWeek({ week, onUnlock }: { week: number; onUnlock: () => v
 }
 
 const st = StyleSheet.create({
+  opt: { flex: 1, borderWidth: 1.5, borderColor: C.line, borderRadius: 16, padding: 12, gap: 2, backgroundColor: C.navy },
+  optOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.12)' },
+  optTitle: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  optPrice: { fontFamily: F.black, fontSize: 26, color: C.white },
+  best: { position: 'absolute', top: -10, right: 8, backgroundColor: C.green, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
+  bestText: { fontFamily: F.black, fontSize: 9, letterSpacing: 0.8, textTransform: 'uppercase', color: C.navy },
   card: { backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.line, borderRadius: 22, padding: 18, gap: 10 },
   badge: { alignSelf: 'flex-start', backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
   badgeText: { fontFamily: F.black, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },

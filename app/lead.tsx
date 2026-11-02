@@ -11,13 +11,14 @@ import { captureLead, readLead, Want } from '../src/lib/lead';
 const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next: string }> = {
   plan: { k: 'Free 12-week plan', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz, then your plan is built from your answers.', cta: 'Build my plan', next: '/quiz' },
   btl: { k: 'Beyond the Label', h: 'Where should I send it?', sub: "You'll see everything inside Beyond the Label next.", cta: 'Show me', next: '/btl' },
+  sub: { k: 'The full app', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz to build your plan. Weeks 1 and 2 are free, then unlock all 12 weeks.', cta: 'Build my plan', next: '/quiz' },
   coaching: { k: '1:1 coaching', h: "Let's see if we're a fit.", sub: 'Next: a 2-minute application. I read every one myself.', cta: 'Start my application', next: '/apply' },
 };
 
 /** One screen between "what are you here for" and the path: name + email, straight into Boon's emails. */
 export default function LeadScreen() {
   const { want: w } = useLocalSearchParams<{ want?: string }>();
-  const want: Want = w === 'btl' || w === 'coaching' ? w : 'plan';
+  const want: Want = w === 'btl' || w === 'coaching' || w === 'sub' ? w : 'plan';
   const c = COPY[want];
   const router = useRouter();
   const [name, setName] = useState('');

@@ -12,6 +12,7 @@ export const KIT_TAGS: Record<string, string> = {
   'app-want-plan': '25303711',
   'app-want-btl': '25303712',
   'app-want-coaching': '25303713',
+  'app-want-sub': '25303949',
 };
 
 type Fields = Record<string, string>;

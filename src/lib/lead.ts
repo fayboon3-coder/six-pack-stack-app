@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { KIT_FORMS, kitForm, kitTag } from './kit';
 
-export type Want = 'plan' | 'btl' | 'coaching';
+export type Want = 'plan' | 'btl' | 'sub' | 'coaching';
 export type Lead = { first_name: string; email: string; want: Want; src?: string };
 const KEY = 'sps:lead';
 
