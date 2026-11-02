@@ -17,6 +17,7 @@ import { productImage } from '../../src/lib/images';
 import { isFree, isLocked, FREE_WEEKS } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
 import StackCheckCard from '../../src/components/StackCheckCard';
+import AskBoonCard from '../../src/components/AskBoonCard';
 import { getStreak } from '../../src/lib/streak';
 import { FlameIcon } from '../../src/components/icons';
 import Backdrop from '../../src/components/Backdrop';
@@ -153,7 +154,8 @@ export default function Today() {
           </>
         )}
 
-        <StackCheckCard style={{ marginHorizontal: 20, marginTop: 28 }} />
+        <AskBoonCard style={{ marginHorizontal: 20, marginTop: 28 }} />
+        <StackCheckCard style={{ marginHorizontal: 20, marginTop: 12 }} />
 
         <View style={st.tip}>
           <Text style={st.tipKicker}>Boon's focus for {phase.name.toLowerCase()} weeks</Text>

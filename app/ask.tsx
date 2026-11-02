@@ -1,0 +1,198 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Image, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import Svg, { Path } from 'react-native-svg';
+import { useAuth } from '../src/lib/auth';
+import { C, F } from '../src/lib/theme';
+import Backdrop from '../src/components/Backdrop';
+import { BackIcon } from '../src/components/icons';
+import { twoTone } from '../src/components/TwoTone';
+import { WHATSAPP } from '../src/components/NoPlan';
+import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
+import { isCoached, isFree } from '../src/lib/access';
+
+const LOGO = require('../assets/logo-b.png');
+
+/** Ask Boon: an AI chat trained on Boon's method, this person's plan and his product verdicts. */
+export default function Ask() {
+  const { q } = useLocalSearchParams<{ q?: string }>();
+  const { session, profile, plan, viewAs, isCoachAccount } = useAuth();
+  const router = useRouter();
+  const [msgs, setMsgs] = useState<ChatMsg[]>([]);
+  const [text, setText] = useState(q ? String(q) : '');
+  const [thinking, setThinking] = useState(false);
+  const [left, setLeft] = useState<number | null>(null);
+  const [blocked, setBlocked] = useState<null | 'limit' | 'not_live'>(null);
+  const scroll = useRef<any>(null);
+  const free = isFree(profile);
+  const name = plan?.name || profile?.first_name || '';
+  const tier = profile?.tier || 'free';
+
+  useEffect(() => {
+    if (!session) return;
+    loadHistory(session.user.id).then(setMsgs);
+    questionsLeft(session.user.id, tier, isCoachAccount && !viewAs).then((n) => { setLeft(n); if (n === 0) setBlocked('limit'); });
+  }, [session, tier]);
+
+  useEffect(() => { setTimeout(() => scroll.current?.scrollToEnd({ animated: true }), 60); }, [msgs.length, thinking]);
+
+  const send = async (raw?: string) => {
+    const question = (raw ?? text).trim();
+    if (!question || thinking || blocked) return;
+    setText('');
+    setMsgs((m) => [...m, { id: 'u' + Date.now(), role: 'user', content: question }]);
+    setThinking(true);
+    const r = await ask(question, viewAs ? { plan, tier } : undefined);
+    setThinking(false);
+    if (r.ok) {
+      setMsgs((m) => [...m, { id: 'a' + Date.now(), role: 'assistant', content: r.answer }]);
+      if (r.left !== null) { setLeft(r.left); if (r.left === 0) setBlocked('limit'); }
+      return;
+    }
+    if (r.reason === 'limit') { setLeft(0); setBlocked('limit'); }
+    if (r.reason === 'not_live') setBlocked('not_live');
+    const note = r.reason === 'offline' ? "I couldn't reach the server. Check your signal and send it again."
+      : r.reason === 'busy' ? "I'm a little slammed right now. Give it a few seconds and send it again."
+      : r.reason === 'signed_out' ? 'Sign in again and ask me that one more time.'
+      : null;
+    if (note) { setMsgs((m) => [...m, { id: 'e' + Date.now(), role: 'assistant', content: note }]); setText(question); }
+    else setMsgs((m) => m.slice(0, -1));
+  };
+
+  const empty = msgs.length === 0;
+
+  return (
+    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
+      <View style={st.top}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12} style={st.back}><BackIcon /></Pressable>
+        <Image source={LOGO} style={st.avatar} />
+        <View style={{ flex: 1 }}>
+          <Text style={st.topT}>{twoTone('Ask| Boon')}</Text>
+          <Text style={st.topS}>AI coach · knows your plan</Text>
+        </View>
+      </View>
+
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView ref={scroll} contentContainerStyle={st.list} keyboardShouldPersistTaps="handled">
+          <Bubble role="assistant" content={`Hey${name ? ' ' + name : ''}. Ask me anything about your plan, food, training or a supplement you saw online. I know your numbers, so I'll answer for you, not for everyone.`} />
+          {empty && (
+            <View style={st.starters}>
+              {STARTERS.map((s) => (
+                <Pressable key={s} accessibilityRole="button" onPress={() => send(s)} style={st.chip}><Text style={st.chipT}>{s}</Text></Pressable>
+              ))}
+            </View>
+          )}
+          {msgs.map((m) => <Bubble key={m.id} role={m.role} content={m.content} />)}
+          {thinking && <Typing />}
+
+          {blocked === 'limit' && (
+            <View style={st.wall}>
+              <Text style={st.wallT}>{free ? "That's your 5 free questions for today." : "That's today's questions."}</Text>
+              <Text style={st.wallB}>{free
+                ? 'They come back tomorrow. With The Full Stack you get 40 a day, plus all 12 weeks of your plan.'
+                : 'They come back tomorrow.' + (isCoached(profile) ? ' Need me before then? Text me on WhatsApp.' : '')}</Text>
+              {free && <Pressable accessibilityRole="button" onPress={() => router.push('/unlock')} style={st.wallBtn}><Text style={st.wallBtnT}>See The Full Stack</Text></Pressable>}
+              {isCoached(profile) && <Pressable accessibilityRole="button" onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} style={st.wallBtn}><Text style={st.wallBtnT}>Text Boon on WhatsApp</Text></Pressable>}
+            </View>
+          )}
+          {blocked === 'not_live' && (
+            <View style={st.wall}>
+              <Text style={st.wallT}>Ask Boon is almost ready.</Text>
+              <Text style={st.wallB}>It switches on as soon as the AI key is added on the server.</Text>
+            </View>
+          )}
+        </ScrollView>
+
+        <View style={st.bar}>
+          <View style={st.inputRow}>
+            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask me anything…'} placeholderTextColor="rgba(255,255,255,0.45)"
+              style={st.input} multiline maxLength={1500} editable={!blocked} onSubmitEditing={() => send()} blurOnSubmit={false}
+              accessibilityLabel="Your question" />
+            <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => send()} disabled={!text.trim() || thinking || !!blocked}
+              style={[st.send, (!text.trim() || thinking || !!blocked) && { opacity: 0.4 }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M5 12h13M13 6l6 6-6 6" stroke={C.white} strokeWidth={2.6} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+            </Pressable>
+          </View>
+          <Text style={st.fine}>
+            {left !== null && !blocked ? `${left} question${left === 1 ? '' : 's'} left today · ` : ''}AI can get things wrong. Not medical advice.
+          </Text>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+/** Renders **bold** inside a message. */
+function Rich({ text, style }: { text: string; style: any }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return (
+    <Text style={style}>
+      {parts.map((p, i) => (p.startsWith('**') && p.endsWith('**') ? <Text key={i} style={{ fontFamily: F.black }}>{p.slice(2, -2)}</Text> : p))}
+    </Text>
+  );
+}
+
+function Bubble({ role, content }: { role: 'user' | 'assistant'; content: string }) {
+  const me = role === 'user';
+  return (
+    <View style={[st.row, me && { justifyContent: 'flex-end' }]}>
+      {!me && <Image source={LOGO} style={st.mini} />}
+      <View style={[st.bubble, me ? st.me : st.ai]}>
+        <Rich text={content} style={[st.msg, me && { color: C.white }]} />
+      </View>
+    </View>
+  );
+}
+
+function Typing() {
+  const dots = [useRef(new Animated.Value(0.3)).current, useRef(new Animated.Value(0.3)).current, useRef(new Animated.Value(0.3)).current];
+  useEffect(() => {
+    const loops = dots.map((d, i) => Animated.loop(Animated.sequence([
+      Animated.delay(i * 160),
+      Animated.timing(d, { toValue: 1, duration: 320, useNativeDriver: true }),
+      Animated.timing(d, { toValue: 0.3, duration: 320, useNativeDriver: true }),
+      Animated.delay((2 - i) * 160),
+    ])));
+    loops.forEach((l) => l.start());
+    return () => loops.forEach((l) => l.stop());
+  }, []);
+  return (
+    <View style={st.row} accessibilityLabel="Boon AI is typing">
+      <Image source={LOGO} style={st.mini} />
+      <View style={[st.bubble, st.ai, { flexDirection: 'row', gap: 6, paddingVertical: 16 }]}>
+        {dots.map((d, i) => <Animated.View key={i} style={[st.dot, { opacity: d, transform: [{ scale: d }] }]} />)}
+      </View>
+    </View>
+  );
+}
+
+const st = StyleSheet.create({
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
+  back: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  avatar: { width: 40, height: 40, borderRadius: 11 },
+  topT: { fontFamily: F.black, fontSize: 20, color: C.white },
+  topS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 1 },
+  list: { padding: 16, gap: 12, paddingBottom: 24 },
+  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  mini: { width: 26, height: 26, borderRadius: 7 },
+  bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 11 },
+  ai: { backgroundColor: 'rgba(20,38,69,0.92)', borderWidth: 1, borderColor: C.line, borderBottomLeftRadius: 6 },
+  me: { backgroundColor: C.red, borderBottomRightRadius: 6 },
+  msg: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: 'rgba(255,255,255,0.92)' },
+  starters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingLeft: 34 },
+  chip: { borderWidth: 1.5, borderColor: C.red, borderRadius: 999, paddingHorizontal: 13, paddingVertical: 8, backgroundColor: 'rgba(226,67,59,0.08)' },
+  chipT: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.white },
+  wall: { backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 16, gap: 8, marginTop: 4 },
+  wallT: { fontFamily: F.black, fontSize: 16, color: C.white },
+  wallB: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(255,255,255,0.8)' },
+  wallBtn: { backgroundColor: C.red, borderRadius: 14, paddingVertical: 13, alignItems: 'center', marginTop: 6 },
+  wallBtnT: { fontFamily: F.black, fontSize: 14, color: C.white, letterSpacing: 0.5, textTransform: 'uppercase' },
+  bar: { paddingHorizontal: 12, paddingTop: 8, paddingBottom: 6, borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.08)', backgroundColor: 'rgba(9,20,42,0.85)' },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  input: { flex: 1, minHeight: 46, maxHeight: 120, borderRadius: 23, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy2, color: C.white, fontFamily: F.semi, fontSize: 15, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 },
+  send: { width: 46, height: 46, borderRadius: 23, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  fine: { fontFamily: F.medium, fontSize: 11, color: 'rgba(255,255,255,0.45)', textAlign: 'center', marginTop: 6 },
+});

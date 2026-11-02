@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { C, F } from '../src/lib/theme';
 import { BackIcon, SearchIcon } from '../src/components/icons';
+import AskBoonCard from '../src/components/AskBoonCard';
 import Poster from '../src/components/Poster';
 import { imageFor, KIND, search, Verdict, VERDICTS } from '../src/lib/stackcheck';
 import Backdrop from '../src/components/Backdrop';
@@ -57,6 +58,7 @@ export default function StackCheck() {
         ListEmptyComponent={
           <View style={st.empty}>
             <Text style={st.emptyT}>Not in the library yet.</Text>
+            <AskBoonCard q={`Is ${q.trim()} worth it?`} title={`Ask Boon about "${q.trim()}"`} sub="My AI checks the label the same way I would." />
             <Text style={st.body}>Rule of thumb until it is: if the label promises fast fat loss, more testosterone or a "proprietary blend", it's almost always marketing. Water, coffee, creatine, protein and sleep cover most of what works.</Text>
           </View>
         }

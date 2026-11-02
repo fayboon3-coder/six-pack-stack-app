@@ -49,6 +49,7 @@ function Gate() {
       <Stack.Screen name="auth" />
       <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
       <Stack.Screen name="workout" />
+      <Stack.Screen name="ask" />
       <Stack.Screen name="client/[id]" />
     </Stack>
   );
