@@ -1,3 +1,5 @@
+import { track } from '../src/lib/track';
+import { askForRatingAfterWin } from '../src/lib/rating';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Image, InputAccessoryView, Keyboard, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -112,6 +114,8 @@ export default function Workout() {
 
   const finish = async () => {
     setFinished(true);
+    track('workout_done', { prs: prs.length });
+    if (prs.length) askForRatingAfterWin('pr');
     if (session) setStreak(await getStreak(session.user.id, plan.train.d.length));
   };
   const setsDone = Object.values(entries).flat().filter((e) => e.done).length;

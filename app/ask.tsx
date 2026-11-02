@@ -9,6 +9,7 @@ import Backdrop from '../src/components/Backdrop';
 import { BackIcon } from '../src/components/icons';
 import { twoTone } from '../src/components/TwoTone';
 import { WHATSAPP } from '../src/components/NoPlan';
+import { track } from '../src/lib/track';
 import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import { isCoached, isFree } from '../src/lib/access';
 
@@ -52,6 +53,7 @@ export default function Ask() {
     setText('');
     setMsgs((m) => [...m, { id: 'u' + Date.now(), role: 'user', content: question }]);
     setThinking(true);
+    track('ask_sent');
     const r = await ask(question, viewAs ? { plan, tier } : undefined);
     setThinking(false);
     if (r.ok) {

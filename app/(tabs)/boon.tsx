@@ -57,7 +57,7 @@ export default function Boon() {
       {free ? (
         <>
           <Eyebrow>Your options</Eyebrow>
-          <SubscriptionCard />
+          <SubscriptionCard source="boon_tab" />
           <BtlCard />
         </>
       ) : sub ? (

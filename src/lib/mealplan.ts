@@ -142,10 +142,10 @@ function solve(main: Food, carb: Food | undefined, side: Food | undefined, fat: 
   const parts: Part[] = [{ food: main, amt: mainAmt }, ...(carb ? [{ food: carb, amt: carbAmt }] : []), ...fixed];
   const t = totals(parts);
   const kErr = Math.abs(t.kcal - K) / K;
-  const pShort = Math.max(0, P - t.p) / P;
+  const pShort = Math.max(0, (tag === 'S' ? P * 0.85 : P) - t.p) / P; // snacks can run a little light on protein
   const pOver = Math.max(0, t.p - P * 1.6) / P;
   // Prefer complete-looking meals: a side, and a carb at breakfast, lunch and dinner.
-  const shape = (side ? 0 : 0.06) + (carb ? 0 : 0.08);
+  const shape = (side ? 0 : 0.06) + (carb || tag === 'S' ? 0 : 0.08);
   const mine = [main, carb, side].some((f) => f?.custom) ? -0.05 : 0;
   return { parts, kcal: t.kcal, p: t.p, score: kErr + 1.6 * pShort + 0.3 * pOver + shape + mine, main, carb };
 }

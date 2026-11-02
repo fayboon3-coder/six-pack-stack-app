@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { C, F } from '../lib/theme';
 import { BTL_URL, COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
 import { useAuth } from '../lib/auth';
+import { track } from '../lib/track';
 import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, type Offer } from '../lib/purchases';
 import { CheckIcon, LockIcon } from './icons';
 
@@ -22,7 +23,7 @@ const Tick = ({ children }: { children: string }) => (
 );
 
 /** The full app (subscription): yearly with a 7-day free trial, or monthly. Sold through the App Store. */
-export function SubscriptionCard() {
+export function SubscriptionCard({ source = 'other' }: { source?: string }) {
   const { refresh } = useAuth();
   const [plan, setPlan] = useState<'yearly' | 'monthly'>('yearly');
   const [offers, setOffers] = useState<Record<'yearly' | 'monthly', Offer> | null>(null);
@@ -30,12 +31,15 @@ export function SubscriptionCard() {
   const [msg, setMsg] = useState('');
   const live = purchasesEnabled();
   useEffect(() => { if (live) getOffers().then(setOffers); }, [live]);
+  useEffect(() => { track('paywall_view', { source, live }, { once: true }); }, [source]);
   const price = (id: 'yearly' | 'monthly') => offers?.[id].price || FALLBACK_PRICES[id];
 
   const start = async () => {
     if (!offers) return;
     setBusy('buy'); setMsg('');
+    track('purchase_tap', { plan, source });
     const r = await buy(offers[plan]);
+    track(r.ok ? 'purchase_done' : 'purchase_fail', { plan, source, reason: r.ok ? null : r.reason });
     if (r.ok) { await refresh(); setMsg("You're in. Weeks 3–12 are unlocked."); }
     else if (r.reason === 'unavailable') setMsg('The App Store is not responding. Try again in a minute.');
     else if (r.reason === 'failed') setMsg('That didn’t go through. You haven’t been charged.');

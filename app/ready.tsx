@@ -7,10 +7,13 @@ import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import FullHero from '../src/components/FullHero';
 import { BtlCard, CoachingCard } from '../src/components/Offers';
-import { coachingFirst } from '../src/lib/access';
+import { coachingFirst, isFree } from '../src/lib/access';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { purchasesEnabled, TRIAL_SEEN } from '../src/lib/purchases';
 import { plain } from '../src/lib/program';
 import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
+import { track } from '../src/lib/track';
 
 const HERO = require('../assets/hero/plan_full.jpg');
 
@@ -21,6 +24,7 @@ export default function Ready() {
   const [tries, setTries] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const reveal = useRef(new Animated.Value(0)).current;
+  useEffect(() => { if (revealed) track('plan_ready', {}, { once: true }); }, [revealed]);
   useEffect(() => { if (revealed) Animated.timing(reveal, { toValue: 1, duration: 450, useNativeDriver: true }).start(); }, [revealed]);
 
   useEffect(() => {
@@ -48,6 +52,11 @@ export default function Ready() {
   }
 
   const first = plan.train.d[0];
+  // Free users on the iPhone app see the 7-day trial offer once, at the moment they're most excited.
+  const startWeek1 = async () => {
+    const seen = await AsyncStorage.getItem(TRIAL_SEEN).catch(() => '1');
+    router.replace(isFree(profile) && purchasesEnabled() && !seen ? '/trial' : '/');
+  };
   const hot = coachingFirst(profile);
   return (
     <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
@@ -61,7 +70,7 @@ export default function Ready() {
             <Tile v={plan.kcal} l="Calories" /><Tile v={`${plan.protein}g`} l="Protein" /><Tile v={plan.steps} l="Steps" />
           </View>
           <Text style={st.body}>First workout: <Text style={{ fontFamily: F.black }}>{first.t}</Text>. Every exercise has a form video.</Text>
-          <Button title="Start week 1" onPress={() => router.replace('/')} />
+          <Button title="Start week 1" onPress={startWeek1} />
           <Text style={[st.k, { marginTop: 14 }]}>{hot ? 'You said you want to start now' : 'Want to go faster?'}</Text>
           {hot ? <CoachingCard /> : <BtlCard />}
           {hot ? <BtlCard /> : <CoachingCard />}

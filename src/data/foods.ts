@@ -200,3 +200,8 @@ export function makeCustomFood(name: string, serving: string, kcal: number, prot
   return { id, name, cat, unit: serving || 'serving', units: serving ? undefined : 'servings', step: 1, min: 1, max: cat === 'protein' || cat === 'carb' ? 3 : 2, def: 1,
     kcal, p: protein, c: carbsGuess, f: fatGuess, meals, custom: true };
 }
+
+/** One tap to a full, balanced starting list. They can remove anything after. */
+export const QUICK_START = ['chicken_breast', 'ground_beef_93', 'eggs', 'greek_yogurt', 'whey', 'salmon',
+  'white_rice', 'potato', 'oats', 'bread_ww', 'tortilla', 'broccoli', 'salad_greens', 'bell_peppers', 'banana', 'berries', 'apple',
+  'milk_2', 'peanut_butter', 'salsa'];

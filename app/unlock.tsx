@@ -26,7 +26,7 @@ export default function Unlock() {
         <Text style={st.h}>{twoTone('Finish what| you started.')}</Text>
         <Text style={st.body}>Weeks 1–2 build the habits. Weeks 3 to 12 are where your body changes. Pick how you want to get there.</Text>
         {hot && <CoachingCard />}
-        <SubscriptionCard />
+        <SubscriptionCard source="unlock" />
         {!hot && <CoachingCard />}
         <BtlCard />
       </ScrollView>

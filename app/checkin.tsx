@@ -17,6 +17,8 @@ import { isCoached } from '../src/lib/access';
 import { isPreviewing } from '../src/lib/preview';
 import { autoReset, RESET_WEEKS } from '../src/lib/reset';
 import { markCheckinDone } from '../src/lib/reminders';
+import { track } from '../src/lib/track';
+import { askForRatingAfterWin } from '../src/lib/rating';
 import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { twoTone } from '../src/components/TwoTone';
@@ -169,6 +171,8 @@ export default function CheckinScreen() {
       if (r) { setNewNums(r); await refresh(); }
     }
     markCheckinDone(!isCoached(profile)).catch(() => {});
+    track('checkin_done', { week });
+    askForRatingAfterWin('checkin');
     setSaved(true);
   };
   const finish = () => {

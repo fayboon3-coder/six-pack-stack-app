@@ -2,8 +2,9 @@ import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { C, F } from '../lib/theme';
 import { CheckIcon } from './icons';
-import { CAT_LABEL, CAT_ORDER, FOOD_DB, foodById, makeCustomFood, type Food, type FoodCat } from '../data/foods';
+import { CAT_LABEL, CAT_ORDER, FOOD_DB, foodById, makeCustomFood, QUICK_START, type Food, type FoodCat } from '../data/foods';
 import { whatsMissing } from '../lib/mealplan';
+import { track } from '../lib/track';
 
 /** Popular picks shown first in each category. */
 const POPULAR = ['chicken_breast', 'ground_beef_93', 'eggs', 'salmon', 'sirloin', 'turkey_deli', 'whey', 'greek_yogurt',
@@ -37,6 +38,16 @@ export default function FoodPicker({ ids, custom, onChange }: {
 
   return (
     <View style={{ gap: 14 }}>
+      {ids.length < 5 && (
+        <Pressable accessibilityRole="button" onPress={() => { track('foods_quick_start'); onChange([...new Set([...ids, ...QUICK_START])], custom); }} style={st.quick}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={st.quickK}>In a hurry?</Text>
+            <Text style={st.quickT}>Quick start: add 20 common foods</Text>
+            <Text style={st.note}>Chicken, eggs, rice, potatoes, oats, fruit, veggies and more. Remove anything you don't eat.</Text>
+          </View>
+          <Text style={st.quickPlus}>+</Text>
+        </Pressable>
+      )}
       <TextInput value={q} onChangeText={setQ} placeholder="Search any food (e.g. salmon, bagels, tofu)" placeholderTextColor="rgba(255,255,255,0.45)"
         style={st.search} accessibilityLabel="Search foods" autoCorrect={false} />
 
@@ -134,5 +145,9 @@ const st = StyleSheet.create({
   summary: { borderRadius: 16, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 14, gap: 4 },
   sumTitle: { fontFamily: F.black, fontSize: 16, color: C.white },
   note: { fontFamily: F.semi, fontSize: 13, lineHeight: 19, color: 'rgba(255,255,255,0.75)' },
+  quick: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 2, borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.12)', padding: 16 },
+  quickK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  quickT: { fontFamily: F.black, fontSize: 16, color: C.white },
+  quickPlus: { fontFamily: F.black, fontSize: 32, color: C.white, marginTop: -4 },
   own: { gap: 10, borderRadius: 16, borderWidth: 1.5, borderColor: C.red, padding: 14, backgroundColor: C.navy2 },
 });

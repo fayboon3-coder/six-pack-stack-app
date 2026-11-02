@@ -12,9 +12,11 @@ import { AuthProvider, useAuth } from '../src/lib/auth';
 import { C } from '../src/lib/theme';
 import Splash from '../src/components/Splash';
 import PreviewBar from '../src/components/PreviewBar';
+import { track } from '../src/lib/track';
 
 function Gate() {
   const { session, loading, profile } = useAuth();
+  useEffect(() => { track('app_open', {}, { once: true }); }, []);
   const segments = useSegments();
   const router = useRouter();
 
@@ -51,6 +53,7 @@ function Gate() {
       <Stack.Screen name="workout" />
       <Stack.Screen name="ask" />
       <Stack.Screen name="foods" />
+      <Stack.Screen name="trial" options={{ gestureEnabled: false }} />
       <Stack.Screen name="delete-account" options={{ presentation: 'modal' }} />
       <Stack.Screen name="client/[id]" />
     </Stack>

@@ -19,6 +19,7 @@ import { quizFromHandoff, readHandoff } from '../src/lib/handoff';
 import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
 import Backdrop from '../src/components/Backdrop';
+import { track } from '../src/lib/track';
 
 const BOON = require('../assets/hero/boon_quiz.jpg');
 
@@ -88,6 +89,12 @@ export default function QuizScreen() {
   const set = (k: keyof Quiz, v: any) => { setErr(''); setA((x) => ({ ...x, [k]: v })); };
   const next = () => { setErr(''); setI((x) => Math.min(STEPS.length - 1, x + 1)); };
   const back = () => { setErr(''); if (i === 0) router.back(); else setI(i - 1); };
+
+  useEffect(() => {
+    if (i === 0) track('quiz_start', { src: a.src || null }, { once: true });
+    track('quiz_step', { step: String(step.id), n: i + 1 }, { once: true });
+    if (step.kind === 'foods') track('quiz_foods', {}, { once: true });
+  }, [i]);
 
   // The goal weight step makes no sense for "build muscle": default it to their weight.
   useEffect(() => {
@@ -196,7 +203,7 @@ export default function QuizScreen() {
           {step.kind === 'spend' && <SpendStep spend={a.monthly_spend} tried={a.tried} onNext={next} />}
           {step.kind === 'story' && <StoryStep onNext={next} />}
           {step.kind === 'chart' && <ChartStep a={a} onNext={next} />}
-          {step.kind === 'account' && <AccountStep a={a} set={set} onDone={() => router.replace('/ready')} />}
+          {step.kind === 'account' && <AccountStep a={a} set={set} onDone={() => { track('quiz_done', { foods: (a.foods || []).length, custom: (a.custom_foods || []).length }); router.replace('/ready'); }} />}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

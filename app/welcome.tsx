@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Image, ImageSourcePropType, Linking, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { track } from '../src/lib/track';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -49,7 +50,7 @@ export default function Welcome() {
         {PATHS.map((p, i) => (
           <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
             <Pressable accessibilityRole="button" accessibilityLabel={`${p.title}, ${p.price}`}
-              onPress={() => (p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : p.want === 'score' ? Linking.openURL(STACK_SCORE_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
+              onPress={() => (track('welcome_pick', { want: p.want }), p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : p.want === 'score' ? Linking.openURL(STACK_SCORE_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
               style={({ pressed }) => [st.card, p.want === 'sub' && st.cardSub, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
               <View style={st.thumb}>
                 <Image source={p.img} style={{ width: 100, height: 126 }} resizeMode="cover" accessibilityIgnoresInvertColors />

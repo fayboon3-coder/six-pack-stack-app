@@ -15,6 +15,7 @@ type Row = {
   last_week: number | null; last_checkin: string | null; last_weight: number | null; checkins: number; needs_review: boolean;
 };
 type Invite = { email: string; first_name: string | null; created_at: string };
+type Step = { step: string; label: string; people: number };
 
 /** Coach-only: every client, newest unreviewed check-ins first, plus plans waiting for a sign-up. */
 export default function Coach() {
@@ -24,16 +25,18 @@ export default function Coach() {
   const viewAs = (v: ViewAs) => setOpening(v);
   const [rows, setRows] = useState<Row[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
+  const [funnel, setFunnel] = useState<Step[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const [{ data: c }, { data: i }] = await Promise.all([
+    const [{ data: c }, { data: f }, { data: i }] = await Promise.all([
       supabase.from('coach_clients').select('*'),
+      supabase.from('funnel_7d').select('step,label,people'),
       supabase.from('plan_invites').select('email,first_name,created_at').is('claimed_at', null).order('created_at', { ascending: false }),
     ]);
     const list = ((c as Row[]) || []).sort((a, b) =>
       Number(b.needs_review) - Number(a.needs_review) || String(b.last_checkin || '').localeCompare(String(a.last_checkin || '')));
-    setRows(list); setInvites((i as Invite[]) || []);
+    setRows(list); setInvites((i as Invite[]) || []); setFunnel((f as Step[]) || []);
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -48,6 +51,29 @@ export default function Coach() {
         <Text style={st.kicker}>Coach</Text>
         <Text style={st.title}>{due ? `${due} check-in${due > 1 ? 's' : ''} to review` : 'All caught up'}</Text>
         <Text style={st.sub}>{coached.length} coaching client{coached.length === 1 ? '' : 's'} · {rows.length} in the app</Text>
+
+        {funnel.length > 0 && (
+          <View style={st.preview}>
+            <Text style={st.section}>Your funnel · last 7 days</Text>
+            <Text style={st.meta}>Unique people at each step. The biggest drop is the one to fix first.</Text>
+            {funnel.map((f, k) => {
+              const top = Math.max(1, funnel[0].people);
+              const prev = k ? funnel[k - 1].people : f.people;
+              const drop = k && prev ? Math.round((1 - f.people / prev) * 100) : 0;
+              return (
+                <View key={f.step} style={{ gap: 4 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={st.meta}>{f.label}</Text>
+                    <Text style={st.name}>{f.people}{k > 0 && drop > 0 ? <Text style={[st.meta, { color: C.red2 }]}>  −{drop}%</Text> : null}</Text>
+                  </View>
+                  <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                    <View style={{ height: 8, borderRadius: 4, width: `${Math.max(2, (f.people / top) * 100)}%`, backgroundColor: k >= 7 ? C.green : C.red }} />
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
 
         <View style={[st.preview, { borderColor: C.red, borderWidth: 2 }]}>
           <Text style={st.section}>View the full app as</Text>

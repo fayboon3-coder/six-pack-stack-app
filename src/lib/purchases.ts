@@ -108,3 +108,6 @@ export async function restore(): Promise<boolean> {
 export const MANAGE_URL = Platform.OS === 'android'
   ? 'https://play.google.com/store/account/subscriptions'
   : 'https://apps.apple.com/account/subscriptions';
+
+/** Set once the free user has seen the 7-day trial offer after their plan was built. */
+export const TRIAL_SEEN = 'sps:trial-offer-seen';

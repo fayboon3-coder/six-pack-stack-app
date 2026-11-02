@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buildFoodPlan, buildFoodGrocery, amountText, whatsMissing } from '../src/lib/mealplan';
-import { FOOD_DB, foodById, makeCustomFood } from '../src/data/foods';
+import { FOOD_DB, foodById, makeCustomFood, QUICK_START } from '../src/data/foods';
 
 const num = (s: string) => Number(s.replace(/[^\d.]/g, ''));
 const SHARES = [0.25, 0.3, 0.15, 0.3];
@@ -46,6 +46,12 @@ describe('meal planner', () => {
     const c = makeCustomFood('Moms chili', '1 bowl', 450, 35, 'protein');
     const plan = buildFoodPlan(2400, 180, [...people[1][1], c.id], [c]);
     expect(plan.meals.flatMap((m) => m.options).some((o) => o.detail.includes('chili'))).toBe(true);
+  });
+
+  it('quick start is a complete list that builds a full plan', () => {
+    expect(whatsMissing(QUICK_START.map((id) => foodById(id)!))).toEqual([]);
+    const plan = buildFoodPlan(2400, 180, QUICK_START);
+    plan.meals.forEach((m) => expect(m.options.length).toBe(3));
   });
 
   it('says what is missing', () => {
