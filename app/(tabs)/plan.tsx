@@ -9,10 +9,10 @@ import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
 import PageHeader from '../../src/components/PageHeader';
 import Pills from '../../src/components/Pills';
-import HeroCard from '../../src/components/HeroCard';
+import FullHero from '../../src/components/FullHero';
 
-const PLAN_IMG = require('../../assets/hero/plan.jpg');
-const STACK_IMG = require('../../assets/hero/stack.jpg');
+const PLAN_IMG = require('../../assets/hero/plan_full.jpg');
+const STACK_IMG = require('../../assets/hero/stack_full.jpg');
 import { productImage } from '../../src/lib/images';
 import { mealImage } from '../../src/lib/meals';
 
@@ -28,14 +28,15 @@ export default function PlanTab() {
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
 
   return (
-    <Screen header={
-      <View style={{ gap: 18 }}>
-        <PageHeader kicker="Your plan" title="Plan" />
+    <Screen edgeToEdge header={
+      <View style={{ gap: 16 }}>
         {tab === 'Stack'
-          ? <HeroCard image={STACK_IMG} badge="Your stack" title={saved > 0 ? `$${saved}/mo saved` : 'Only what works'}
-              subtitle={`${(plan.stack || []).length} products to take. Everything else, cut.`} />
-          : <HeroCard image={PLAN_IMG} badge="Your goal" title={plain(plan.goal_short)}
-              subtitle={`${plan.kcal} calories · ${plan.protein}g protein · ${plan.steps} steps a day`} />}
+          ? <FullHero image={STACK_IMG} pills={[{ text: 'Your stack' }, ...(saved > 0 ? [{ text: `$${saved}/mo saved`, tone: 'green' as const }] : [])]}
+              title="The Stack"
+              lede={`${(plan.stack || []).length} products that actually work. Everything else got cut.`} />
+          : <FullHero image={PLAN_IMG} pills={[{ text: 'Your plan' }, { text: `${plan.kcal} cal · ${plan.protein}g protein`, tone: 'green' }]}
+              title="Eat like this"
+              lede="Built only from food you already love. Pick one option per meal and you're on plan." />}
         <Pills items={TABS} value={tab} onChange={setTab} />
       </View>
     }>
