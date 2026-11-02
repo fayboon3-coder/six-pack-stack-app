@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
+import { COACHING_URL } from '../src/lib/access';
 import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
@@ -12,7 +13,7 @@ const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next:
   plan: { k: 'Your first 2 weeks free', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz, then your plan is built from your answers.', cta: 'Build my plan', next: '/quiz' },
   btl: { k: 'Beyond the Label', h: 'Where should I send it?', sub: "You'll see everything inside Beyond the Label next.", cta: 'Show me', next: '/btl' },
   sub: { k: 'The full app', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz to build your plan. Weeks 1 and 2 are free, then unlock all 12 weeks.', cta: 'Build my plan', next: '/quiz' },
-  coaching: { k: '1:1 coaching', h: "Let's see if we're a fit.", sub: 'Next: a 2-minute application. I read every one myself.', cta: 'Start my application', next: '/apply' },
+  coaching: { k: '1:1 coaching', h: 'Where should I send the details?', sub: "Next: everything you get with 1:1 coaching, and the Abs or It's Free guarantee.", cta: 'Show me', next: 'coaching' },
 };
 
 /** One screen between "what are you here for" and the path: name + email, straight into Boon's emails. */
@@ -40,6 +41,7 @@ export default function LeadScreen() {
     setBusy(true);
     await captureLead({ first_name: name.trim(), email: e, want, src });
     setBusy(false);
+    if (c.next === 'coaching') { Linking.openURL(COACHING_URL); return router.replace('/welcome'); }
     router.replace({ pathname: c.next as any, params: { name: name.trim(), email: e, ...(src ? { src } : {}) } });
   };
 

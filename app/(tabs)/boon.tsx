@@ -10,7 +10,7 @@ import { WHATSAPP } from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 import { useRouter } from 'expo-router';
-import { isCoached, isFree } from '../../src/lib/access';
+import { COACHING_URL, isCoached, isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 
@@ -43,7 +43,7 @@ export default function Boon() {
             subtitle={sub
               ? "You've got the full program. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
               : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
-            cta="Apply for coaching" onPress={() => router.push('/apply')} />
+            cta="See how coaching works" onPress={() => Linking.openURL(COACHING_URL)} />
         ) : (
           <HeroCard image={HERO_IMG} badge="Replies within 24 hours" title="I've got you"
             subtitle="Stuck, hungry, sore, or staring at a supplement you saw online? Send it. I read and answer every message myself." cta="Text Boon on WhatsApp"

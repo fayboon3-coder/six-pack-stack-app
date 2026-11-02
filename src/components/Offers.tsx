@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C, F } from '../lib/theme';
-import { BTL_URL } from '../lib/access';
+import { BTL_URL, COACHING_URL } from '../lib/access';
 import { CheckIcon, LockIcon } from './icons';
 
 const BTL_IMG = require('../../assets/img/btl_cover.jpg');
@@ -65,10 +65,10 @@ export function CoachingCard() {
       <Text style={st.kicker}>1:1 with Boon</Text>
       <Text style={st.title}>Six-Pack Stack Coaching</Text>
       <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. 12 weeks, with a results guarantee.</Text>
-      <Pressable accessibilityRole="button" onPress={() => router.push('/apply')} style={st.btn}>
-        <Text style={st.btnText}>Apply for coaching</Text>
+      <Pressable accessibilityRole="button" onPress={() => Linking.openURL(COACHING_URL)} style={st.btn}>
+        <Text style={st.btnText}>See how coaching works</Text>
       </Pressable>
-      <Text style={st.small}>2 minutes. I read every application myself.</Text>
+      <Text style={st.small}>The Abs or It's Free guarantee is on the page.</Text>
     </View>
   );
 }

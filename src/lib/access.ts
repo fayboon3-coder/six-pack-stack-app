@@ -10,6 +10,8 @@ export const isSubscriber = (p?: Profile | null) => !!p && p.role === 'client' &
 export const isLocked = (p: Profile | null | undefined, week: number) => isFree(p) && week > FREE_WEEKS;
 
 export const BTL_URL = 'https://boon-fay.kit.com/a9cb0690c3';
+/** Six-Pack Stack 1:1 coaching landing page (its Apply button goes to the same application form). */
+export const COACHING_URL = 'https://six-pack-stack.vercel.app/?src=app';
 
 /** Who should see coaching first (they told the quiz they're ready now). */
 export function coachingFirst(p?: Profile | null) {
