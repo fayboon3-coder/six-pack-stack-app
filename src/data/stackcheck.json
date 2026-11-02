@@ -1,0 +1,1711 @@
+[
+{
+"id": "whey_protein",
+"name": "Whey Protein",
+"category": "Protein and food",
+"kind": "worth",
+"verdict": "Worth it",
+"evidence": "Strong",
+"cost": "",
+"headline": "Food in a tub, and that's the point",
+"intro": "Whey is a complete, high-quality protein that digests fast. It's not magic, but it's one of the easiest ways to hit your protein target on a busy day.",
+"claim": "Builds muscle, speeds recovery, \"anabolic\" results.",
+"research": "Protein intake, from any source, supports muscle growth when you lift. Gains tend to level off around 1.6 g per kg of body weight per day. Whey is a convenient, high-quality way to get there. (Morton et al., 2018)",
+"swap": "A plain whey with a third-party seal. Whey isolate costs more and mainly helps if regular whey bothers your stomach.",
+"swap_short": "Plain whey, third-party tested",
+"mvr": [
+[
+"Anabolic formula",
+"It's protein. Your total daily intake is what matters."
+],
+[
+"Advanced blend",
+"Often regular whey with added buzzwords."
+],
+[
+"Post-workout window",
+"Hitting your daily total matters far more than timing."
+]
+],
+"aliases": [
+"whey",
+"protein powder",
+"optimum nutrition",
+"gold standard",
+"isolate",
+"iso100",
+"dymatize",
+"muscletech",
+"nitro tech",
+"ghost protein",
+"myprotein"
+],
+"img": "whey"
+},
+{
+"id": "plant_protein",
+"name": "Plant Protein",
+"category": "Protein and food",
+"kind": "worth",
+"verdict": "Worth it (if you need it)",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Good if you need it, not \"better\" if you don't",
+"intro": "If you don't eat dairy, plant protein does the job. Just don't pay extra for the \"superfood\" add-ins.",
+"claim": "Just as good as whey, cleaner and healthier.",
+"research": "Single plant proteins can be lower in some essential amino acids, but blends, such as pea and rice, cover that well. Soy is a complete protein on its own. Hit the same daily total and results look similar.",
+"swap": "If you eat dairy, whey is usually cheaper per gram. If you don't, a pea-and-rice blend.",
+"swap_short": "Pea-and-rice blend, or whey",
+"mvr": [
+[
+"Superfood blend",
+"\"Superfood\" has no legal definition."
+],
+[
+"Cleaner than whey",
+"Both can be clean. Look for a third-party seal."
+],
+[
+"Better for digestion",
+"Only if dairy is the problem for you."
+]
+],
+"aliases": [
+"vegan protein",
+"pea protein",
+"garden of life",
+"orgain",
+"vega",
+"soy protein"
+],
+"img": ""
+},
+{
+"id": "protein_bars_and_snacks",
+"name": "Protein Bars and Snacks",
+"category": "Protein and food",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Some are food. Some are candy in disguise.",
+"intro": "A good bar is a handy backup. A bad one is a candy bar that charges you extra for 10 grams of protein.",
+"claim": "A healthy, high-protein snack.",
+"research": "US labels can say \"high protein\" with just 10 grams per serving, measured against a 50 g daily value. Many bars rely on sugar, sugar alcohols and oils to taste good. See Protein in Everything, page 35.",
+"swap": "Use the calorie test: drop the last zero from the calories, and the protein should beat it. Greek yogurt, jerky, eggs, cottage cheese or a shake usually win.",
+"swap_short": "Greek yogurt, jerky, eggs",
+"mvr": [
+[
+"High protein",
+"Can legally mean 10 g."
+],
+[
+"Guilt-free",
+"Calories still count."
+],
+[
+"Protein packed",
+"No legal definition at all."
+]
+],
+"aliases": [
+"quest bar",
+"protein bar",
+"barebells",
+"one bar",
+"rxbar",
+"protein chips",
+"protein cookie",
+"built bar"
+],
+"img": "quest"
+},
+{
+"id": "collagen",
+"name": "Collagen",
+"category": "Protein and food",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Weak to moderate",
+"cost": "",
+"headline": "It doesn't go straight to your skin",
+"intro": "Collagen is a protein, and your body breaks it down like any other. Eating collagen doesn't mean it ends up where the ad says it will.",
+"claim": "Better skin, hair, nails and joints.",
+"research": "Some small studies show modest skin and joint benefits, but many are industry-funded. For building muscle, collagen is a low-quality protein because it's missing key amino acids.",
+"swap": "For skin, daily sunscreen and a retinoid. For muscle, whey.",
+"swap_short": "Sunscreen for skin, whey for muscle",
+"mvr": [
+[
+"Rebuilds your collagen",
+"It's digested into amino acids first."
+],
+[
+"Counts toward your protein",
+"It does, but it's a weak protein for muscle."
+],
+[
+"Gummies with collagen",
+"Some contain tiny amounts. Check the dose."
+]
+],
+"aliases": [
+"vital proteins",
+"collagen peptides",
+"collagen gummies"
+],
+"img": "collagen"
+},
+{
+"id": "mass_gainers_and_meal_replacements",
+"name": "Mass Gainers and Meal Replacements",
+"category": "Protein and food",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Mostly cheap carbs at a premium",
+"intro": "A mass gainer is mostly sugar or maltodextrin plus some protein. A meal replacement can help in a pinch, but check what's actually in the powder.",
+"claim": "Easy gains, or a complete meal in a bottle.",
+"research": "Gaining weight comes down to eating more calories than you burn. A gainer is just a convenient, expensive way to do that. Some meal replacements advertise protein \"with milk\" while the powder itself has very little.",
+"swap": "Blend your own: milk, oats, a banana, peanut butter and a scoop of whey. More protein and calories for less money.",
+"swap_short": "Homemade shake",
+"mvr": [
+[
+"1,250 calories per serving",
+"Mostly cheap carbs."
+],
+[
+"Complete nutrition",
+"Read the label without the milk."
+],
+[
+"Lean gains",
+"Gaining fast mostly adds fat."
+]
+],
+"aliases": [
+"mass gainer",
+"serious mass",
+"slimfast",
+"huel",
+"ensure",
+"meal replacement",
+"weight gainer"
+],
+"img": "mass"
+},
+{
+"id": "creatine",
+"name": "Creatine",
+"category": "Performance",
+"kind": "worth",
+"verdict": "Worth it",
+"evidence": "Strong",
+"cost": "about $6–12/mo",
+"headline": "The cheap one is the one that works",
+"intro": "One of the most researched supplements there is. The only mistake is paying extra for a fancy version.",
+"claim": "More strength and muscle. Fancy versions add \"advanced absorption\" and results \"from the first dose.\"",
+"research": "Creatine monohydrate consistently improves strength and muscle gains when paired with training, and it has a strong safety record in healthy people. (Kreider et al., 2017) Creatine builds up in your muscles over a few weeks, so you won't feel it on day one. A head-to-head study found creatine ethyl ester, a \"premium\" form, worked worse than plain monohydrate. Some people naturally have high creatine levels and notice less.",
+"swap": "Plain, unflavored, third-party-tested creatine monohydrate. 3–5 g a day, every day, any time.",
+"swap_short": "Plain monohydrate",
+"mvr": [
+[
+"Advanced absorption",
+"Monohydrate is the proven form."
+],
+[
+"Feel it on day one",
+"It takes a few weeks to build up."
+],
+[
+"Loading phase required",
+"Optional. 3–5 g daily gets you there, just slower."
+]
+],
+"aliases": [
+"creatine monohydrate",
+"creatine hcl",
+"creatine gummies",
+"creapure",
+"kre-alkalyn"
+],
+"img": "creatine"
+},
+{
+"id": "pre_workout",
+"name": "Pre-Workout",
+"category": "Performance",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Strong (for caffeine)",
+"cost": "about $35 a tub",
+"headline": "You're mostly paying for caffeine",
+"intro": "I'll be honest, I like pre-workout. But I know exactly what I'm paying for.",
+"claim": "Explosive energy, insane pumps, laser focus.",
+"research": "Caffeine is the ingredient doing most of the work, and it has strong evidence. (Guest et al., 2021) The tingle is beta-alanine, a harmless side effect, not a sign it's working. Many tubs hide doses in proprietary blends, and pre-workouts have a history of banned stimulants like ephedra and DMAA. See page 39.",
+"swap": "A coffee 30 minutes before training. If you like pre-workout, choose a fully disclosed label with a third-party seal.",
+"swap_short": "Coffee",
+"mvr": [
+[
+"Explosive energy",
+"Mostly caffeine."
+],
+[
+"The tingle means it's working",
+"It's a side effect of beta-alanine."
+],
+[
+"Proprietary energy matrix",
+"You can't check the doses."
+]
+],
+"aliases": [
+"c4",
+"pre workout",
+"preworkout",
+"ghost legend",
+"gorilla mode",
+"bucked up",
+"total war",
+"pump"
+],
+"img": "c4"
+},
+{
+"id": "bcaas_and_eaas",
+"name": "BCAAs and EAAs",
+"category": "Performance",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak (if you eat enough protein)",
+"cost": "",
+"headline": "Watering your lawn while it's raining",
+"intro": "If you already eat enough protein, these add basically nothing.",
+"claim": "Builds muscle, prevents breakdown, speeds recovery.",
+"research": "BCAAs are three of the amino acids found in protein. On their own, they can't build muscle, because your body needs all the essential amino acids to do that. Benefits mostly show up when people aren't eating enough protein. EAAs are a more complete product, but the same rule applies: hit your protein and they add little.",
+"swap": "Hit your daily protein. If you just like flavored water, a cheap water flavoring does the same job.",
+"swap_short": "",
+"mvr": [
+[
+"Prevents muscle breakdown",
+"Only matters if your protein is low."
+],
+[
+"Intra-workout recovery",
+"Your post-workout meal covers it."
+],
+[
+"Zero calories, all gains",
+"Mostly flavored water."
+]
+],
+"aliases": [
+"bcaa",
+"eaa",
+"xtend",
+"amino",
+"aminos",
+"scivation",
+"amino energy"
+],
+"img": "xtend"
+},
+{
+"id": "caffeine_pills",
+"name": "Caffeine Pills",
+"category": "Performance",
+"kind": "worth",
+"verdict": "Worth it",
+"evidence": "Strong",
+"cost": "",
+"headline": "One of the few things that really works",
+"intro": "Caffeine has some of the best evidence of any performance supplement. You just don't need a fancy version of it.",
+"claim": "More energy, more focus, better performance.",
+"research": "Caffeine reliably improves performance for many people. Studies typically use about 3–6 mg per kg of body weight, 30–60 minutes before exercise. (Guest et al., 2021) More isn't better: high doses cause jitters, anxiety and wrecked sleep.",
+"swap": "Coffee works just as well. Pills are handy if you don't like coffee or want an exact dose.",
+"swap_short": "Coffee",
+"mvr": [
+[
+"Thermogenic energy",
+"It's caffeine, with a tiny calorie burn."
+],
+[
+"Clean energy blend",
+"Still caffeine. Check the total."
+],
+[
+"Take it any time",
+"Avoid it within about 8 hours of bed."
+]
+],
+"aliases": [
+"caffeine",
+"energy pills",
+"coffee",
+"energy drink",
+"celsius",
+"alani nu",
+"bang"
+],
+"img": "coffee"
+},
+{
+"id": "beta_alanine",
+"name": "Beta-Alanine",
+"category": "Performance",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "The tingle in your pre-workout",
+"intro": "It does something, just not for most of what guys use it for.",
+"claim": "More endurance and more reps.",
+"research": "Beta-alanine helps most with hard efforts lasting about one to four minutes, like high-rep sets, sprints or conditioning. It does little for heavy, low-rep strength. It builds up over weeks, and the tingle is harmless. (Trexler et al., 2015)",
+"swap": "If you mostly lift heavy for sets of five, skip it. If you do a lot of high-rep or conditioning work, plain beta-alanine powder is cheaper than paying for it in a pre-workout.",
+"swap_short": "Plain powder if needed",
+"mvr": [
+[
+"Strength and power",
+"Helps endurance in 1–4 minute efforts."
+],
+[
+"Feel it working",
+"The tingle is a side effect."
+],
+[
+"One scoop, instant results",
+"Builds up over several weeks."
+]
+],
+"aliases": [
+"beta alanine",
+"tingles",
+"carnosyn"
+],
+"img": "betaalanine"
+},
+{
+"id": "citrulline",
+"name": "Citrulline",
+"category": "Performance",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Weak to moderate",
+"cost": "",
+"headline": "The \"pump\" ingredient",
+"intro": "Some evidence, small effects, and often underdosed.",
+"claim": "Bigger pumps, better blood flow, more reps.",
+"research": "Some studies show small improvements in reps and fatigue, but results are mixed. Studies usually use several grams of citrulline malate, and many \"pump\" products contain much less.",
+"swap": "If you want it, buy plain citrulline and use a study-sized dose, instead of a \"nitric oxide booster\" built around a tiny one.",
+"swap_short": "Plain citrulline",
+"mvr": [
+[
+"Skin-splitting pumps",
+"The pump is temporary and doesn't equal growth."
+],
+[
+"Nitric oxide booster",
+"Often an underdosed blend."
+],
+[
+"Clinically dosed",
+"Check the grams against the studies."
+]
+],
+"aliases": [
+"l-citrulline",
+"citrulline malate",
+"nitric oxide",
+"pump pills"
+],
+"img": ""
+},
+{
+"id": "electrolyte_packets",
+"name": "Electrolyte Packets",
+"category": "Hydration",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Strong for long, hot sessions. Weak for daily use.",
+"cost": "about $47/mo",
+"headline": "Built for the 1%, sold to the 100%",
+"intro": "I used to take one every single day and tell guys drinking water they were doing it wrong. Then I read the research.",
+"claim": "Water isn't enough. You need electrolytes every day to stay hydrated.",
+"research": "Electrolyte drinks were built for real problems: severe dehydration from illness, and athletes losing huge amounts of sweat in the heat. In 2012, an investigation by the *BMJ* and Oxford examined hundreds of sports product performance claims and found the evidence behind them was weak. Sweat is less salty than your blood, so a normal workout actually concentrates your sodium. And most people already eat more sodium than recommended.",
+"swap": "Plain water for normal training. For long, hot sessions where you're soaked, a pinch of salt and a splash of juice in your bottle.",
+"swap_short": "Water, or salt and juice",
+"mvr": [
+[
+"Water isn't enough",
+"For a normal workout, it is."
+],
+[
+"Optimal ratio",
+"There's no proven perfect ratio for everyday use."
+],
+[
+"Daily hydration habit",
+"Most people already get plenty of sodium from food."
+]
+],
+"aliases": [
+"lmnt",
+"liquid iv",
+"liquid i.v.",
+"electrolytes",
+"nuun",
+"drip drop"
+],
+"img": ""
+},
+{
+"id": "sports_drinks",
+"name": "Sports Drinks",
+"category": "Hydration",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Strong (for long sessions)",
+"cost": "",
+"headline": "Great for a two-hour game. Not for a 45-minute lift.",
+"intro": "The sugar and sodium in a sports drink genuinely help during long, intense exercise. The problem is who's drinking them.",
+"claim": "Better hydration and performance, for everyone.",
+"research": "For exercise lasting roughly an hour or more, especially in the heat, carbs and sodium can help performance and rehydration. For a short lift or a walk, a sports drink is mostly extra sugar.",
+"swap": "Water for most sessions. Save sports drinks for long games, hot practices and endurance events.",
+"swap_short": "Water",
+"mvr": [
+[
+"Hydrates better than water",
+"Only matters in long, sweaty sessions."
+],
+[
+"Fuel your workout",
+"A 45-minute lift doesn't need it."
+],
+[
+"For athletes",
+"Mostly bought by people who aren't mid-game."
+]
+],
+"aliases": [
+"gatorade",
+"powerade",
+"bodyarmor",
+"body armor"
+],
+"img": ""
+},
+{
+"id": "prime",
+"name": "Prime",
+"category": "Hydration",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "\"sports hydration\" with almost no sodium",
+"intro": "Sponsored by huge sports teams and sold as elite hydration. Then you read the label.",
+"claim": "Elite sports hydration.",
+"research": "Sodium is the main electrolyte you lose in sweat, and Prime Hydration has about 10 mg per bottle. Its big electrolyte number comes mostly from potassium. It also has almost no sugar, which is part of what makes a sports drink work during long exercise. It's closer to flavored water than a sports drink. One founder even said the 871 mg electrolyte stick was set to beat a competitor's 870 mg on purpose.",
+"swap": "Water, or a real sports drink for long, hot sessions.",
+"swap_short": "",
+"mvr": [
+[
+"Sports hydration",
+"Barely any sodium."
+],
+[
+"871 mg of electrolytes",
+"A number picked to beat a competitor."
+],
+[
+"Low sugar",
+"Sugar is part of how sports drinks work."
+]
+],
+"aliases": [
+"prime hydration",
+"prime energy",
+"logan paul",
+"ksi"
+],
+"img": "prime"
+},
+{
+"id": "greens_powders",
+"name": "Greens Powders",
+"category": "Health",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "about $79–99/mo",
+"headline": "An expensive multivitamin with a podcast budget",
+"intro": "75 ingredients and a host you trust reading the ad every week. Here's what the ad leaves out.",
+"claim": "One scoop covers your nutrition, energy, immunity and gut health.",
+"research": "Most greens powders put their ingredients in a proprietary blend, so you can't tell if you're getting a useful dose of anything. Many of the vitamins you can see come in amounts far beyond what you need, and your body flushes the extra. Compared with a basic multivitamin, popular greens powders can come up short on minerals like calcium and magnesium.",
+"swap": "A bag of frozen vegetables. If your diet really has gaps, a basic multivitamin.",
+"swap_short": "",
+"mvr": [
+[
+"75+ ingredients",
+"Doses hidden in a blend."
+],
+[
+"Better than a multivitamin",
+"Can miss key minerals."
+],
+[
+"Superfood",
+"No legal definition."
+]
+],
+"aliases": [
+"ag1",
+"athletic greens",
+"bloom greens",
+"super greens",
+"greens",
+"bloom"
+],
+"img": "ag1"
+},
+{
+"id": "multivitamins",
+"name": "Multivitamins",
+"category": "Health",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Cheap insurance, not a health upgrade",
+"intro": "A multivitamin won't make a healthy eater healthier. But if your diet has gaps, it's a cheap safety net.",
+"claim": "More energy, better immunity, better health.",
+"research": "Multivitamins help cover deficiencies. For people who already eat a varied diet, the benefits for preventing disease are unclear. They're not an energy product.",
+"swap": "A basic, third-party-tested multivitamin. No need for \"men's performance\" versions.",
+"swap_short": "Basic multivitamin",
+"mvr": [
+[
+"All-day energy",
+"Only if you were deficient."
+],
+[
+"Men's performance formula",
+"Often the same vitamins, priced higher."
+],
+[
+"Gummies are just as good",
+"Often lower doses and added sugar."
+]
+],
+"aliases": [
+"multivitamin",
+"centrum",
+"one a day",
+"ritual",
+"vitamins"
+],
+"img": "centrum"
+},
+{
+"id": "vitamin_d",
+"name": "Vitamin D",
+"category": "Health",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Strong (if deficient)",
+"cost": "",
+"headline": "Worth it if you're low. A blood test tells you.",
+"intro": "If you work indoors all day, there's a decent chance you're low.",
+"claim": "Better immunity, mood, bones and testosterone.",
+"research": "Vitamin D deficiency is common worldwide, especially for people who get little sun. (Holick, 2007) Correcting a deficiency matters. If your levels are already fine, taking more doesn't add much.",
+"swap": "Get a blood test. If you're low, a basic D3 supplement at the dose your doctor suggests.",
+"swap_short": "Blood test, then basic D3",
+"mvr": [
+[
+"Testosterone support",
+"Helps mainly if you're deficient."
+],
+[
+"Mega-dose for immunity",
+"More isn't better, and too much can be harmful."
+],
+[
+"Everyone needs it",
+"Depends on your levels and sun exposure."
+]
+],
+"aliases": [
+"vitamin d3",
+"d3",
+"vit d"
+],
+"img": ""
+},
+{
+"id": "fish_oil",
+"name": "Fish Oil",
+"category": "Health",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Useful if you never eat fish",
+"intro": "The research is more mixed than the bottle suggests.",
+"claim": "Heart health, joint health, brain health.",
+"research": "A large trial, VITAL, didn't find that fish oil supplements reduced major heart events in the general population. It may help people who eat very little fish.",
+"swap": "Fatty fish like salmon, sardines or mackerel twice a week.",
+"swap_short": "Salmon twice a week",
+"mvr": [
+[
+"Heart protection",
+"Mixed results in healthy people."
+],
+[
+"Joint support",
+"Small effects at best."
+],
+[
+"Everyone should take it",
+"Food covers it for many people."
+]
+],
+"aliases": [
+"omega 3",
+"omega-3",
+"nordic naturals",
+"krill oil"
+],
+"img": ""
+},
+{
+"id": "magnesium",
+"name": "Magnesium",
+"category": "Health",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate (if deficient)",
+"cost": "",
+"headline": "Helps if you're low. Not a sleeping pill.",
+"intro": "A lot of people come up short on magnesium. That doesn't make it a sleep cure.",
+"claim": "Better sleep, less stress, fewer cramps.",
+"research": "Many people get less magnesium from food than recommended. (NIH Office of Dietary Supplements) Fixing a shortfall can help. Evidence for magnesium as a sleep aid in healthy people is weak.",
+"swap": "Nuts, seeds, beans, leafy greens and dark chocolate. If you're short, a basic supplement like magnesium glycinate.",
+"swap_short": "Food first, basic glycinate",
+"mvr": [
+[
+"Deep sleep formula",
+"Weak evidence in healthy people."
+],
+[
+"Everyone is deficient",
+"Many fall short, not everyone."
+],
+[
+"Sleep stack",
+"Often magnesium at a big markup."
+]
+],
+"aliases": [
+"magnesium glycinate",
+"magnesium citrate",
+"mag glycinate"
+],
+"img": ""
+},
+{
+"id": "probiotics",
+"name": "Probiotics",
+"category": "Health",
+"kind": "skip",
+"verdict": "Waste of money (for most people)",
+"evidence": "Weak for healthy people",
+"cost": "",
+"headline": "The right strain for the right problem, or nothing",
+"intro": "Effects depend on the exact strain and the exact problem. \"Gut health\" isn't one.",
+"claim": "Fixes your gut, boosts immunity, beats bloating.",
+"research": "Some strains have evidence for specific issues, like diarrhea from antibiotics. For healthy people, the benefit is unclear. See The Gut Health Craze, page 37.",
+"swap": "Fermented foods like yogurt, kefir, sauerkraut and kimchi, plus more fiber. For a real gut issue, ask a doctor which strain, if any.",
+"swap_short": "",
+"mvr": [
+[
+"50 billion CFUs",
+"A big number doesn't mean the right strain."
+],
+[
+"Heals your gut",
+"Not a diagnosis. Not a cure."
+],
+[
+"Take it forever",
+"Benefits often stop when you stop."
+]
+],
+"aliases": [
+"seed",
+"gut health",
+"culturelle",
+"probiotic"
+],
+"img": ""
+},
+{
+"id": "ashwagandha",
+"name": "Ashwagandha",
+"category": "Health",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Some evidence for stress. Not a t-booster.",
+"intro": "One of the better-studied herbs, but with real caveats.",
+"claim": "Less stress, better sleep, more testosterone.",
+"research": "There's some evidence for stress and sleep. Testosterone benefits mostly show up in men who are already low. There have been rare reports of liver injury, and some countries have restricted it.",
+"swap": "Fix sleep and stress first. If you try it, use a third-party-tested product and stop if you notice side effects. Talk to a doctor if you have a thyroid condition or take medication.",
+"swap_short": "Sleep and stress basics",
+"mvr": [
+[
+"Boosts testosterone",
+"Mainly in men who are low."
+],
+[
+"Ancient, so it's safe",
+"Rare liver injury has been reported."
+],
+[
+"Stress-proof",
+"Small effects, not a fix for your life."
+]
+],
+"aliases": [
+"ksm-66",
+"sensoril",
+"cortisol"
+],
+"img": ""
+},
+{
+"id": "apple_cider_vinegar_gummies",
+"name": "Apple Cider Vinegar Gummies",
+"category": "Health",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "Candy with a wellness label",
+"intro": "The evidence for vinegar is small. The dose in most gummies is smaller.",
+"claim": "Weight loss, detox, blood sugar control.",
+"research": "Studies on apple cider vinegar show small effects at best, and most gummies don't contain the amounts used in those studies. Your liver and kidneys already handle \"detox.\"",
+"swap": "Nothing. If you like vinegar, put it in a salad dressing.",
+"swap_short": "",
+"mvr": [
+[
+"Melts fat",
+"No meaningful evidence."
+],
+[
+"Detox",
+"Your organs already do that."
+],
+[
+"Nature's Ozempic",
+"Not even close."
+]
+],
+"aliases": [
+"goli",
+"acv",
+"apple cider vinegar"
+],
+"img": "goli"
+},
+{
+"id": "sea_moss",
+"name": "Sea Moss",
+"category": "Health",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "\"92 minerals\" and almost no research",
+"intro": "It's food. Expensive food, with a marketing story.",
+"claim": "A superfood packed with minerals that fixes everything.",
+"research": "Sea moss contains nutrients, but there's little real research on sea moss supplements. Iodine content can vary a lot from product to product, and too much iodine can affect your thyroid.",
+"swap": "A varied diet with fruit, vegetables and seafood.",
+"swap_short": "",
+"mvr": [
+[
+"92 of 102 minerals",
+"Mostly a marketing line."
+],
+[
+"Superfood",
+"No legal definition."
+],
+[
+"Thyroid support",
+"Too much iodine can do the opposite."
+]
+],
+"aliases": [
+"irish moss",
+"sea moss gel"
+],
+"img": ""
+},
+{
+"id": "fat_burners",
+"name": "Fat Burners",
+"category": "Fat loss",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "about $20–29 a bottle",
+"headline": "Mostly caffeine, with the worst safety record in the aisle",
+"intro": "Ephedra and DNP were both sold as fat burners. That alone should make you careful.",
+"claim": "\"Thermogenic\" formulas that torch fat.",
+"research": "Most fat burners rely on caffeine. The extra calories burned are small, roughly what a few extra minutes of walking would do. Fat loss comes from a consistent calorie deficit, not from a pill. This category also has the worst safety history in the industry. See page 39.",
+"swap": "A calorie deficit you can stick to. If you want the energy, coffee.",
+"swap_short": "",
+"mvr": [
+[
+"Torch fat",
+"Burning fat isn't losing fat."
+],
+[
+"Thermogenic formula",
+"Usually caffeine."
+],
+[
+"Clinically proven",
+"Check who was studied, and their diet."
+]
+],
+"aliases": [
+"hydroxycut",
+"lipo 6",
+"fat burner",
+"thermogenic",
+"raspberry ketone",
+"garcinia",
+"green tea extract"
+],
+"img": "hydroxycut"
+},
+{
+"id": "skinny_and_detox_teas",
+"name": "Skinny and Detox Teas",
+"category": "Fat loss",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "A laxative in a nice box",
+"intro": "You'll lose weight. It just won't be fat.",
+"claim": "Flatten your stomach. Detox your body.",
+"research": "Many contain senna, a laxative. You lose water and whatever is in your gut, not fat. Regular laxative use can cause real problems. Your liver and kidneys already do the detoxing.",
+"swap": "Peppermint or ginger tea if you just enjoy tea.",
+"swap_short": "",
+"mvr": [
+[
+"Flat tummy in 14 days",
+"Water and digestion, not fat."
+],
+[
+"Detox",
+"Your organs already do it."
+],
+[
+"All natural",
+"Senna is natural, and it's a laxative."
+]
+],
+"aliases": [
+"detox tea",
+"skinny tea",
+"fit tea",
+"teatox",
+"flat tummy"
+],
+"img": ""
+},
+{
+"id": "l_carnitine",
+"name": "L-Carnitine",
+"category": "Fat loss",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "The \"fat shuttle\" you already have",
+"intro": "Carnitine does help move fat into your cells for energy. You just already make plenty.",
+"claim": "Shuttles fat into your cells to be burned.",
+"research": "Healthy people already make enough carnitine. Supplementing hasn't shown meaningful fat loss in healthy, active people.",
+"swap": "A calorie deficit.",
+"swap_short": "",
+"mvr": [
+[
+"Fat transport",
+"Your body already does it."
+],
+[
+"Added to energy drinks",
+"Marketing, not fat loss."
+],
+[
+"Liquid shots work faster",
+"No good evidence."
+]
+],
+"aliases": [
+"carnitine",
+"alcar",
+"acetyl l-carnitine"
+],
+"img": ""
+},
+{
+"id": "cla",
+"name": "CLA",
+"category": "Fat loss",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "A fraction of a pound, at best",
+"intro": "CLA had its moment in the 2000s. The research never caught up with the hype.",
+"claim": "Melts belly fat.",
+"research": "In human studies, the effect is tiny, a fraction of a pound a week at best, and it can cause stomach upset.",
+"swap": "A calorie deficit.",
+"swap_short": "",
+"mvr": [
+[
+"Targets belly fat",
+"You can't spot-reduce fat."
+],
+[
+"Natural fat burner",
+"Tiny effect."
+],
+[
+"Keeps muscle while dieting",
+"Protein does that."
+]
+],
+"aliases": [
+"conjugated linoleic acid",
+"tonalin"
+],
+"img": ""
+},
+{
+"id": "berberine",
+"name": "Berberine",
+"category": "Fat loss",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate (blood sugar), weak (weight loss)",
+"cost": "",
+"headline": "\"nature's ozempic\" isn't ozempic",
+"intro": "It has some real research behind it. Just not the research the nickname suggests.",
+"claim": "A natural version of Ozempic.",
+"research": "Berberine has some evidence for improving blood sugar. Studies show modest weight loss at most, nowhere near a GLP-1 drug. It can interact with medications and cause stomach issues.",
+"swap": "If blood sugar is a real concern, see a doctor. For weight loss, a calorie deficit and protein at every meal.",
+"swap_short": "Doctor, deficit, protein",
+"mvr": [
+[
+"Nature's Ozempic",
+"Nowhere near the same effect."
+],
+[
+"Melts fat",
+"Modest results at most."
+],
+[
+"Safe because it's natural",
+"It can interact with medications."
+]
+],
+"aliases": [
+"nature's ozempic",
+"natures ozempic",
+"ozempic"
+],
+"img": "ozempic"
+},
+{
+"id": "sweat_belts_and_waist_trainers",
+"name": "Sweat Belts and Waist Trainers",
+"category": "Fat loss",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "None for fat loss",
+"cost": "about $22–40",
+"headline": "The only thing you lose is water",
+"intro": "The 1970s sauna suit, now in a smaller size.",
+"claim": "Burn belly fat while you train.",
+"research": "Sweating more doesn't burn more fat. It's water, and it comes back the moment you drink. You can't melt fat from one spot by heating it. Waist trainers squeeze your midsection while you wear them, and that's all.",
+"swap": "A calorie deficit and consistent training. For support on heavy lifts, a real lifting belt.",
+"swap_short": "",
+"mvr": [
+[
+"Burns belly fat",
+"Burns nothing extra."
+],
+[
+"Inches lost",
+"Water, back after you drink."
+],
+[
+"Sauna effect",
+"Just sweat."
+]
+],
+"aliases": [
+"waist trainer",
+"sweat belt",
+"sauna suit",
+"sweat band"
+],
+"img": ""
+},
+{
+"id": "testosterone_boosters",
+"name": "Testosterone Boosters",
+"category": "Hormones",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak for healthy men",
+"cost": "about $65–70/mo",
+"headline": "Selling to the biggest insecurity guys have",
+"intro": "Most of these ingredients don't deliver. The ones that do mostly help guys who are deficient.",
+"claim": "Naturally boost your testosterone for more muscle, energy and drive.",
+"research": "D-aspartic acid showed a short bump in one study, then levels returned to normal within weeks. Fenugreek and tribulus haven't reliably raised testosterone in healthy men. Zinc, vitamin D and magnesium only help if you're actually deficient.",
+"swap": "Track your food for a week and fix real gaps. Eat enough, because long, hard diets suppress hormones. Sleep, lift and lose excess fat. Got real symptoms? See a doctor.",
+"swap_short": "",
+"mvr": [
+[
+"Clinically proven",
+"On paper, not in the mirror."
+],
+[
+"Boosts T naturally",
+"Mostly if you're deficient."
+],
+[
+"Alpha male formula",
+"Marketing aimed at insecurity."
+]
+],
+"aliases": [
+"nugenix",
+"test booster",
+"t booster",
+"prime male",
+"testofen",
+"fenugreek",
+"tribulus",
+"dhea"
+],
+"img": "nugenix"
+},
+{
+"id": "tongkat_ali",
+"name": "Tongkat Ali",
+"category": "Hormones",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "",
+"headline": "Significant on paper. Hard to feel in real life.",
+"intro": "It has better evidence than most boosters. But think about what the numbers actually mean.",
+"claim": "A proven natural testosterone booster.",
+"research": "Some studies show a 10–20% increase in testosterone. A guy at 600 ng/dL might reach about 700. Testosterone therapy can roughly double levels. That's the gap between \"statistically significant\" and something you'd notice in the gym. See page 18.",
+"swap": "The basics on the previous page will do more for most guys.",
+"swap_short": "Fix the basics",
+"mvr": [
+[
+"Raises T by 15%",
+"A change you probably won't feel."
+],
+[
+"Podcast-approved",
+"Endorsed isn't the same as proven."
+],
+[
+"Natural TRT",
+"Not even close."
+]
+],
+"aliases": [
+"tongkat",
+"longjack",
+"fadogia"
+],
+"img": ""
+},
+{
+"id": "hormone_balancing_supplements",
+"name": "\"Hormone Balancing\" Supplements",
+"category": "Hormones",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "",
+"intro": "Your body has dozens of hormones. \"Balanced\" means something different for each one, and for each person.",
+"claim": "Balances your hormones.",
+"research": "No single supplement brings every hormone to a perfect middle. If a product won't name which hormone it changes, and how, that's your answer.",
+"swap": "If you think something is off, get blood work and talk to a doctor.",
+"swap_short": "",
+"mvr": [
+[
+"Balances your hormones",
+"Which ones? It never says."
+],
+[
+"Fixes fatigue and weight gain",
+"Those have many possible causes."
+],
+[
+"Doctor formulated",
+"Doesn't mean it was tested."
+]
+],
+"aliases": [
+"hormone balance",
+"estrogen blocker",
+"dim",
+"cortisol supplement"
+],
+"img": ""
+},
+{
+"id": "melatonin",
+"name": "Melatonin",
+"category": "Sleep and recovery",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate (jet lag, shifted schedules)",
+"cost": "",
+"headline": "Not a sedative, and the label might be wrong",
+"intro": "Melatonin can help with jet lag and a shifted schedule. It's not a nightly knockout pill.",
+"claim": "Knocks you out. Better sleep every night.",
+"research": "Melatonin can help you fall asleep a little faster, especially when your schedule is off. And labels often aren't accurate: a 2023 *JAMA* study tested 25 melatonin gummy products and found only 3 were within 10% of the amount on the label. One had none at all. (Lee et al., 2023)",
+"swap": "A consistent bedtime, a dark and cool room, and no screens or caffeine late. For jet lag, a small dose of a third-party-tested product.",
+"swap_short": "A consistent bedtime",
+"mvr": [
+[
+"Deep sleep gummies",
+"Helps timing, not depth."
+],
+[
+"5 mg per serving",
+"Often not what's actually inside."
+],
+[
+"Take it every night",
+"Fix the habits first."
+]
+],
+"aliases": [
+"sleep gummies",
+"sleep aid",
+"zzzquil"
+],
+"img": "melatonin"
+},
+{
+"id": "zma",
+"name": "ZMA",
+"category": "Sleep and recovery",
+"kind": "skip",
+"verdict": "Waste of money (for most people)",
+"evidence": "Weak",
+"cost": "",
+"headline": "Zinc, magnesium and b6, at a markup",
+"intro": "It only helps if you're actually low in zinc or magnesium.",
+"claim": "Better sleep, recovery and testosterone.",
+"research": "In people who aren't deficient, studies haven't shown meaningful gains in testosterone or performance.",
+"swap": "Eat enough meat, seeds, nuts and beans. If a blood test shows you're low, a basic zinc or magnesium supplement.",
+"swap_short": "",
+"mvr": [
+[
+"Anabolic sleep formula",
+"Basic minerals with a big name."
+],
+[
+"Boosts testosterone",
+"Only if you're deficient."
+],
+[
+"Vivid dreams mean it works",
+"That's a side effect, not proof."
+]
+],
+"aliases": [
+"zinc",
+"zinc magnesium"
+],
+"img": ""
+},
+{
+"id": "cold_plunge_tubs",
+"name": "Cold Plunge Tubs",
+"category": "Sleep and recovery",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate",
+"cost": "about $1,150–$8,000",
+"headline": "Good for soreness. Bad timing for gains.",
+"intro": "Many people love how cold water makes them feel. Just don't jump in right after you lift.",
+"claim": "Faster recovery and more growth.",
+"research": "Cold water can reduce soreness. But regular cold-water immersion right after strength training may blunt long-term gains in muscle and strength. (Roberts et al., 2015)",
+"swap": "A cold shower costs nothing. If you plunge, keep it away from your lifting sessions.",
+"swap_short": "A cold shower, away from lifting",
+"mvr": [
+[
+"Faster recovery",
+"Less soreness, maybe smaller gains."
+],
+[
+"You need a tub",
+"A cold shower works."
+],
+[
+"Plunge after every lift",
+"Bad timing if muscle is your goal."
+]
+],
+"aliases": [
+"ice bath",
+"cold plunge",
+"plunge"
+],
+"img": ""
+},
+{
+"id": "red_light_therapy",
+"name": "Red Light Therapy",
+"category": "Sleep and recovery",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Weak to moderate",
+"cost": "",
+"headline": "Some science, lots of weak devices",
+"intro": "There's real research here, but the cheap gadgets often aren't strong enough to match it.",
+"claim": "Better skin, faster recovery, more energy.",
+"research": "Some evidence supports properly powered devices for skin, used consistently, often several times a week. Many cheap devices are too weak to do much. For skin, daily sunscreen has far stronger evidence.",
+"swap": "Sunscreen and a retinoid for skin. Sleep and smart training for recovery.",
+"swap_short": "Sunscreen + retinoid",
+"mvr": [
+[
+"Clinical results at home",
+"Depends heavily on the device's power."
+],
+[
+"Faster muscle recovery",
+"Evidence is limited."
+],
+[
+"Use it whenever",
+"Studies need consistent, frequent use."
+]
+],
+"aliases": [
+"red light",
+"red light mask",
+"red light panel"
+],
+"img": ""
+},
+{
+"id": "massage_guns",
+"name": "Massage Guns",
+"category": "Sleep and recovery",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Weak to moderate",
+"cost": "",
+"headline": "Feels good. Doesn't heal you faster.",
+"intro": "Great for the first month. Then they tend to live in a drawer.",
+"claim": "Faster recovery.",
+"research": "They can make sore muscles feel better and may help short-term flexibility. They don't meaningfully speed up muscle repair.",
+"swap": "A foam roller or a lacrosse ball does most of the same job.",
+"swap_short": "Foam roller",
+"mvr": [
+[
+"Accelerates recovery",
+"Feels better, doesn't repair faster."
+],
+[
+"Pro athletes use it",
+"They also have physical therapists."
+],
+[
+"Daily essential",
+"Most end up collecting dust."
+]
+],
+"aliases": [
+"theragun",
+"hypervolt",
+"massage gun",
+"percussion"
+],
+"img": "roller"
+},
+{
+"id": "infrared_sauna_blankets",
+"name": "Infrared Sauna Blankets",
+"category": "Sleep and recovery",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "A sleeping bag that makes you sweat",
+"intro": "Traditional saunas have research behind them. Blankets mostly don't.",
+"claim": "Detox, fat loss, recovery.",
+"research": "Traditional saunas have a decent body of research, much of it from Finland. Infrared sauna blankets have very little. Sweating out water isn't fat loss or \"detox.\"",
+"swap": "A gym or spa with a real sauna, if you enjoy it.",
+"swap_short": "",
+"mvr": [
+[
+"Sweat out toxins",
+"Sweat is mostly water and salt."
+],
+[
+"Burn 600 calories",
+"Mostly water weight."
+],
+[
+"Same as a sauna",
+"Much less research."
+]
+],
+"aliases": [
+"sauna blanket",
+"higherdose",
+"infrared sauna"
+],
+"img": ""
+},
+{
+"id": "mouth_tape",
+"name": "Mouth Tape",
+"category": "Sleep and recovery",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "A viral hack with real risks",
+"intro": "If you snore or wake up exhausted, tape isn't the fix. A doctor is.",
+"claim": "Better sleep, less snoring, a sharper jawline.",
+"research": "A 2025 review found scant benefits and significant risks, especially for people with blocked noses or undiagnosed sleep apnea. (HealthDay, 2025)",
+"swap": "If you snore or wake up tired, ask a doctor about sleep apnea. If your nose is always blocked, get that checked.",
+"swap_short": "",
+"mvr": [
+[
+"Better sleep",
+"Little evidence."
+],
+[
+"Jawline gains",
+"No evidence."
+],
+[
+"Stops snoring",
+"May hide a real problem."
+]
+],
+"aliases": [
+"mouth taping"
+],
+"img": ""
+},
+{
+"id": "vibration_plates",
+"name": "Vibration Plates",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money (for fat loss)",
+"evidence": "Weak for fat loss",
+"cost": "",
+"headline": "The 1920s vibrating belt, with an app",
+"intro": "Stand on it, shake, lose fat. We've been falling for this for a hundred years.",
+"claim": "Burn fat and cellulite by standing on it.",
+"research": "There's some research on balance and bone health, mostly in older adults. There's no good evidence it burns a meaningful amount of fat. See 100 Years of the Same Scam, page 23.",
+"swap": "Walking, and any real workout.",
+"swap_short": "",
+"mvr": [
+[
+"Shake off the fat",
+"No meaningful fat loss."
+],
+[
+"10 minutes = 1 hour workout",
+"No."
+],
+[
+"Boosts circulation",
+"So does walking."
+]
+],
+"aliases": [
+"vibration plate",
+"power plate"
+],
+"img": ""
+},
+{
+"id": "the_machine_moves_for_you_equipment",
+"name": "\"The Machine Moves for You\"",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "",
+"intro": "Under-desk ellipticals that pedal themselves, waist twisters and motorized gadgets that promise results \"without exerting yourself.\"",
+"claim": "Get fit without working hard.",
+"research": "Your body adapts when your muscles do hard work. Equipment that's too easy lands in a dead zone: not heavy enough to build muscle, not long enough to be real cardio.",
+"swap": "Bodyweight squats, push-ups, rows and walking. Add dumbbells when you need more challenge.",
+"swap_short": "",
+"mvr": [
+[
+"No sweat required",
+"No sweat, no results."
+],
+[
+"Full-body workout",
+"Usually one easy movement."
+],
+[
+"Low impact",
+"Low effort, too."
+]
+],
+"aliases": [
+"under desk elliptical",
+"ems",
+"ems belt",
+"ab belt",
+"cubii"
+],
+"img": ""
+},
+{
+"id": "ab_gadgets",
+"name": "Ab Gadgets",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "Abs are built in the kitchen, not on a rocker",
+"intro": "You can't spot-reduce belly fat. Abs show up when your body fat is low enough.",
+"claim": "A six-pack in minutes a day.",
+"research": "Most ab gadgets just make a crunch slightly easier. Training your abs makes them stronger, but whether you can see them comes down to body fat, and that comes down to diet.",
+"swap": "Planks, hanging leg raises and cable crunches, plus a calorie deficit.",
+"swap_short": "",
+"mvr": [
+[
+"Abs in 3 minutes a day",
+"Abs come from low body fat."
+],
+[
+"Better than crunches",
+"Usually an easier crunch."
+],
+[
+"Targets belly fat",
+"Spot reduction doesn't work."
+]
+],
+"aliases": [
+"ab roller",
+"ab wheel",
+"ab machine",
+"ab stimulator",
+"flex belt"
+],
+"img": ""
+},
+{
+"id": "lumen",
+"name": "Lumen",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak (for fat loss)",
+"cost": "",
+"headline": "It measures something real. The promise isn't.",
+"intro": "The device can estimate whether you're burning more fat or carbs right now. That's not the same as losing fat.",
+"claim": "Track your metabolism and burn more fat.",
+"research": "Your body balances fat and carb use over the whole day. Burn more fat in one hour, and you'll often burn less later, and vice versa. Fat loss depends on a calorie deficit over time, not on your fuel mix in the moment.",
+"swap": "A food-tracking app and a bathroom scale.",
+"swap_short": "",
+"mvr": [
+[
+"Burn more fat",
+"Burning fat isn't losing fat."
+],
+[
+"Hack your metabolism",
+"You can't out-breathe a calorie surplus."
+],
+[
+"Personalized plan",
+"A calorie target does the job."
+]
+],
+"aliases": [
+"metabolism tracker",
+"breath tracker"
+],
+"img": ""
+},
+{
+"id": "food_sensitivity_tests",
+"name": "Food Sensitivity Tests",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "Weak",
+"cost": "",
+"headline": "It tells you what you eat a lot of",
+"intro": "Most home tests measure antibodies that rise with foods you eat often. So the results mostly read like your grocery list.",
+"claim": "Find the foods secretly holding you back.",
+"research": "Most home tests measure IgG antibodies, which usually reflect exposure to a food, not a problem with it. Allergy organizations advise against using IgG tests to diagnose food sensitivities.",
+"swap": "If certain foods really bother you, see a doctor or a registered dietitian about a proper elimination approach. Real allergies need real testing.",
+"swap_short": "",
+"mvr": [
+[
+"Find your hidden sensitivities",
+"Mostly shows what you eat often."
+],
+[
+"Lab-grade results",
+"Measuring the wrong thing precisely."
+],
+[
+"Personalized elimination plan",
+"Can cut out foods you're fine with."
+]
+],
+"aliases": [
+"everlywell",
+"food intolerance test",
+"5strands"
+],
+"img": ""
+},
+{
+"id": "body_fat_scales",
+"name": "Body Fat Scales",
+"category": "Gadgets and tests",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate (for trends)",
+"cost": "",
+"headline": "Useful for trends. Not for daily numbers.",
+"intro": "Not a scam. Just less accurate than the screen makes it look.",
+"claim": "Track your body fat every day.",
+"research": "Home scales use bioimpedance, which can swing with how hydrated you are. The daily body fat number isn't very accurate, but the long-term trend can be useful.",
+"swap": "A regular scale, a tape measure around your waist, and progress photos every few weeks.",
+"swap_short": "Scale + tape + photos",
+"mvr": [
+[
+"Precise body fat %",
+"Can swing several points day to day."
+],
+[
+"Track muscle gain",
+"Rough estimate at best."
+],
+[
+"Check daily",
+"Look at weekly averages instead."
+]
+],
+"aliases": [
+"smart scale",
+"renpho",
+"withings",
+"inbody",
+"body fat"
+],
+"img": "scale"
+},
+{
+"id": "sleep_and_fitness_trackers",
+"name": "Sleep and Fitness Trackers",
+"category": "Gadgets and tests",
+"kind": "situational",
+"verdict": "Situational",
+"evidence": "Moderate (steps), weak (sleep stages)",
+"cost": "",
+"headline": "Great for habits. Watch the subscription.",
+"intro": "Useful while you're building a habit. Many people stop checking after a few months.",
+"claim": "Optimize your sleep, recovery and training.",
+"research": "Trackers are good at counting steps and showing trends. Sleep stages and \"recovery scores\" are estimates, not lab measurements.",
+"swap": "Your phone already counts steps. If you buy one, buy it to build a habit, and check for monthly fees.",
+"swap_short": "Your phone",
+"mvr": [
+[
+"Know your recovery",
+"An estimate, not a diagnosis."
+],
+[
+"Optimize your sleep",
+"Going to bed earlier does more."
+],
+[
+"Small monthly fee",
+"Adds up over a year."
+]
+],
+"aliases": [
+"whoop",
+"oura",
+"fitbit",
+"apple watch",
+"garmin"
+],
+"img": "watch"
+},
+{
+"id": "balance_bracelets",
+"name": "Balance Bracelets",
+"category": "Gadgets and tests",
+"kind": "skip",
+"verdict": "Waste of money",
+"evidence": "None",
+"cost": "",
+"headline": "A rubber band with a hologram",
+"intro": "At their peak, pro athletes wore them. Then the company admitted the truth.",
+"claim": "Better balance, strength and flexibility.",
+"research": "In 2010, Power Balance told Australia's consumer watchdog, \"We admit that there is no credible scientific evidence that supports our claims,\" and offered refunds. (SBS News, 2011)",
+"swap": "Nothing. It's a rubber band.",
+"swap_short": "",
+"mvr": [
+[
+"Hologram technology",
+"Marketing."
+],
+[
+"Worn by pros",
+"Pros get paid to wear things."
+],
+[
+"Feel the difference",
+"Placebo."
+]
+],
+"aliases": [
+"power balance",
+"bracelet",
+"magnetic bracelet",
+"ionic bracelet"
+],
+"img": ""
+}
+]

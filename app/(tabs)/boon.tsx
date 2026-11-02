@@ -12,6 +12,7 @@ import HeroCard from '../../src/components/HeroCard';
 import { useRouter } from 'expo-router';
 import { isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
+import RemindersCard from '../../src/components/RemindersCard';
 
 const HERO_IMG = require('../../assets/hero/boon.jpg');
 const FACE_IMG = require('../../assets/hero/boon_jacked.jpg');
@@ -64,12 +65,15 @@ export default function Boon() {
       ))}
       </>)}
 
+      <Eyebrow style={{ marginTop: 12 }}>Settings</Eyebrow>
+      <RemindersCard />
+
       <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium', lineHeight: 16, marginTop: 16 }]}>
         Product names, logos and photos belong to their owners and are shown to identify the products Boon reviews. No sponsorships, no affiliate links. Not medical advice: check with your doctor before changing anything if you have a condition or take medication.
       </Text>
       <View style={{ marginTop: 8, gap: 8 }}>
         <Text style={st.sub}>Signed in as {profile?.email || session?.user.email}</Text>
-        <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium' }]}>App update: Nov 1 · free plan + quiz</Text>
+        <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium' }]}>App update: Nov 1 · Stack Check, streaks, reminders</Text>
         <Button title="Sign out" variant="ghost" onPress={signOut} />
       </View>
     </Screen>

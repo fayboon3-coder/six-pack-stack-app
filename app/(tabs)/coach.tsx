@@ -45,7 +45,7 @@ export default function Coach() {
           <Text style={st.section}>See what new people see</Text>
           <Text style={st.meta}>Preview only. Nothing gets saved or sent to Kit.</Text>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {[['Welcome', '/welcome'], ['Quiz', '/quiz'], ['Unlock screen', '/unlock'], ['Application', '/apply']].map(([l, h]) => (
+            {[['Welcome', '/welcome'], ['Quiz', '/quiz'], ['Unlock screen', '/unlock'], ['Application', '/apply'], ['Stack Check', '/stack-check']].map(([l, h]) => (
               <Pressable key={h} accessibilityRole="button" onPress={() => router.push(h as any)} style={st.pbtn}>
                 <Text style={st.pbtnText}>{l}</Text>
               </Pressable>

@@ -15,6 +15,7 @@ const PLAN_IMG = require('../../assets/hero/plan_full.jpg');
 const STACK_IMG = require('../../assets/hero/stack_full.jpg');
 import { productImage } from '../../src/lib/images';
 import { mealImage } from '../../src/lib/meals';
+import StackCheckCard from '../../src/components/StackCheckCard';
 
 const TABS = ['Stack', 'Meals', 'Eating out', 'Groceries', 'Overview'] as const;
 type Tab = (typeof TABS)[number];
@@ -71,6 +72,7 @@ export default function PlanTab() {
 
       {tab === 'Stack' && (
         <>
+          <StackCheckCard />
           {saved > 0 && (
             <Card style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
               <View><Text style={ui.label}>Saved every month</Text><Text style={[st.big, { color: C.green }]}>${saved}</Text></View>

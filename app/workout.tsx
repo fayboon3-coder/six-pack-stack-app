@@ -10,6 +10,9 @@ import { BackIcon, CheckIcon, PlayIcon } from '../src/components/icons';
 import { exercises, repsOf, setsFor, weekOf } from '../src/lib/program';
 import { isoDate, lastSession, saveSet } from '../src/lib/logs';
 import { isLocked } from '../src/lib/access';
+import { getStreak } from '../src/lib/streak';
+import RemindersCard from '../src/components/RemindersCard';
+import { FlameIcon, TrophyIcon } from '../src/components/icons';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -30,6 +33,10 @@ export default function Workout() {
   const [now, setNow] = useState(Date.now());
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const [kb, setKb] = useState(false);
+  const [pr, setPr] = useState<string>('');
+  const [prs, setPrs] = useState<string[]>([]);
+  const [finished, setFinished] = useState(false);
+  const [streak, setStreak] = useState<{ weeks: number; workouts: number } | null>(null);
 
   // Free plan past week 2: send them to the offers instead of the workout.
   useEffect(() => { if (isLocked(profile, week)) router.replace('/unlock'); }, [profile, week]);
@@ -76,6 +83,17 @@ export default function Workout() {
     const r = e.r || (p?.reps != null ? String(p.reps) : '');
     update(k, { done: true, w, r });
     setRest(REST);
+    // Personal record: more weight than any set last time, or same top weight for more reps
+    const past = (prev[ex[0]] || []).filter(Boolean) as { weight: number | null; reps: number | null }[];
+    const topW = Math.max(0, ...past.map((x) => Number(x.weight) || 0));
+    const topR = Math.max(0, ...past.filter((x) => Number(x.weight) === topW).map((x) => Number(x.reps) || 0));
+    const nw = Number(w), nr = Number(r);
+    if (past.length && nw > 0 && (nw > topW || (nw === topW && nr > topR)) && !prs.includes(ex[0])) {
+      const name = exercises[ex[0]]?.name || ex[0];
+      setPr(`${name}: ${nw} lbs × ${nr || '?'}`);
+      setPrs([...prs, ex[0]]);
+      setTimeout(() => setPr(''), 4500);
+    }
     if (session) {
       await saveSet({
         user_id: session.user.id, logged_on: isoDate(), day_label: day.t, exercise_id: ex[0], set_no: k + 1,
@@ -91,8 +109,46 @@ export default function Workout() {
   const p0 = prev[ex[0]] || [];
   const beat = list.some((e, k) => e.done && p0[k]?.weight != null && Number(e.w) > Number(p0[k]!.weight));
 
+  const finish = async () => {
+    setFinished(true);
+    if (session) setStreak(await getStreak(session.user.id, plan.train.d.length));
+  };
+  const setsDone = Object.values(entries).flat().filter((e) => e.done).length;
+
+  if (finished) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+        <ScrollView contentContainerStyle={{ padding: 24, gap: 16, paddingBottom: 48 }}>
+          <View style={st.doneBadge}><CheckIcon color={C.navy} size={30} /></View>
+          <Text style={st.doneK}>{(day.t.split('·')[1] || day.t).trim()} done</Text>
+          <Text style={st.doneH}>{prs.length ? `${prs.length} new personal record${prs.length > 1 ? 's' : ''}.` : 'Another one in the bank.'}</Text>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={st.doneTile}><Text style={st.doneV}>{mmss(elapsed)}</Text><Text style={st.doneL}>Time</Text></View>
+            <View style={st.doneTile}><Text style={st.doneV}>{setsDone}</Text><Text style={st.doneL}>Sets</Text></View>
+            <View style={st.doneTile}><Text style={st.doneV}>{streak ? streak.workouts : '–'}</Text><Text style={st.doneL}>Workouts</Text></View>
+          </View>
+          {!!streak && streak.weeks > 0 && (
+            <View style={st.streak}><FlameIcon size={22} /><Text style={st.streakT}>{streak.weeks}-week streak. Don't break it.</Text></View>
+          )}
+          {prs.map((id) => (
+            <View key={id} style={st.prRow}><TrophyIcon color={C.green} /><Text style={st.prT}>{exercises[id]?.name || id}</Text></View>
+          ))}
+          <Text style={st.doneSub}>Want a nudge on your next training day?</Text>
+          <RemindersCard compact />
+          <Button title="Back to my plan" onPress={() => router.back()} />
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      {!!pr && (
+        <View style={st.prBanner} accessibilityLiveRegion="polite">
+          <TrophyIcon color={C.navy} size={22} />
+          <View style={{ flex: 1 }}><Text style={st.prK}>New personal record</Text><Text style={st.prV}>{pr}</Text></View>
+        </View>
+      )}
       <View style={{ flex: 1 }}>
         <View style={st.top}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={st.icon}><BackIcon /></Pressable>
@@ -180,7 +236,7 @@ export default function Workout() {
 
         {!kb && <View style={st.footer}>
           {i > 0 && <Button title="Back" variant="ghost" onPress={() => setI(i - 1)} style={{ flex: 1 }} />}
-          <Button title={last ? 'Finish workout' : 'Next exercise'} onPress={() => (last ? router.back() : setI(i + 1))} style={{ flex: 2 }} />
+          <Button title={last ? 'Finish workout' : 'Next exercise'} onPress={() => (last ? finish() : setI(i + 1))} style={{ flex: 2 }} />
         </View>}
       </View>
     </SafeAreaView>
@@ -188,6 +244,20 @@ export default function Workout() {
 }
 
 const st = StyleSheet.create({
+  prBanner: { position: 'absolute', zIndex: 10, top: 60, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.green, borderRadius: 18, padding: 14 },
+  prK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.navy },
+  prV: { fontFamily: F.black, fontSize: 17, color: C.navy },
+  doneBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
+  doneK: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.green },
+  doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
+  doneTile: { flex: 1, backgroundColor: C.navy2, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
+  doneV: { fontFamily: F.black, fontSize: 22, color: C.white },
+  doneL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: C.red, borderRadius: 16, padding: 14 },
+  streakT: { fontFamily: F.black, fontSize: 16, color: C.white, flex: 1 },
+  prRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  prT: { fontFamily: F.bold, fontSize: 15, color: C.white },
+  doneSub: { fontFamily: F.bold, fontSize: 15, color: C.white, marginTop: 8 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 4 },
   icon: { width: 44, height: 44, justifyContent: 'center' },
   title: { fontFamily: F.black, fontSize: 15, color: C.white, textTransform: 'uppercase', letterSpacing: 0.6 },

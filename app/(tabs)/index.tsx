@@ -16,6 +16,9 @@ import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
 import { isFree, isLocked, FREE_WEEKS } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
+import StackCheckCard from '../../src/components/StackCheckCard';
+import { getStreak } from '../../src/lib/streak';
+import { FlameIcon } from '../../src/components/icons';
 
 
 export default function Today() {
@@ -24,6 +27,7 @@ export default function Today() {
   const [refreshing, setRefreshing] = useState(false);
   const [doneDays, setDoneDays] = useState<Set<string>>(new Set());
   const [taken, setTaken] = useState<Record<string, boolean>>({});
+  const [streak, setStreak] = useState<{ weeks: number; workouts: number } | null>(null);
   const today = isoDate();
 
   const load = useCallback(async () => {
@@ -32,8 +36,9 @@ export default function Today() {
     const sunday = new Date(); sunday.setDate(sunday.getDate() - sunday.getDay());
     const rows = await loggedDays(session.user.id, isoDate(sunday));
     setDoneDays(new Set(rows.map((r) => r.day_label)));
+    if (plan) getStreak(session.user.id, plan.train.d.length).then(setStreak).catch(() => {});
     try { setTaken(JSON.parse((await AsyncStorage.getItem('sps:stack:' + today)) || '{}')); } catch { setTaken({}); }
-  }, [session, today]);
+  }, [session, today, plan]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -68,6 +73,13 @@ export default function Today() {
           onRefresh={async () => { setRefreshing(true); await refresh(); await load(); setRefreshing(false); }} />}>
 
         <PageHeader kicker={`Week ${week} of 12 · ${phase.name}`} title={`${greet}, ${plan.name}`} week={week} />
+        {!!streak && streak.workouts > 0 && (
+          <View style={st.streak} accessibilityLabel={`${streak.weeks} week streak, ${streak.workouts} workouts logged`}>
+            <FlameIcon size={18} />
+            <Text style={st.streakT}>{streak.weeks > 0 ? `${streak.weeks}-week streak` : 'Start your streak this week'}</Text>
+            <Text style={st.streakS}>· {streak.workouts} workout{streak.workouts === 1 ? '' : 's'} logged</Text>
+          </View>
+        )}
         <View style={{ height: 18 }} />
 
         {checkinDue && (
@@ -139,6 +151,8 @@ export default function Today() {
           </>
         )}
 
+        <StackCheckCard style={{ marginHorizontal: 20, marginTop: 28 }} />
+
         <View style={st.tip}>
           <Text style={st.tipKicker}>Boon's focus for {phase.name.toLowerCase()} weeks</Text>
           <Text style={st.tipText}>{week <= 4 ? plan.phase1 : week <= 8 ? plan.phase2 : plan.phase3}</Text>
@@ -183,6 +197,9 @@ const st = StyleSheet.create({
   rowTitle: { fontFamily: F.black, fontSize: 17, color: C.white },
   rowSub: { fontFamily: F.semi, fontSize: 13, color: C.white },
   chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 20, marginTop: 10 },
+  streakT: { fontFamily: F.black, fontSize: 14, color: C.white },
+  streakS: { fontFamily: F.semi, fontSize: 13, color: C.white },
   free: { marginHorizontal: 20, marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, padding: 14 },
   freeK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
   freeT: { fontFamily: F.black, fontSize: 16, color: C.white },

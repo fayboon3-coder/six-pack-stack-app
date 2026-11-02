@@ -38,6 +38,8 @@ function Gate() {
       <Stack.Screen name="ready" options={{ gestureEnabled: false }} />
       <Stack.Screen name="apply" options={{ presentation: 'modal' }} />
       <Stack.Screen name="unlock" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="stack-check" />
+      <Stack.Screen name="verdict/[id]" />
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="auth" />
       <Stack.Screen name="checkin" options={{ presentation: 'modal' }} />
