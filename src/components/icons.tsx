@@ -91,3 +91,12 @@ export const QuestionIcon = ({ color = '#fff', size = 18 }: P) => (
 export const ShieldIcon = ({ color = '#fff', size = 14 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" {...base(color)} /></Svg>
 );
+export const FlagIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M5 21V4M5 4h11l-2 4 2 4H5" {...base(color)} /></Svg>
+);
+export const TrendIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M3 7l6 6 4-4 8 8M15 17h6v-6" {...base(color)} /></Svg>
+);
+export const CalendarIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Rect x={3} y={5} width={18} height={16} rx={3} {...base(color)} /><Path d="M3 10h18M8 3v4M16 3v4" {...base(color)} /></Svg>
+);
