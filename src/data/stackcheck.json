@@ -78,7 +78,7 @@
 "vega",
 "soy protein"
 ],
-"img": ""
+"img": "ic_plant_protein"
 },
 {
 "id": "protein_bars_and_snacks",
@@ -418,7 +418,7 @@
 "nitric oxide",
 "pump pills"
 ],
-"img": ""
+"img": "ic_citrulline"
 },
 {
 "id": "electrolyte_packets",
@@ -456,7 +456,7 @@
 "nuun",
 "drip drop"
 ],
-"img": ""
+"img": "ic_electrolyte_packets"
 },
 {
 "id": "sports_drinks",
@@ -492,7 +492,7 @@
 "bodyarmor",
 "body armor"
 ],
-"img": ""
+"img": "ic_sports_drinks"
 },
 {
 "id": "prime",
@@ -638,7 +638,7 @@
 "d3",
 "vit d"
 ],
-"img": ""
+"img": "ic_vitamin_d"
 },
 {
 "id": "fish_oil",
@@ -674,7 +674,7 @@
 "nordic naturals",
 "krill oil"
 ],
-"img": ""
+"img": "ic_fish_oil"
 },
 {
 "id": "magnesium",
@@ -709,7 +709,7 @@
 "magnesium citrate",
 "mag glycinate"
 ],
-"img": ""
+"img": "ic_magnesium"
 },
 {
 "id": "probiotics",
@@ -745,7 +745,7 @@
 "culturelle",
 "probiotic"
 ],
-"img": ""
+"img": "ic_probiotics"
 },
 {
 "id": "ashwagandha",
@@ -780,7 +780,7 @@
 "sensoril",
 "cortisol"
 ],
-"img": ""
+"img": "ic_ashwagandha"
 },
 {
 "id": "apple_cider_vinegar_gummies",
@@ -849,7 +849,7 @@
 "irish moss",
 "sea moss gel"
 ],
-"img": ""
+"img": "ic_sea_moss"
 },
 {
 "id": "fat_burners",
@@ -925,7 +925,7 @@
 "teatox",
 "flat tummy"
 ],
-"img": ""
+"img": "ic_skinny_and_detox_teas"
 },
 {
 "id": "l_carnitine",
@@ -960,7 +960,7 @@
 "alcar",
 "acetyl l-carnitine"
 ],
-"img": ""
+"img": "ic_l_carnitine"
 },
 {
 "id": "cla",
@@ -994,7 +994,7 @@
 "conjugated linoleic acid",
 "tonalin"
 ],
-"img": ""
+"img": "ic_cla"
 },
 {
 "id": "berberine",
@@ -1029,7 +1029,7 @@
 "natures ozempic",
 "ozempic"
 ],
-"img": "ozempic"
+"img": "ic_berberine"
 },
 {
 "id": "sweat_belts_and_waist_trainers",
@@ -1065,7 +1065,7 @@
 "sauna suit",
 "sweat band"
 ],
-"img": ""
+"img": "ic_sweat_belts_and_waist_trainers"
 },
 {
 "id": "testosterone_boosters",
@@ -1140,7 +1140,7 @@
 "longjack",
 "fadogia"
 ],
-"img": ""
+"img": "ic_tongkat_ali"
 },
 {
 "id": "hormone_balancing_supplements",
@@ -1176,7 +1176,7 @@
 "dim",
 "cortisol supplement"
 ],
-"img": ""
+"img": "ic_hormone_balancing_supplements"
 },
 {
 "id": "melatonin",
@@ -1245,7 +1245,7 @@
 "zinc",
 "zinc magnesium"
 ],
-"img": ""
+"img": "ic_zma"
 },
 {
 "id": "cold_plunge_tubs",
@@ -1280,7 +1280,7 @@
 "cold plunge",
 "plunge"
 ],
-"img": ""
+"img": "ic_cold_plunge_tubs"
 },
 {
 "id": "red_light_therapy",
@@ -1315,7 +1315,7 @@
 "red light mask",
 "red light panel"
 ],
-"img": ""
+"img": "ic_red_light_therapy"
 },
 {
 "id": "massage_guns",
@@ -1386,7 +1386,7 @@
 "higherdose",
 "infrared sauna"
 ],
-"img": ""
+"img": "ic_infrared_sauna_blankets"
 },
 {
 "id": "mouth_tape",
@@ -1419,7 +1419,7 @@
 "aliases": [
 "mouth taping"
 ],
-"img": ""
+"img": "ic_mouth_tape"
 },
 {
 "id": "vibration_plates",
@@ -1453,7 +1453,7 @@
 "vibration plate",
 "power plate"
 ],
-"img": ""
+"img": "ic_vibration_plates"
 },
 {
 "id": "the_machine_moves_for_you_equipment",
@@ -1490,7 +1490,7 @@
 "ab belt",
 "cubii"
 ],
-"img": ""
+"img": "ic_the_machine_moves_for_you_equipment"
 },
 {
 "id": "ab_gadgets",
@@ -1527,7 +1527,7 @@
 "ab stimulator",
 "flex belt"
 ],
-"img": ""
+"img": "ic_ab_gadgets"
 },
 {
 "id": "lumen",
@@ -1561,7 +1561,7 @@
 "metabolism tracker",
 "breath tracker"
 ],
-"img": ""
+"img": "ic_lumen"
 },
 {
 "id": "food_sensitivity_tests",
@@ -1596,7 +1596,7 @@
 "food intolerance test",
 "5strands"
 ],
-"img": ""
+"img": "ic_food_sensitivity_tests"
 },
 {
 "id": "body_fat_scales",
@@ -1706,6 +1706,6 @@
 "magnetic bracelet",
 "ionic bracelet"
 ],
-"img": ""
+"img": "ic_balance_bracelets"
 }
 ]
