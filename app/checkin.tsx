@@ -151,7 +151,7 @@ export default function CheckinScreen() {
       workouts, nutrition_days: nutrition, energy, hunger, win: win || null, hardest: hardest || null,
       questions: questions || null, share_win: shareWin,
     }).select('id').single();
-    if (error || !data) { setBusy(false); return Alert.alert('That didn\'t send', 'Check your signal and tap Send again. Nothing you typed is lost.'); }
+    if (error || !data) { setBusy(false); return Alert.alert('That didn\'t send', 'Check your signal and tap the button again. Nothing you typed is lost.'); }
     for (const [angle, uri] of Object.entries(photos) as [Angle, string][]) {
       const path = `${uid}/week${week}-${angle}-${Date.now()}.jpg`;
       const body = await (await fetch(uri)).arrayBuffer();
@@ -232,7 +232,7 @@ export default function CheckinScreen() {
               <Scale icon={<HungerIcon color={C.red2} />} label="Hunger" n={10} from={1} value={hunger} onChange={setHunger} low="Full all week" high="Starving" />
             </Section>
 
-            <Section n={photoWeek ? 4 : 3} title={!isCoached(profile) ? "Your week" : "Talk to me"} sub={!isCoached(profile) ? "Writing it down is how you spot what works." : "This is where I learn what to change for you."} done={done.talk}>
+            <Section n={photoWeek ? 4 : 3} title={!isCoached(profile) ? "Your notes" : "Talk to me"} sub={!isCoached(profile) ? "Writing it down is how you spot what works." : "This is where I learn what to change for you."} done={done.talk}>
               <Note icon={<TrophyIcon color={C.red2} />} label="Your win this week" value={win} onChange={setWin}
                 placeholder="Big or small. Hit every workout, skipped the drive-thru, slept 8 hours…" />
               <View style={st.shareRow}>

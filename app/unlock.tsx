@@ -24,7 +24,7 @@ export default function Unlock() {
         </Pressable>
         <Text style={st.k}>Keep going{plan?.name ? `, ${plan.name}` : ''}</Text>
         <Text style={st.h}>{twoTone('Finish what| you started.')}</Text>
-        <Text style={st.body}>Weeks 1 and 2 build the habits. Weeks 3 to 12 are where your body changes. Pick how you want to get there.</Text>
+        <Text style={st.body}>Weeks 1–2 build the habits. Weeks 3 to 12 are where your body changes. Pick how you want to get there.</Text>
         {hot && <CoachingCard />}
         <SubscriptionCard />
         {!hot && <CoachingCard />}

@@ -18,9 +18,9 @@ const LOGO = require('../assets/logo-b.png');
 
 const PATHS: { want: Want; img: ImageSourcePropType; tag: string; price: string; title: string; line: string; contain?: boolean }[] = [
   { want: 'plan', img: PLAN, tag: 'Start here', price: 'Free', title: 'The Free Stack', line: 'Your first 2 weeks free: your calories, your meals and your training, built from a 2-minute quiz.' },
-  { want: 'btl', img: BTL, tag: 'The guide', price: '$39.99', title: 'Beyond the Label', line: 'What actually works out of 40+ supplements and gadgets, and what\'s marketing.' },
+  { want: 'btl', img: BTL, tag: 'The guide', price: '$39.99', title: 'Beyond the Label', line: '47 supplements and gadgets investigated: what actually works, and what\'s just marketing.' },
   { want: 'sub', img: APP, tag: 'Best value', price: '$19.99/mo', title: 'The Full Stack', line: 'All 12 weeks: everything you need to finish on your own. Or $99 a year ($1.90 a week).' },
-  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'Apply', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
+  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'By application', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
 ];
 
 /** The front door: pick what you're here for. */

@@ -78,7 +78,7 @@ export default function SignIn() {
               <Text style={st.linkText}>{mode === 'in' ? 'Coaching client, first time here? Create your account' : 'Already have an account? Sign in'}</Text>
             </Pressable>
             <Pressable accessibilityRole="button" onPress={() => router.replace('/quiz')} style={st.link}>
-              <Text style={st.linkText}>Not a client yet? Get your free 12-week plan</Text>
+              <Text style={st.linkText}>New here? Start The Free Stack (2 weeks free)</Text>
             </Pressable>
             {mode === 'in' && (
               <Pressable accessibilityRole="button" onPress={reset} style={st.link}>

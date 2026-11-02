@@ -13,7 +13,7 @@ import Backdrop from '../src/components/Backdrop';
 const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next: string }> = {
   plan: { k: 'The Free Stack · 2 weeks free', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz, then your plan is built from your answers.', cta: 'Build my plan', next: '/quiz' },
   btl: { k: 'Beyond the Label', h: 'Where should I send it?', sub: "You'll see everything inside Beyond the Label next.", cta: 'Show me', next: '/btl' },
-  sub: { k: 'The Full Stack', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz to build your plan. Weeks 1 and 2 are free, then unlock all 12 weeks.', cta: 'Build my plan', next: '/quiz' },
+  sub: { k: 'The Full Stack', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz to build your plan. Weeks 1–2 are free. Unlock all 12 when you\'re ready.', cta: 'Build my plan', next: '/quiz' },
   coaching: { k: '1:1 coaching', h: 'Where should I send the details?', sub: "Next: everything you get with 1:1 coaching, and the Abs or It's Free guarantee.", cta: 'Show me', next: 'coaching' },
 };
 

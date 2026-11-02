@@ -44,10 +44,10 @@ export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'mon
       </View>
       <View style={{ gap: 8 }}>
         <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>
-        <Tick>Calories re-set at weeks 4 and 8 so you never stall</Tick>
+        <Tick>Calories re-set at weeks 4 and 8 so your progress keeps moving</Tick>
         <Tick>Your meal plan, swaps, eating-out orders and grocery list</Tick>
         <Tick>Stack Check: all 47 Beyond the Label verdicts ($39.99 on its own)</Tick>
-        <Tick>Weekly check-ins, progress photos, streaks and PR alerts</Tick>
+        <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
       <Pressable accessibilityRole="button" onPress={() => onStart?.(plan)} disabled={!onStart} style={[st.btn, !onStart && { opacity: 0.55 }]}>
@@ -80,7 +80,7 @@ export function BtlCard() {
       <View style={{ gap: 10 }}>
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>
-        <Text style={st.body}>My full investigation of 40+ fitness products. Check anything before you buy it.</Text>
+        <Text style={st.body}>My full investigation of 47 supplements and gadgets. Check anything before you buy it.</Text>
         <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.white }]}>
           <Text style={st.btnText}>Get Beyond the Label</Text>
         </Pressable>

@@ -33,7 +33,7 @@ const STEPS: Step[] = [
   { id: 'where_train', kind: 'one', q: 'Where will you train?', opts: ['Gym', 'Home with dumbbells'] },
   { id: 'days', kind: 'one', q: 'How many days a week can you train?', sub: '45–60 minutes each.', opts: ['3 days', '4 days'] },
   { id: 'experience', kind: 'one', q: 'How long have you been lifting?', opts: ['Never lifted', 'Under 1 year', '1–3 years', '3+ years'] },
-  { id: 'tried', kind: 'multi', q: 'Which of these have you bought?', sub: 'Tick all that apply.', opts: ['Fat burners', 'Pre-workout', 'Test boosters', 'Greens powder', 'Protein powder', 'Creatine', 'None of these'] },
+  { id: 'tried', kind: 'multi', q: 'Which of these have you bought?', sub: 'Pick all that apply.', opts: ['Fat burners', 'Pre-workout', 'Test boosters', 'Greens powder', 'Protein powder', 'Creatine', 'None of these'] },
   { id: 'monthly_spend', kind: 'one', q: 'About how much do you spend on supplements a month?', opts: ['Under $50', '$50–$100', '$100–$200', '$200+'] },
   { id: 'spend', kind: 'spend' },
   { id: 'eat_out', kind: 'one', q: 'How often do you eat out or order in?', opts: ['Rarely', '1–3 times a week', '4+ times a week'] },
@@ -135,7 +135,7 @@ export default function QuizScreen() {
                 })}
               </View>
               {!!err && <Text style={st.err}>{err}</Text>}
-              <Button title="Next" onPress={() => (a.tried.length ? next() : setErr('Tick at least one, or "None of these".'))} />
+              <Button title="Next" onPress={() => (a.tried.length ? next() : setErr('Pick at least one, or "None of these".'))} />
             </>
           )}
 
