@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 import type { Plan, Profile } from './types';
 import { buildFreePlan, clearPendingQuiz, readPendingQuiz } from './quiz';
+import { setPreviewing, type ViewAs } from './preview';
 
 type Ctx = {
   session: Session | null;
@@ -11,7 +12,24 @@ type Ctx = {
   loading: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
+  /** Coach only: see the app as a free user, subscriber or coaching client (nothing saved). */
+  viewAs: ViewAs | null;
+  setViewAs: (v: ViewAs | null) => void;
+  isCoachAccount: boolean;
 };
+
+const SAMPLE_QUIZ: any = { goal: 'Lose fat and see my abs', sex: 'Male', age: '29', height_ft: '5', height_in: '11', weight: '212', goal_weight: '185',
+  where_train: 'Gym', days: '4 days', experience: '1–3 years', tried: ['Fat burners', 'Pre-workout'], monthly_spend: '$100–$200',
+  eat_out: '1–3 times a week', struggle: 'Weekends', start_timing: 'This week', ready_to_invest: 'Yes, with a payment plan', first_name: 'Jake', email: 'preview@example.com' };
+
+function previewProfilePlan(real: Profile, v: ViewAs): { profile: Profile; plan: Plan } {
+  const fp = buildFreePlan(SAMPLE_QUIZ);
+  const profile = { ...real, role: 'client', tier: v, first_name: 'Jake', quiz: SAMPLE_QUIZ } as Profile;
+  if (v === 'free') return { profile, plan: fp };
+  // Paid tiers: the full sample plan, starting the same week as the free one.
+  const demo = require('../data/samplePlan.json');
+  return { profile, plan: { ...demo, name: 'Jake', train: { ...demo.train, s: fp.train.s } } };
+}
 
 let claiming = false; // one plan build at a time
 
@@ -23,6 +41,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(true);
+  const [viewAs, setViewAsState] = useState<ViewAs | null>(null);
+  const setViewAs = useCallback((v: ViewAs | null) => { setPreviewing(!!v); setViewAsState(v); }, []);
 
   const load = useCallback(async (s: Session | null) => {
     if (!s) { setProfile(null); setPlan(null); return; }
@@ -72,6 +92,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setPlan({ ...fp, train: { ...fp.train, s: process.env.EXPO_PUBLIC_DEMO_START || fp.train.s } });
       } else
       setPlan({ ...demo, name: 'Boon', train: { ...demo.train, s: process.env.EXPO_PUBLIC_DEMO_START || '2026-11-01' } });
+      if (process.env.EXPO_PUBLIC_DEMO_ROLE === 'coach') setProfile({ id: 'demo', email: 'demo@example.com', first_name: 'Boon', role: 'coach', tier: 'coached', start_date: null });
       setLoading(false);
       return;
     }
@@ -88,10 +109,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [load]);
 
   const refresh = useCallback(() => load(session), [load, session]);
-  const signOut = useCallback(async () => { await supabase.auth.signOut(); }, []);
+  const signOut = useCallback(async () => { setViewAs(null); await supabase.auth.signOut(); }, [setViewAs]);
+
+  const isCoachAccount = profile?.role === 'coach';
+  const pv = useMemo(() => (isCoachAccount && viewAs && profile ? previewProfilePlan(profile, viewAs) : null), [isCoachAccount, viewAs, profile]);
 
   return (
-    <AuthCtx.Provider value={{ session, profile, plan, loading, refresh, signOut }}>
+    <AuthCtx.Provider value={{ session, profile: pv ? pv.profile : profile, plan: pv ? pv.plan : plan, loading, refresh, signOut,
+      viewAs: pv ? viewAs : null, setViewAs, isCoachAccount }}>
       {children}
     </AuthCtx.Provider>
   );

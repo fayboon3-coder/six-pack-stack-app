@@ -10,6 +10,7 @@ import {
 import { AuthProvider, useAuth } from '../src/lib/auth';
 import { C } from '../src/lib/theme';
 import Splash from '../src/components/Splash';
+import PreviewBar from '../src/components/PreviewBar';
 
 function Gate() {
   const { session, loading, profile } = useAuth();
@@ -62,6 +63,7 @@ export default function RootLayout() {
         <StatusBar style="light" />
         <View style={{ flex: 1, backgroundColor: C.navy }}>
           {fontsLoaded && <Gate />}
+          {fontsLoaded && <PreviewBar />}
           <Intro fontsLoaded={fontsLoaded} />
         </View>
       </AuthProvider>

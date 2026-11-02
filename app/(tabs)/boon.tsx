@@ -10,7 +10,7 @@ import { WHATSAPP } from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 import { useRouter } from 'expo-router';
-import { isFree } from '../../src/lib/access';
+import { isCoached, isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 
@@ -24,6 +24,8 @@ export default function Boon() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const router = useRouter();
   const free = isFree(profile);
+  const coached = isCoached(profile) || profile?.role === 'coach';
+  const sub = !free && !coached; // Full 12-Week Program subscriber
 
   useFocusEffect(useCallback(() => {
     if (!session) return;
@@ -36,10 +38,12 @@ export default function Boon() {
     <Screen header={
       <View style={{ gap: 18 }}>
         <PageHeader kicker="Your coach" title="Boon" subtitle="I went from 225 to 175 lbs after wasting years on supplements that did nothing. Now I do for you what I wish someone did for me." right={<View />} />
-        {free ? (
+        {free || sub ? (
           <HeroCard image={FACE_IMG} imageRatio={16 / 9} title="Want me in your corner?"
-            subtitle="I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp." cta="Apply for coaching"
-            onPress={() => router.push('/apply')} />
+            subtitle={sub
+              ? "You've got the full program. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
+              : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
+            cta="Apply for coaching" onPress={() => router.push('/apply')} />
         ) : (
           <HeroCard image={HERO_IMG} badge="Replies within 24 hours" title="I've got you"
             subtitle="Stuck, hungry, sore, or staring at a supplement you saw online? Send it. I read and answer every message myself." cta="Text Boon on WhatsApp"
@@ -53,6 +57,15 @@ export default function Boon() {
           <Eyebrow>Your options</Eyebrow>
           <SubscriptionCard />
           <BtlCard />
+        </>
+      ) : sub ? (
+        <>
+          <Eyebrow>Your program</Eyebrow>
+          <Card>
+            <Text style={ui.label}>The Full 12-Week Program</Text>
+            <Body>All 12 weeks are unlocked: your training, your meal plan, eating-out orders, the grocery list and every Stack Check verdict. Your calories re-set at weeks 4 and 8, so do your Sunday check-in.</Body>
+          </Card>
+          <CoachingCard />
         </>
       ) : (<>
       <Eyebrow>Your weekly reviews</Eyebrow>

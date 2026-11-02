@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from './supabase';
+import { isPreviewing } from './preview';
 
 export type SetLog = {
   user_id: string;
@@ -24,6 +25,7 @@ async function readQueue(): Promise<SetLog[]> {
 
 /** Save a set. Works offline: failed saves wait in a queue and sync later. */
 export async function saveSet(log: SetLog) {
+  if (isPreviewing()) return true; // coach preview: nothing saved
   const { error } = await supabase.from('workout_logs').insert(log);
   if (error) {
     const q = await readQueue();

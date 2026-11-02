@@ -5,6 +5,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { supabase } from '../../src/lib/supabase';
 import { C, F } from '../../src/lib/theme';
 import { ChevronIcon } from '../../src/components/icons';
+import { useAuth } from '../../src/lib/auth';
+import type { ViewAs } from '../../src/lib/preview';
 
 type Row = {
   id: string; email: string | null; first_name: string | null; tier: string; start_date: string | null;
@@ -15,6 +17,8 @@ type Invite = { email: string; first_name: string | null; created_at: string };
 /** Coach-only: every client, newest unreviewed check-ins first, plus plans waiting for a sign-up. */
 export default function Coach() {
   const router = useRouter();
+  const { setViewAs } = useAuth();
+  const viewAs = (v: ViewAs) => { setViewAs(v); router.replace('/'); };
   const [rows, setRows] = useState<Row[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -40,6 +44,24 @@ export default function Coach() {
         <Text style={st.kicker}>Coach</Text>
         <Text style={st.title}>{due ? `${due} check-in${due > 1 ? 's' : ''} to review` : 'All caught up'}</Text>
         <Text style={st.sub}>{coached.length} coaching client{coached.length === 1 ? '' : 's'} · {rows.length} in the app</Text>
+
+        <View style={[st.preview, { borderColor: C.red, borderWidth: 2 }]}>
+          <Text style={st.section}>View the full app as</Text>
+          <Text style={st.meta}>Opens every tab exactly as they'd see it, with a sample plan for "Jake". Tap Exit on the red bar to come back. Nothing saves.</Text>
+          {([
+            ['free', 'Free plan user', 'Weeks 1–2 open, weeks 3–12 locked, offers on the Boon tab'],
+            ['self', 'Full 12-Week Program', 'The $19.99/mo or $99/yr subscriber: all 12 weeks, meals, Stack Check, on their own'],
+            ['coached', 'Coaching client', 'Everything, plus your Sunday reviews and WhatsApp'],
+          ] as [ViewAs, string, string][]).map(([v, l, d]) => (
+            <Pressable key={v} accessibilityRole="button" onPress={() => viewAs(v)} style={st.vrow}>
+              <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+                <Text style={st.name}>{l}</Text>
+                <Text style={st.meta}>{d}</Text>
+              </View>
+              <ChevronIcon />
+            </Pressable>
+          ))}
+        </View>
 
         <View style={st.preview}>
           <Text style={st.section}>See what new people see</Text>
@@ -89,6 +111,7 @@ export default function Coach() {
 
 const st = StyleSheet.create({
   preview: { borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 14, gap: 8 },
+  vrow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, backgroundColor: C.navy, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
   pbtn: { minHeight: 44, borderRadius: 999, backgroundColor: C.red, paddingHorizontal: 16, justifyContent: 'center' },
   pbtnText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase', letterSpacing: 0.5 },
   kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2, marginTop: 10 },

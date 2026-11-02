@@ -13,7 +13,8 @@ import {
   QuestionIcon, RulerIcon, ScaleIcon, ShieldIcon, StepsIcon, TrophyIcon,
 } from '../src/components/icons';
 import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
-import { isFree } from '../src/lib/access';
+import { isCoached } from '../src/lib/access';
+import { isPreviewing } from '../src/lib/preview';
 
 const HERO = require('../assets/hero/checkin.jpg');
 type Angle = 'front' | 'side' | 'back';
@@ -140,6 +141,7 @@ export default function CheckinScreen() {
   const submit = async () => {
     if (!session) return;
     if (!weight) return Alert.alert('Add your weight first', 'Use your 7-day average. If you only weighed once, that works too.');
+    if (isPreviewing()) { Alert.alert('Preview only', 'This is what they see. Nothing was saved.'); return router.back(); }
     setBusy(true);
     const uid = session.user.id;
     const { data, error } = await supabase.from('checkins').insert({
@@ -155,7 +157,7 @@ export default function CheckinScreen() {
       if (!up.error) await supabase.from('photos').insert({ user_id: uid, checkin_id: data.id, angle, path });
     }
     setBusy(false);
-    Alert.alert('Got it. Nice work this week.', 'I\'ll go through everything and send your adjustments within 24 hours.');
+    Alert.alert('Got it. Nice work this week.', isCoached(profile) ? 'I\'ll go through everything and send your adjustments within 24 hours.' : 'Your numbers are saved. Check the trend on your Progress tab.');
     router.back();
   };
 
@@ -180,7 +182,7 @@ export default function CheckinScreen() {
                 {photoWeek && <View style={[st.pill, { backgroundColor: C.green }]}><CameraIcon size={12} color={C.navy} /><Text style={[st.pillText, { color: C.navy }]}>Photo week</Text></View>}
               </View>
               <Text style={st.title} accessibilityRole="header">Sunday Check-in</Text>
-              <Text style={st.lede}>{name ? `${name}, this` : 'This'} takes 2 minutes. {isFree(profile) ? 'Your numbers build your trend on the Progress tab, so you can see exactly what is working.' : 'I read every answer myself and send your adjustments within 24 hours.'}</Text>
+              <Text style={st.lede}>{name ? `${name}, this` : 'This'} takes 2 minutes. {!isCoached(profile) ? 'Your numbers build your trend on the Progress tab, so you can see exactly what is working.' : 'I read every answer myself and send your adjustments within 24 hours.'}</Text>
             </View>
           </View>
 
@@ -211,7 +213,7 @@ export default function CheckinScreen() {
                     </Pressable>
                   ))}
                 </View>
-                <View style={st.private}><ShieldIcon color={C.green} /><Text style={st.privateText}>{isFree(profile) ? 'Private. Only you can see these.' : 'Private. Only you and Boon can see these.'}</Text></View>
+                <View style={st.private}><ShieldIcon color={C.green} /><Text style={st.privateText}>{!isCoached(profile) ? 'Private. Only you can see these.' : 'Private. Only you and Boon can see these.'}</Text></View>
               </Section>
             ) : (
               <View style={st.nextPhoto}>
@@ -227,7 +229,7 @@ export default function CheckinScreen() {
               <Scale icon={<HungerIcon color={C.red2} />} label="Hunger" n={10} from={1} value={hunger} onChange={setHunger} low="Full all week" high="Starving" />
             </Section>
 
-            <Section n={photoWeek ? 4 : 3} title={isFree(profile) ? "Your week" : "Talk to me"} sub={isFree(profile) ? "Writing it down is how you spot what works." : "This is where I learn what to change for you."} done={done.talk}>
+            <Section n={photoWeek ? 4 : 3} title={!isCoached(profile) ? "Your week" : "Talk to me"} sub={!isCoached(profile) ? "Writing it down is how you spot what works." : "This is where I learn what to change for you."} done={done.talk}>
               <Note icon={<TrophyIcon color={C.red2} />} label="Your win this week" value={win} onChange={setWin}
                 placeholder="Big or small. Hit every workout, skipped the drive-thru, slept 8 hours…" />
               <View style={st.shareRow}>
@@ -236,12 +238,12 @@ export default function CheckinScreen() {
               </View>
               <Note icon={<MountainIcon color={C.red2} />} label="What was hardest?" value={hardest} onChange={setHardest}
                 placeholder="Weekends, late-night snacking, getting to the gym…" />
-              {!isFree(profile) && <Note icon={<QuestionIcon color={C.red2} />} label="Anything you want me to answer?" value={questions} onChange={setQuestions}
+              {!!isCoached(profile) && <Note icon={<QuestionIcon color={C.red2} />} label="Anything you want me to answer?" value={questions} onChange={setQuestions}
                 placeholder="Food swaps, a sore joint, a supplement you saw online…" />}
             </Section>
 
-            <Button title={busy ? 'Saving…' : isFree(profile) ? 'Save my check-in' : 'Send to Boon'} onPress={submit} loading={busy} />
-            {!isFree(profile) && <Text style={st.footer}>Questions before Sunday? Text me on WhatsApp anytime: (323) 229-0609</Text>}
+            <Button title={busy ? 'Saving…' : !isCoached(profile) ? 'Save my check-in' : 'Send to Boon'} onPress={submit} loading={busy} />
+            {!!isCoached(profile) && <Text style={st.footer}>Questions before Sunday? Text me on WhatsApp anytime: (323) 229-0609</Text>}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
