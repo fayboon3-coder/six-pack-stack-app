@@ -15,6 +15,14 @@ import { isCoached, isFree } from '../src/lib/access';
 const FACE = require('../assets/logo-b.png');
 
 /** Stack: the Six-Pack Stack AI, a chat trained on Boon's method, this person's plan and his product verdicts. */
+/** Sample conversation for App Store screenshots (only with EXPO_PUBLIC_DEMO_CHAT=1, never in real builds). */
+const DEMO_CHAT: ChatMsg[] = [
+  { id: 'q1', role: 'user', content: 'Going out Saturday. Can I still drink on this plan?' },
+  { id: 'a1', role: 'assistant', content: "Yes. Pick drinks or a big meal, not both.\n\nStick to **2–3 light beers or vodka sodas** (about 100–150 calories each), eat protein before you go out, and skip the late-night food. Sunday is a normal day, no \"starting over.\"" },
+  { id: 'q2', role: 'user', content: 'Should I buy a fat burner to speed it up?' },
+  { id: 'a2', role: 'assistant', content: "Save your money. Most fat burners are **caffeine with a markup**. A coffee before your workout does the same job for about $0.30.\n\nYour deficit is what's burning fat. You're already down 7 lbs in 4 weeks." },
+];
+
 export default function Ask() {
   const { q } = useLocalSearchParams<{ q?: string }>();
   const { session, profile, plan, viewAs, isCoachAccount } = useAuth();
@@ -30,6 +38,7 @@ export default function Ask() {
   const tier = profile?.tier || 'free';
 
   useEffect(() => {
+    if (process.env.EXPO_PUBLIC_DEMO_CHAT === '1') { setMsgs(DEMO_CHAT); return; } // store screenshots only
     if (!session) return;
     loadHistory(session.user.id).then(setMsgs);
     questionsLeft(session.user.id, tier, isCoachAccount && !viewAs).then((n) => { setLeft(n); if (n === 0) setBlocked('limit'); });

@@ -43,6 +43,12 @@ function CardHead({ icon, title, sub }: { icon: React.ReactNode; title: string; 
   );
 }
 
+/** Sample check-ins for App Store screenshots (only with EXPO_PUBLIC_DEMO_CHECKINS=1, never in real builds). */
+const DEMO_CHECKINS = [212.4, 209.6, 207.8, 205.2].map((w, i) => ({
+  id: 'd' + i, week: i + 1, checkin_date: new Date(Date.UTC(2026, 9, 18 + i * 7)).toISOString().slice(0, 10),
+  weight: w, workouts: [4, 4, 3, 4][i], nutrition_days: [5, 6, 6, 7][i], energy: [6, 7, 7, 8][i], win: null,
+})) as unknown as Checkin[];
+
 export default function Progress() {
   const { plan, profile, session } = useAuth();
   const router = useRouter();
@@ -50,6 +56,7 @@ export default function Progress() {
   const [rows, setRows] = useState<Checkin[]>([]);
 
   useFocusEffect(useCallback(() => {
+    if (process.env.EXPO_PUBLIC_DEMO_CHECKINS === '1') { setRows(DEMO_CHECKINS); return; } // store screenshots only
     if (!session) return;
     supabase.from('checkins').select('id,week,checkin_date,weight,workouts,nutrition_days,energy,win')
       .eq('user_id', session.user.id).order('checkin_date', { ascending: true })
