@@ -102,7 +102,7 @@ export default function Today() {
         {isFree(profile) && !isLocked(profile, week) && (
           <Pressable accessibilityRole="button" onPress={() => router.push('/unlock')} style={st.free}>
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={st.freeK}>Free plan · week {week} of {FREE_WEEKS}</Text>
+              <Text style={st.freeK}>The Free Stack · week {week} of {FREE_WEEKS}</Text>
               <Text style={st.freeT}>{FREE_WEEKS - week + 1 === 1 ? 'Last free week. Unlock weeks 3–12' : 'Weeks 3–12: see your options'}</Text>
             </View>
             <Text style={st.chev}>›</Text>

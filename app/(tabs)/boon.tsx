@@ -25,7 +25,7 @@ export default function Boon() {
   const router = useRouter();
   const free = isFree(profile);
   const coached = isCoached(profile) || profile?.role === 'coach';
-  const sub = !free && !coached; // Full 12-Week Program subscriber
+  const sub = !free && !coached; // The Full Stack subscriber
 
   useFocusEffect(useCallback(() => {
     if (!session) return;
@@ -41,7 +41,7 @@ export default function Boon() {
         {free || sub ? (
           <HeroCard image={FACE_IMG} imageRatio={16 / 9} title="Want me in your corner?"
             subtitle={sub
-              ? "You've got the full program. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
+              ? "You've got The Full Stack. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
               : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
             cta="See how coaching works" onPress={() => Linking.openURL(COACHING_URL)} />
         ) : (
@@ -62,7 +62,7 @@ export default function Boon() {
         <>
           <Eyebrow>Your program</Eyebrow>
           <Card>
-            <Text style={ui.label}>The Full 12-Week Program</Text>
+            <Text style={ui.label}>The Full Stack</Text>
             <Body>All 12 weeks are unlocked: your training, your meal plan, eating-out orders, the grocery list and every Stack Check verdict. Your calories re-set at weeks 4 and 8, so do your Sunday check-in.</Body>
           </Card>
           <CoachingCard />

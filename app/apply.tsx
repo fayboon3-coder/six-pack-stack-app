@@ -74,7 +74,7 @@ export default function Apply() {
         <Text style={st.body}>I read every application myself, within 24 hours. Watch your inbox at {f.email.trim()}. If we're a fit, you'll get a short video I recorded for you and a link to claim your spot.</Text>
         <Text style={st.body}>Check your spam or promotions folder and move my email to your main inbox so you don't miss it.</Text>
         {session ? <Button title="Back to my plan" onPress={() => router.back()} />
-          : <Button title="Get my free plan while you wait" onPress={() => router.replace('/quiz')} />}
+          : <Button title="Get The Free Stack while you wait" onPress={() => router.replace('/quiz')} />}
       </SafeAreaView>
     );
   }

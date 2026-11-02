@@ -1,11 +1,11 @@
 import type { Profile } from './types';
 
-/** Free plan: weeks 1–2 open, weeks 3–12 need the subscription (or coaching). */
+/** The Free Stack: weeks 1–2 open, weeks 3–12 need the subscription (or coaching). */
 export const FREE_WEEKS = 2;
 export const isFree = (p?: Profile | null) => !!p && p.role === 'client' && p.tier === 'free';
 /** 1:1 coaching client: Boon reads their check-ins and answers on WhatsApp. */
 export const isCoached = (p?: Profile | null) => !!p && p.role === 'client' && p.tier === 'coached';
-/** Full 12-Week Program subscriber: everything unlocked, on their own (no Boon reviews). */
+/** The Full Stack subscriber: everything unlocked, on their own (no Boon reviews). */
 export const isSubscriber = (p?: Profile | null) => !!p && p.role === 'client' && p.tier === 'self';
 export const isLocked = (p: Profile | null | undefined, week: number) => isFree(p) && week > FREE_WEEKS;
 

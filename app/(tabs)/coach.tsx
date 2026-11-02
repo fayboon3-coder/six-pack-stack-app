@@ -49,8 +49,8 @@ export default function Coach() {
           <Text style={st.section}>View the full app as</Text>
           <Text style={st.meta}>Opens every tab exactly as they'd see it, with a sample plan for "Jake". Tap Exit on the red bar to come back. Nothing saves.</Text>
           {([
-            ['free', 'Free plan user', 'Weeks 1–2 open, weeks 3–12 locked, offers on the Boon tab'],
-            ['self', 'Full 12-Week Program', 'The $19.99/mo or $99/yr subscriber: all 12 weeks, meals, Stack Check, on their own'],
+            ['free', 'The Free Stack', 'Weeks 1–2 open, weeks 3–12 locked, offers on the Boon tab'],
+            ['self', 'The Full Stack', 'The $19.99/mo or $99/yr subscriber: all 12 weeks, meals, Stack Check, on their own'],
             ['coached', 'Coaching client', 'Everything, plus your Sunday reviews and WhatsApp'],
           ] as [ViewAs, string, string][]).map(([v, l, d]) => (
             <Pressable key={v} accessibilityRole="button" onPress={() => viewAs(v)} style={st.vrow}>

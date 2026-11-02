@@ -36,8 +36,8 @@ export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'mon
   return (
     <View style={[st.card, { borderColor: C.red }]}>
       <Cover src={PROGRAM_IMG} />
-      <Text style={st.kicker}>The full app</Text>
-      <Text style={st.title}>The Full 12-Week Program</Text>
+      <Text style={st.kicker}>All 12 weeks</Text>
+      <Text style={st.title}>The Full Stack</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Opt id="yearly" title="Yearly" price="$99" per="/yr" note="$1.90 a week · 7-day free trial" best />
         <Opt id="monthly" title="Monthly" price="$19.99" per="/mo" note="Cancel anytime" />
@@ -94,7 +94,7 @@ export function LockedWeek({ week, onUnlock }: { week: number; onUnlock: () => v
     <Pressable accessibilityRole="button" onPress={onUnlock} style={st.locked}>
       <View style={st.lockIcon}><LockIcon size={22} /></View>
       <Text style={st.kicker}>Week {week} is ready</Text>
-      <Text style={st.title}>Your free 2 weeks are done.</Text>
+      <Text style={st.title}>Your Free Stack is done.</Text>
       <Text style={st.body}>Don't stop now. The next 10 weeks are where the results show. Unlock the rest of your plan to keep going.</Text>
       <View style={st.btn}><Text style={st.btnText}>Unlock weeks 3–12</Text></View>
     </Pressable>
