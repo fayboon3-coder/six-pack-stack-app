@@ -53,6 +53,7 @@ function Gate() {
       <Stack.Screen name="workout" />
       <Stack.Screen name="ask" />
       <Stack.Screen name="foods" />
+      <Stack.Screen name="training" />
       <Stack.Screen name="trial" options={{ gestureEnabled: false }} />
       <Stack.Screen name="delete-account" options={{ presentation: 'modal' }} />
       <Stack.Screen name="client/[id]" />

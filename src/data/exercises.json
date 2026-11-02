@@ -511,5 +511,230 @@
    "Sit back to touch the box lightly",
    "Stand up through your whole foot"
   ]
+ },
+ "machine_chest_press": {
+  "name": "Machine chest press",
+  "video": "n8TOta_pfr4",
+  "cues": [
+   "Seat so the handles line up with the middle of your chest",
+   "Press forward without locking your elbows hard at the end",
+   "Let the handles come back slowly until you feel a stretch in your chest"
+  ]
+ },
+ "cable_fly": {
+  "name": "Cable chest fly",
+  "video": "Iwe6AmxVf7o",
+  "cues": [
+   "Pulleys at shoulder height or above, one step forward, slight bend in the elbows",
+   "Bring your hands together in a wide hug, squeezing your chest",
+   "Open back up slowly; keep the same elbow bend the whole time"
+  ]
+ },
+ "db_fly": {
+  "name": "Dumbbell fly",
+  "video": "eozdVDA78K0",
+  "cues": [
+   "Lie flat, dumbbells over your chest, slight bend in the elbows",
+   "Lower them out wide until you feel a stretch, not past your shoulders",
+   "Bring them back up in the same arc, like hugging a tree"
+  ]
+ },
+ "back_squat": {
+  "name": "Barbell back squat",
+  "video": "aOzrA4FgnM0",
+  "cues": [
+   "Bar on your upper back, feet shoulder-width, toes slightly out",
+   "Brace your core, sit down and back until your thighs are about parallel",
+   "Drive up through your whole foot, knees tracking over your toes"
+  ]
+ },
+ "bodyweight_squat": {
+  "name": "Bodyweight squat",
+  "video": "P-yaD24bUE8",
+  "cues": [
+   "Feet shoulder-width, arms out in front for balance",
+   "Sit back and down as low as you can with your chest up",
+   "Stand up by pushing the floor away; slow down, fast up"
+  ]
+ },
+ "pike_push_up": {
+  "name": "Pike push-up",
+  "video": "226O2XfevJ0",
+  "cues": [
+   "Hands on the floor, hips high, body in an upside-down V",
+   "Bend your elbows and lower the top of your head toward the floor",
+   "Press back up; walk your feet closer to make it harder"
+  ]
+ },
+ "bench_dip": {
+  "name": "Bench dip",
+  "video": "0326dy_-CzM",
+  "cues": [
+   "Hands on the edge of a bench or chair, fingers forward, legs out",
+   "Bend your elbows straight back to about 90°, shoulders down",
+   "Press back up with your triceps; bend your knees to make it easier"
+  ]
+ },
+ "inverted_row": {
+  "name": "Inverted row",
+  "video": "GdyhjXlxE-U",
+  "cues": [
+   "Under a sturdy bar or table, body straight from head to heels",
+   "Pull your chest to the bar, squeezing your shoulder blades together",
+   "Lower with control; bend your knees to make it easier"
+  ]
+ },
+ "glute_bridge": {
+  "name": "Glute bridge",
+  "video": "SKOMwg1JLrU",
+  "cues": [
+   "Lie on your back, knees bent, feet flat and hip-width",
+   "Drive through your heels and lift your hips until your body is straight",
+   "Squeeze your glutes for a second at the top, then lower slowly"
+  ]
+ },
+ "skull_crusher": {
+  "name": "Dumbbell skull crusher",
+  "video": "ir5PsbniVSc",
+  "cues": [
+   "Lie flat, dumbbells straight up, palms facing each other",
+   "Bend only at the elbows and lower the weights beside your head",
+   "Straighten your arms back up; keep your upper arms still"
+  ]
+ },
+ "barbell_row": {
+  "name": "Barbell row",
+  "video": "FWJR5Ve8bnQ",
+  "cues": [
+   "Hinge forward to about 45°, back flat, bar hanging under your shoulders",
+   "Pull the bar to your lower ribs, elbows close to your body",
+   "Lower it with control; no jerking your torso up"
+  ]
+ },
+ "hip_abduction": {
+  "name": "Hip abduction machine",
+  "video": "OjI5OpV6IWA",
+  "cues": [
+   "Sit tall or lean slightly forward, pads on the outside of your knees",
+   "Push your knees out as far as you can, squeezing your glutes",
+   "Control the weight back in; don't let the plates slam"
+  ]
+ },
+ "cable_kickback": {
+  "name": "Cable glute kickback",
+  "video": "l4zReIOfPCQ",
+  "cues": [
+   "Ankle strap on, hold the machine, slight forward lean",
+   "Kick your leg straight back by squeezing your glute, not swinging",
+   "Return slowly; keep your lower back from arching"
+  ]
+ },
+ "preacher_curl": {
+  "name": "Preacher curl",
+  "video": "Gydpcouclx8",
+  "cues": [
+   "Armpits snug on the pad, arms straight down the pad",
+   "Curl the weight up without lifting your elbows off the pad",
+   "Lower all the way down slowly; don't drop it"
+  ]
+ },
+ "ab_wheel": {
+  "name": "Ab wheel rollout",
+  "video": "_BHKT60P6bc",
+  "cues": [
+   "Kneel, hands on the wheel under your shoulders, core braced",
+   "Roll forward slowly as far as you can without your back sagging",
+   "Pull back with your abs, not your hips"
+  ]
+ },
+ "bicycle_crunch": {
+  "name": "Bicycle crunch",
+  "video": "9FGilxCbdz8",
+  "cues": [
+   "Lie on your back, hands lightly behind your head, legs up",
+   "Bring one elbow toward the opposite knee as the other leg straightens",
+   "Switch sides slowly; twist from your ribs, not your neck"
+  ]
+ },
+ "dip": {
+  "name": "Dip",
+  "video": "TrJVszDm7ik",
+  "cues": [
+   "Hands on the bars, arms straight, shoulders down away from your ears",
+   "Lower until your elbows are about 90°, leaning slightly forward",
+   "Press back up; use the assisted machine or a band if you need help"
+  ]
+ },
+ "seated_calf_raise": {
+  "name": "Seated calf raise",
+  "video": "6O5hh1rBtx8",
+  "cues": [
+   "Pad on your lower thighs, balls of your feet on the platform",
+   "Lower your heels as far as you can and pause in the stretch",
+   "Push up onto your toes as high as you can and squeeze"
+  ]
+ },
+ "sl_rdl": {
+  "name": "Single-leg Romanian deadlift",
+  "video": "Va4Sz7hRI5I",
+  "cues": [
+   "Stand on one leg, soft knee, dumbbells or hands in front of you",
+   "Hinge forward as your back leg lifts behind you, back flat",
+   "Stand back up by squeezing the glute of your standing leg"
+  ]
+ },
+ "reverse_crunch": {
+  "name": "Reverse crunch",
+  "video": "7rRWy7-Gokg",
+  "cues": [
+   "Lie on your back, knees bent at 90°, hands by your sides",
+   "Curl your hips off the floor and pull your knees toward your chest",
+   "Lower slowly without letting your feet touch down"
+  ]
+ },
+ "cable_woodchop": {
+  "name": "Cable woodchop",
+  "video": "pAplQXk3dkU",
+  "cues": [
+   "Cable high and to one side, both hands on the handle",
+   "Rotate down and across your body, pivoting your back foot",
+   "Control it back up; turn from your trunk, not your arms"
+  ]
+ },
+ "trap_bar_deadlift": {
+  "name": "Trap bar deadlift",
+  "video": "WzvsIU9FW60",
+  "cues": [
+   "Stand in the middle of the bar, grab the handles, hips back",
+   "Brace, then push the floor away and stand up tall",
+   "Lower by pushing your hips back; keep the bar close and your back flat"
+  ]
+ },
+ "leg_press_calf": {
+  "name": "Leg press calf raise",
+  "video": "PYZY00hI43w",
+  "cues": [
+   "Balls of your feet on the bottom edge of the platform, legs almost straight",
+   "Lower the platform with your ankles for a deep stretch",
+   "Press up onto your toes as far as you can and squeeze"
+  ]
+ },
+ "decline_push_up": {
+  "name": "Decline push-up",
+  "video": "SKPab2YC8BE",
+  "cues": [
+   "Feet up on a chair or couch, hands a little wider than your shoulders",
+   "Lower your chest to the floor in one straight line, elbows at about 45°",
+   "Press back up without letting your hips sag"
+  ]
+ },
+ "slider_leg_curl": {
+  "name": "Slider leg curl",
+  "video": "p-V7uBUHeLc",
+  "cues": [
+   "Lie on your back, heels on a towel or sliders, hips lifted into a bridge",
+   "Pull your heels toward your butt while keeping your hips up",
+   "Slide them back out slowly; that slow part does most of the work"
+  ]
  }
 }

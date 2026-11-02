@@ -4,6 +4,7 @@ import SAMPLE from '../data/samplePlan.json';
 import { buildEatOut, buildGrocery, buildMenu } from './menu';
 import { buildFoodPlan, buildFoodGrocery } from './mealplan';
 import { LEGACY_LIKES, type Food } from '../data/foods';
+import { buildTrain, defaultCfg, type TrainCfg } from './training';
 
 /** Everything the quiz collects. Strings are the exact option labels (they go to Kit as-is). */
 export type Quiz = {
@@ -15,6 +16,8 @@ export type Quiz = {
   likes?: string[]; spots?: string[];
   /** Every food they picked (food ids) plus any they added themselves. */
   foods?: string[]; custom_foods?: Food[];
+  /** Training split id and weekdays (0 = Sunday), from the split step. */
+  split?: string; train_days?: number[]; train_cfg?: TrainCfg;
   first_name: string; email: string; src?: string; done_at?: string;
 };
 
@@ -66,36 +69,11 @@ export function targets(q: Quiz) {
   return { kcal, protein, fat, carbs };
 }
 
-type Ex = [string, string, string?];
-const gym4: Record<string, Ex[]> = {
-  Push: [['barbell_bench', '3 × 6–10', 'Or dumbbell bench press'], ['incline_db_press', '3 × 8–12'], ['machine_shoulder_press', '3 × 8–12'], ['cable_lateral_raise', '3 × 12–15'], ['rope_pushdown', '3 × 10–15']],
-  Pull: [['pull_up', '3 × 6–10', "Use the assisted machine if you can't get 6"], ['seated_cable_row', '3 × 8–12'], ['chest_supported_row', '3 × 8–12'], ['face_pull', '2 × 12–15'], ['incline_curl', '2 × 10–15'], ['cable_curl', '2 × 10–15']],
-  Legs: [['hack_squat', '3 × 8–12', 'Or leg press'], ['rdl', '3 × 8–10'], ['walking_lunge', '2 × 10 each leg'], ['seated_leg_curl', '3 × 10–15'], ['leg_extension', '2 × 12–15'], ['standing_calf_raise', '3 × 12–15']],
-  Upper: [['db_bench', '3 × 8–12'], ['lat_pulldown', '3 × 8–12'], ['db_shoulder_press', '2 × 8–12'], ['chest_supported_db_row', '2 × 10–12'], ['cable_lateral_raise', '2 × 12–15'], ['hanging_knee_raise', '3 × 10–15'], ['cable_crunch', '3 × 10–15']],
-};
-const home4: Record<string, Ex[]> = {
-  Push: [['db_bench', '3 × 8–15', 'Or push-ups on the floor'], ['incline_db_press', '3 × 8–12'], ['db_shoulder_press', '3 × 8–12'], ['db_lateral_raise', '3 × 12–20'], ['oh_db_ext', '2 × 10–15']],
-  Pull: [['pull_up', '3 × max (stop 1–2 short)', 'Or band pulldown'], ['one_arm_db_row', '3 × 8–12 each'], ['chest_supported_db_row', '3 × 10–12'], ['rear_delt_fly', '2 × 12–20'], ['db_curl', '2 × 10–15'], ['hammer_curl', '2 × 10–15']],
-  Legs: [['goblet_squat', '3 × 10–15'], ['db_rdl', '3 × 8–12'], ['bulgarian_split_squat', '2 × 8–12 each leg'], ['db_hip_thrust', '3 × 10–15'], ['sl_calf_raise', '2 × 12–20 each'], ['dead_bug', '3 × 8 each side']],
-  Upper: [['push_up', '3 × 8–15'], ['chin_up', '3 × max (stop 1–2 short)', 'Or band row'], ['arnold_press', '2 × 8–12'], ['one_arm_db_row', '2 × 10–12 each'], ['db_lateral_raise', '2 × 12–20'], ['lying_leg_raise', '3 × 10–15'], ['plank', '3 × 30–60 sec']],
-};
-
-export function buildTraining(q: Quiz) {
-  const lib = q.where_train.startsWith('Home') ? home4 : gym4;
-  const four = q.days !== '3 days';
-  const order: [string, string][] = four
-    ? [['Monday', 'Push'], ['Tuesday', 'Pull'], ['Thursday', 'Legs'], ['Friday', 'Upper']]
-    : [['Monday', 'Push'], ['Wednesday', 'Pull'], ['Friday', 'Legs']];
-  const newbie = q.experience === 'Never lifted' || q.experience === 'Under 1 year';
-  const d: TrainDay[] = order.map(([day, type]) => ({
-    t: `${day} · ${type}`,
-    // New lifters: 2 sets a move for the first block, so they learn the move and recover.
-    x: lib[type].map(([id, tgt, note]) => {
-      const t = newbie ? tgt.replace(/^3 ×/, '2 ×') : tgt;
-      return (note ? [id, t, note] : [id, t]) as [string, string, string?];
-    }),
-  }));
-  return { d, e: newbie ? 0 : 1, four };
+/** The training week from the quiz (or from saved training choices). */
+export function buildTraining(q: Quiz, cfg?: TrainCfg) {
+  const c = cfg || q.train_cfg || defaultCfg(q);
+  const t = buildTrain(c);
+  return { d: t.d, e: t.e, cfg: t.cfg, c: t.c, sessions: t.d.length };
 }
 
 const meal = (o: { name: string; detail: string; kcal: string; protein: string }) => o;
@@ -119,7 +97,7 @@ export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
   const p = projection(q);
   const tr = buildTraining(q);
   const name = q.first_name.trim().split(' ')[0] || 'You';
-  const sessions = tr.four ? 4 : 3;
+  const sessions = tr.sessions;
   const share = [0.22, 0.3, 0.13, 0.35];
   const proteinShare = [0.23, 0.32, 0.17, 0.28];
   const goalShort = p.build
@@ -172,6 +150,6 @@ export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
     phase1: `Hit all ${sessions} sessions and your protein every day. Steps up to 8,000. Learn the moves.`,
     phase2: 'Add weight or reps every week. Week 4: your calories get re-set to your new weight.',
     phase3: 'Keep the weights heavy while you get leaner. Week 12: final photos and results.',
-    train: { n: name, s: thisSunday(), e: tr.e, d: tr.d },
+    train: { n: name, s: thisSunday(), e: tr.e, d: tr.d, cfg: tr.cfg, c: tr.c },
   } as Plan;
 }

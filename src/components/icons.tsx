@@ -106,3 +106,6 @@ export const SparkIcon = ({ color = '#fff', size = 18 }: P) => (
 export const SearchIcon = ({ color = '#fff', size = 18 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={11} cy={11} r={6.5} {...base(color)} /><Path d="M16 16l5 5" {...base(color)} /></Svg>
 );
+export const SwapIcon = ({ color = '#fff', size = 16 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7" {...base(color)} /></Svg>
+);

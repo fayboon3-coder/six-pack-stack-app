@@ -16,6 +16,11 @@ import { getStreak } from '../src/lib/streak';
 import RemindersCard from '../src/components/RemindersCard';
 import { FlameIcon, TrophyIcon } from '../src/components/icons';
 import Backdrop from '../src/components/Backdrop';
+import SwapSheet from '../src/components/SwapSheet';
+import { SwapIcon } from '../src/components/icons';
+import { exName } from '../src/lib/workoutMeta';
+import { applySwap, resetSwap, type TrainCfg } from '../src/lib/training';
+import { canEditTraining, saveTraining } from '../src/lib/trainingSave';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -23,7 +28,8 @@ const ACC = 'setInputs';
 
 export default function Workout() {
   const { d } = useLocalSearchParams<{ d: string }>();
-  const { plan, session, profile } = useAuth();
+  const { plan, session, profile, refresh } = useAuth();
+  const [swapOpen, setSwapOpen] = useState(false);
   const router = useRouter();
   const dayIdx = Number(d || 0);
   const day = plan?.train.d[dayIdx];
@@ -92,7 +98,7 @@ export default function Workout() {
     const topR = Math.max(0, ...past.filter((x) => Number(x.weight) === topW).map((x) => Number(x.reps) || 0));
     const nw = Number(w), nr = Number(r);
     if (past.length && nw > 0 && (nw > topW || (nw === topW && nr > topR)) && !prs.includes(ex[0])) {
-      const name = exercises[ex[0]]?.name || ex[0];
+      const name = exName(ex[0], plan);
       setPr(`${name}: ${nw} lbs × ${nr || '?'}`);
       setPrs([...prs, ex[0]]);
       setTimeout(() => setPr(''), 4500);
@@ -103,6 +109,16 @@ export default function Workout() {
         weight: w ? Number(w) : null, reps: r ? Number(r) : null,
       });
     }
+  };
+
+  // Swaps work on plans the app built (the person's own training choices).
+  const cfg = plan.train.cfg as TrainCfg | undefined;
+  const canSwap = !!cfg && canEditTraining(profile) && !(entries[ex[0]] || []).some((e) => e.done);
+  const doSwap = async (next: TrainCfg) => {
+    setSwapOpen(false);
+    if (!session) return;
+    await saveTraining(session.user.id, plan, profile, next);
+    await refresh();
   };
 
   const nextUndone = list.findIndex((e) => !e.done);
@@ -137,7 +153,7 @@ export default function Workout() {
             <View style={st.streak}><FlameIcon size={22} /><Text style={st.streakT}>{streak.weeks}-week streak. Don't break it.</Text></View>
           )}
           {prs.map((id) => (
-            <View key={id} style={st.prRow}><TrophyIcon color={C.green} /><Text style={st.prT}>{exercises[id]?.name || id}</Text></View>
+            <View key={id} style={st.prRow}><TrophyIcon color={C.green} /><Text style={st.prT}>{exName(id, plan)}</Text></View>
           ))}
           <Text style={st.doneSub}>Want a nudge on your next training day?</Text>
           <RemindersCard compact />
@@ -183,7 +199,14 @@ export default function Workout() {
             </Pressable>
           )}
           <View style={{ gap: 6 }}>
-            <Text style={st.exName}>{info?.name || ex[0]}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+              <Text style={[st.exName, { flex: 1 }]}>{exName(ex[0], plan)}</Text>
+              {canSwap && (
+                <Pressable accessibilityRole="button" accessibilityLabel={`Swap ${exName(ex[0], plan)}`} onPress={() => setSwapOpen(true)} hitSlop={6} style={st.swapBtn}>
+                  <SwapIcon size={14} /><Text style={st.swapT}>Swap</Text>
+                </Pressable>
+              )}
+            </View>
             <Text style={st.target}>{nSets} sets · {repsOf(ex[1])} reps</Text>
             {!!ex[2] && <Text style={st.note}>{ex[2]}</Text>}
             {(info?.cues || []).map((c, k) => <Text key={k} style={st.cue}>{k + 1}. {c}</Text>)}
@@ -235,10 +258,16 @@ export default function Workout() {
         {Platform.OS === 'ios' && (
           <InputAccessoryView nativeID={ACC}>
             <View style={st.acc}>
-              <Text style={st.accText}>{info?.name}</Text>
+              <Text style={st.accText}>{exName(ex[0], plan)}</Text>
               <Pressable accessibilityRole="button" onPress={() => Keyboard.dismiss()} hitSlop={10} style={st.accBtn}><Text style={st.accBtnText}>Done</Text></Pressable>
             </View>
           </InputAccessoryView>
+        )}
+
+        {swapOpen && cfg && (
+          <SwapSheet cfg={cfg} day={dayIdx} ex={i} onClose={() => setSwapOpen(false)}
+            onPick={(to, hurts) => { track('exercise_swap', { to, hurts, where: 'workout' }); doSwap(applySwap(cfg, dayIdx, i, to, hurts)); }}
+            onReset={() => doSwap(resetSwap(cfg, dayIdx, i))} />
         )}
 
         {!kb && <View style={st.footer}>
@@ -299,5 +328,7 @@ const st = StyleSheet.create({
   accText: { fontFamily: F.xbold, fontSize: 13, color: C.white, flex: 1 },
   accBtn: { backgroundColor: C.red, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8 },
   accBtnText: { fontFamily: F.black, fontSize: 14, color: C.white },
+  swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2, marginTop: 2 },
+  swapT: { fontFamily: F.xbold, fontSize: 13, color: C.white },
   restTime: { fontFamily: F.black, fontSize: 22, color: C.white },
 });

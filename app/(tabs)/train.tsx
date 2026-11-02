@@ -15,6 +15,9 @@ import { dayMeta, thumb } from '../../src/lib/workoutMeta';
 import { isoDate, loggedDays } from '../../src/lib/logs';
 import { isLocked } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
+import { canEditTraining } from '../../src/lib/trainingSave';
+import { EQUIP_LABEL, SPLITS } from '../../src/lib/training';
+import { SwapIcon } from '../../src/components/icons';
 
 const WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -33,7 +36,7 @@ export default function Train() {
   const week = weekOf(plan.train.s);
   const phase = phaseOf(week);
   const { index, isToday } = todayIndex(plan);
-  const metas = plan.train.d.map(dayMeta);
+  const metas = plan.train.d.map((d) => dayMeta(d, plan.train.c));
   const doneCount = plan.train.d.filter((d) => done.has(d.t)).length;
   const locked = isLocked(profile, week);
   const go = (k: number) => locked ? router.push('/unlock') : router.push({ pathname: '/workout', params: { d: String(k) } });
@@ -67,6 +70,17 @@ export default function Train() {
           cta={isToday ? 'Start workout' : 'Preview workout'} onPress={() => go(index)} maxRows={4} cover={1} />}
       </View>
     }>
+      {canEditTraining(profile) && (
+        <Pressable accessibilityRole="button" onPress={() => router.push('/training')} style={st.edit}>
+          <View style={st.editIcon}><SwapIcon size={18} /></View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={st.editK}>Your training{plan.train.cfg ? ` · ${SPLITS[plan.train.cfg.split].short}` : ''}</Text>
+            <Text style={st.editT}>Change your split, days or equipment. Swap any move.</Text>
+            {!!plan.train.cfg && <Text style={st.editS}>{EQUIP_LABEL[plan.train.cfg.equip]}{plan.train.cfg.focus.length ? ` · extra ${plan.train.cfg.focus.join(' + ')}` : ''}</Text>}
+          </View>
+          <ChevronIcon />
+        </Pressable>
+      )}
       <Text style={st.listTitle}>All {plan.train.d.length} workouts</Text>
       {metas.map((m, k) => {
         const isDone = done.has(plan.train.d[k].t);
@@ -127,6 +141,11 @@ const st = StyleSheet.create({
   rest: { backgroundColor: 'transparent', borderStyle: 'dashed' },
   restText: { fontFamily: F.bold, fontSize: 14, color: C.white },
   weekType: { fontFamily: F.black, fontSize: 9, color: C.white, letterSpacing: 0.3 },
+  edit: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.navy2, padding: 16 },
+  editIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  editT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.white },
+  editS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(255,255,255,0.75)' },
   listTitle: { fontFamily: F.black, fontSize: 21, color: C.white, marginTop: 8 },
   card: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 12 },
   cardNext: { borderColor: C.red, borderWidth: 2 },

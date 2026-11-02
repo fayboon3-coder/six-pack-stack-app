@@ -100,7 +100,7 @@ export default function Today() {
         )}
 
         {isLocked(profile, week) ? <LockedWeek week={week} onUnlock={() => router.push('/unlock')} /> : <WorkoutPreview
-          meta={dayMeta(day)}
+          meta={dayMeta(day, plan.train.c)}
           badge={doneToday ? 'Done today ✓' : isToday ? "Today's workout" : `Next up · ${dayName}`}
           cta={doneToday ? 'Review workout' : isToday ? 'Start workout' : 'Preview workout'}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })}

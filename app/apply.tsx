@@ -26,7 +26,7 @@ export default function Apply() {
   const params = useLocalSearchParams<{ name?: string; email?: string; src?: string }>();
   const q = profile?.quiz || (params.src ? { src: params.src } : {});
   const quizStart = q.start_timing === 'Today' ? 'This week' : q.start_timing;
-  const quizDays = q.days === '3 days' ? '3–4' : q.days === '4 days' ? '3–4' : '';
+  const quizDays = q.days === '3 days' || q.days === '4 days' ? '3–4' : q.days === '5 days' || q.days === '6 days' ? '5+' : '';
   const [f, setF] = useState({
     name: profile?.first_name || q.first_name || params.name || '',
     email: profile?.email || session?.user.email || params.email || '',

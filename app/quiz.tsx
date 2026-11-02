@@ -20,6 +20,7 @@ import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
 import Backdrop from '../src/components/Backdrop';
 import { track } from '../src/lib/track';
+import { DAY_NAMES, DEFAULT_DAYS, defaultCfg, SPLITS, SPLITS_FOR, weekLine, type SplitId } from '../src/lib/training';
 
 const BOON = require('../assets/hero/boon_quiz.jpg');
 
@@ -28,7 +29,7 @@ type Step =
   | { id: 'tried' | 'likes' | 'spots'; kind: 'multi'; q: string; sub?: string; opts: readonly string[]; none?: string; min?: number }
   | { id: keyof Quiz; kind: 'num'; q: string; sub?: string; unit: string; min: number; max: number; ph: string }
   | { id: 'height'; kind: 'height'; q: string }
-  | { id: string; kind: 'spend' | 'story' | 'chart' | 'account' | 'foods' };
+  | { id: string; kind: 'spend' | 'story' | 'chart' | 'account' | 'foods' | 'split' };
 
 const STEPS: Step[] = [
   { id: 'goal', kind: 'one', q: "What's your main goal?", opts: GOALS },
@@ -37,9 +38,10 @@ const STEPS: Step[] = [
   { id: 'height', kind: 'height', q: 'How tall are you?' },
   { id: 'weight', kind: 'num', q: 'What do you weigh right now?', sub: 'Morning weight is best. A rough number is fine.', unit: 'lbs', min: 80, max: 450, ph: '200' },
   { id: 'goal_weight', kind: 'num', q: "What's your goal weight?", sub: 'The number you want to see on the scale.', unit: 'lbs', min: 80, max: 450, ph: '180' },
-  { id: 'where_train', kind: 'one', q: 'Where will you train?', opts: ['Gym', 'Home with dumbbells'] },
-  { id: 'days', kind: 'one', q: 'How many days a week can you train?', sub: '45–60 minutes each.', opts: ['3 days', '4 days'] },
+  { id: 'where_train', kind: 'one', q: 'Where will you train?', opts: ['Gym', 'Home with dumbbells', 'Home, no equipment'] },
   { id: 'experience', kind: 'one', q: 'How long have you been lifting?', opts: ['Never lifted', 'Under 1 year', '1–3 years', '3+ years'] },
+  { id: 'days', kind: 'one', q: 'How many days a week can you train?', sub: '45–60 minutes each. Pick what you can do every week, not your best week.', opts: ['3 days', '4 days', '5 days', '6 days'] },
+  { id: 'split', kind: 'split' },
   { id: 'tried', kind: 'multi', q: 'Which of these have you bought?', sub: 'Pick all that apply.', opts: ['Fat burners', 'Pre-workout', 'Test boosters', 'Greens powder', 'Protein powder', 'Creatine', 'None of these'], none: 'None of these' },
   { id: 'monthly_spend', kind: 'one', q: 'About how much do you spend on supplements a month?', opts: ['Under $50', '$50–$100', '$100–$200', '$200+'] },
   { id: 'spend', kind: 'spend' },
@@ -200,6 +202,7 @@ export default function QuizScreen() {
             </>
           )}
 
+          {step.kind === 'split' && <SplitStep a={a} set={set} onNext={next} />}
           {step.kind === 'spend' && <SpendStep spend={a.monthly_spend} tried={a.tried} onNext={next} />}
           {step.kind === 'story' && <StoryStep onNext={next} />}
           {step.kind === 'chart' && <ChartStep a={a} onNext={next} />}
@@ -207,6 +210,54 @@ export default function QuizScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+/** Pick your split: the presets for the days they chose, with a smart default. */
+function SplitStep({ a, set, onNext }: { a: Quiz; set: (k: keyof Quiz, v: any) => void; onNext: () => void }) {
+  const n = parseInt(a.days, 10) || 4;
+  const ids = SPLITS_FOR[n];
+  const rec = defaultCfg({ days: a.days, experience: a.experience }).split;
+  const cur = a.split && ids.includes(a.split as SplitId) ? (a.split as SplitId) : rec;
+  const [days, setDays] = useState<number[]>(() => (a.train_days?.length === n ? a.train_days : DEFAULT_DAYS[n]));
+  useEffect(() => { if (a.split !== cur) set('split', cur); }, [cur]);
+  const toggleDay = (d: number) => setDays((x) => x.includes(d) ? x.filter((y) => y !== d) : x.length >= n ? x : [...x, d].sort());
+  const ok = days.length === n;
+  return (
+    <>
+      <Q q="Pick your split." sub="These are the proven ones for your schedule. You can change it, swap moves or add your own any time in the Train tab." />
+      <View style={{ gap: 10 }}>
+        {ids.map((id) => {
+          const on = cur === id;
+          const sp = SPLITS[id];
+          return (
+            <Pressable key={id} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => set('split', id)} style={[st.opt, on && st.optOn, { alignItems: 'flex-start' }]}>
+              <View style={{ flex: 1, gap: 4 }}>
+                {id === rec && <Text style={st.recPill}>Best for you</Text>}
+                <Text style={[st.optText, { flex: 0 }]}>{sp.label}</Text>
+                <Text style={st.splitBlurb}>{sp.blurb}</Text>
+                <Text style={st.splitDays}>{weekLine(id)}</Text>
+              </View>
+              <View style={[st.radio, on && st.radioOn]}>{on && <CheckIcon size={12} />}</View>
+            </Pressable>
+          );
+        })}
+      </View>
+      <Text style={st.sub}>Which days? Pick {n}.</Text>
+      <View style={st.dayRow}>
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((l, d) => {
+          const on = days.includes(d);
+          return (
+            <Pressable key={d} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={DAY_NAMES[d]}
+              onPress={() => toggleDay(d)} style={[st.dayDot, on && st.dayDotOn]}>
+              <Text style={[st.dayDotT, on && { color: C.white }]}>{l}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      {!ok && <Text style={st.err}>{days.length < n ? `Pick ${n - days.length} more day${n - days.length > 1 ? 's' : ''}.` : ''}</Text>}
+      <Button title="Next" onPress={() => { if (!ok) return; set('train_days', days); set('split', cur); onNext(); }} />
+    </>
   );
 }
 
@@ -309,7 +360,7 @@ function ChartStep({ a, onNext }: { a: Quiz; onNext: () => void }) {
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Tile v={t.kcal.toLocaleString('en-US')} l="Calories" />
         <Tile v={`${t.protein}g`} l="Protein" />
-        <Tile v={a.days === '3 days' ? '3x' : '4x'} l="Training" />
+        <Tile v={`${parseInt(a.days, 10) || 4}x`} l="Training" />
       </View>
       <Text style={st.sub}>
         {p.build ? 'Eat a little above maintenance, lift hard, and let the scale move slowly.' : `About ${p.rate} lbs a week: fast enough to see, slow enough to keep your muscle.`} Results depend on following the plan.
@@ -401,6 +452,13 @@ const st = StyleSheet.create({
   unit: { fontFamily: F.xbold, fontSize: 16, color: C.white },
   input: { height: 56, borderRadius: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, color: C.white, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
   err: { fontFamily: F.bold, fontSize: 14, color: C.red2 },
+  recPill: { alignSelf: 'flex-start', fontFamily: F.black, fontSize: 10, letterSpacing: 1, textTransform: 'uppercase', color: C.white, backgroundColor: C.red, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, overflow: 'hidden' },
+  splitBlurb: { fontFamily: F.semi, fontSize: 13, lineHeight: 19, color: 'rgba(255,255,255,0.8)' },
+  splitDays: { fontFamily: F.xbold, fontSize: 12, color: C.red2, letterSpacing: 0.3 },
+  dayRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 6 },
+  dayDot: { flex: 1, maxWidth: 46, aspectRatio: 1, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center' },
+  dayDotOn: { backgroundColor: C.red, borderColor: C.red },
+  dayDotT: { fontFamily: F.black, fontSize: 14, color: 'rgba(255,255,255,0.7)' },
   note: { fontFamily: F.bold, fontSize: 14, color: C.green },
   fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.white, textAlign: 'center' },
   chart: { backgroundColor: C.navy2, borderRadius: 20, borderWidth: 1, borderColor: C.line, paddingVertical: 8, alignItems: 'center' },
