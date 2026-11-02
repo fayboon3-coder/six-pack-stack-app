@@ -58,3 +58,36 @@ export const NoteIcon = ({ color = '#fff', size = 14 }: P) => (
 export const ChevronIcon = ({ color = '#fff', size = 18 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M9 6l6 6-6 6" {...base(color)} strokeWidth={2.4} /></Svg>
 );
+export const ScaleIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Rect x={3} y={3} width={18} height={18} rx={4} {...base(color)} /><Path d="M8 9a5 5 0 0 1 8 0" {...base(color)} /><Path d="M12 9l1.5-2" {...base(color)} /></Svg>
+);
+export const RulerIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Rect x={2} y={8} width={20} height={8} rx={2} {...base(color)} /><Path d="M6 8v3M10 8v4M14 8v3M18 8v4" {...base(color)} /></Svg>
+);
+export const StepsIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M7 4c1.7 0 2.5 2 2.5 4.5S8.7 13 7 13s-2.5-2-2.5-4.5S5.3 4 7 4zM5 16h4M17 9c1.7 0 2.5 2 2.5 4.5S18.7 18 17 18s-2.5-2-2.5-4.5S15.3 9 17 9zM15 21h4" {...base(color)} /></Svg>
+);
+export const CameraIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" {...base(color)} /><Circle cx={12} cy={13} r={3.5} {...base(color)} /></Svg>
+);
+export const BoltIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M13 2L4 14h7l-1 8 9-12h-7z" {...base(color)} /></Svg>
+);
+export const ForkIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M7 3v7a2 2 0 0 0 2 2v9M11 3v7a2 2 0 0 1-2 2M17 3c-1.7 0-3 2.2-3 5s1.3 4 3 4v9" {...base(color)} /></Svg>
+);
+export const HungerIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={8} {...base(color)} /><Circle cx={12} cy={12} r={4} {...base(color)} /></Svg>
+);
+export const TrophyIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M9 17h6" {...base(color)} /></Svg>
+);
+export const MountainIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M3 20l6-10 4 6 2-3 6 7z" {...base(color)} /><Path d="M9 10V4l4 2-4 2" {...base(color)} /></Svg>
+);
+export const QuestionIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={9} {...base(color)} /><Path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 .9-1 1.7M12 17h.01" {...base(color)} strokeWidth={2.4} /></Svg>
+);
+export const ShieldIcon = ({ color = '#fff', size = 14 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" {...base(color)} /></Svg>
+);
