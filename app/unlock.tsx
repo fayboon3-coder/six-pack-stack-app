@@ -7,6 +7,8 @@ import { C, F } from '../src/lib/theme';
 import { BackIcon } from '../src/components/icons';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../src/components/Offers';
 import { coachingFirst } from '../src/lib/access';
+import Backdrop from '../src/components/Backdrop';
+import { twoTone } from '../src/components/TwoTone';
 
 /** The offers screen. Payments (trial, yearly, monthly) are wired in phase 3. */
 export default function Unlock() {
@@ -15,12 +17,13 @@ export default function Unlock() {
   const hot = coachingFirst(profile);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <Text style={st.k}>Keep going{plan?.name ? `, ${plan.name}` : ''}</Text>
-        <Text style={st.h}>Finish what you started.</Text>
+        <Text style={st.h}>{twoTone('Finish what| you started.')}</Text>
         <Text style={st.body}>Weeks 1 and 2 build the habits. Weeks 3 to 12 are where your body changes. Pick how you want to get there.</Text>
         {hot && <CoachingCard />}
         <SubscriptionCard />

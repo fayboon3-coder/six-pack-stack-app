@@ -3,6 +3,7 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../lib/auth';
 import { C, F } from '../lib/theme';
+import { twoTone } from './TwoTone';
 
 /**
  * Clean page header (Sweat-style): small date/context line, big bold title,
@@ -28,7 +29,7 @@ export default function PageHeader({ kicker, title, subtitle, week, right }: {
           </Pressable>
         )}
       </View>
-      <Text style={st.title} accessibilityRole="header">{title}</Text>
+      <Text style={st.title} accessibilityRole="header">{twoTone(title)}</Text>
       {!!subtitle && <Text style={st.subtitle}>{subtitle}</Text>}
       {week != null && (
         <View style={st.weeks} accessibilityLabel={`Week ${week} of 12`}>

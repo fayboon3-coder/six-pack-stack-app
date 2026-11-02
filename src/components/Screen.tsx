@@ -2,6 +2,7 @@ import React from 'react';
 import { RefreshControl, ScrollView, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { C } from '../lib/theme';
+import Backdrop from './Backdrop';
 
 export default function Screen({ children, onRefresh, refreshing = false, style, scroll = true, header, edgeToEdge }: {
   children: React.ReactNode; onRefresh?: () => void; refreshing?: boolean; style?: ViewStyle; scroll?: boolean;
@@ -12,6 +13,7 @@ export default function Screen({ children, onRefresh, refreshing = false, style,
 }) {
   return (
     <SafeAreaView edges={edgeToEdge ? [] : ['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       {scroll ? (
         <ScrollView
           contentContainerStyle={{ paddingBottom: 40 }}

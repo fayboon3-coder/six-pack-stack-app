@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { Button, Eyebrow, H1 } from '../src/components/ui';
+import Backdrop from '../src/components/Backdrop';
 
 export default function SignIn() {
   const router = useRouter();
@@ -45,6 +46,7 @@ export default function SignIn() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 22, paddingTop: 24, paddingBottom: 40 }}>

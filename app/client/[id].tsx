@@ -7,6 +7,7 @@ import { C, F } from '../../src/lib/theme';
 import { Button } from '../../src/components/ui';
 import { BackIcon, BoltIcon, DumbbellIcon, ForkIcon, ScaleIcon, TrophyIcon } from '../../src/components/icons';
 import { plain } from '../../src/lib/program';
+import Backdrop from '../../src/components/Backdrop';
 
 type Checkin = {
   id: string; week: number; checkin_date: string; weight: number | null; waist: number | null; steps: number | null;
@@ -66,6 +67,7 @@ export default function ClientDetail() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={st.back}><BackIcon /></Pressable>

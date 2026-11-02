@@ -8,6 +8,7 @@ import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { KIT_FORMS, kitForm } from '../src/lib/kit';
+import Backdrop from '../src/components/Backdrop';
 
 const START = ['This week', 'Within 2 weeks', 'Within a month', 'Just looking'];
 const INVEST = ['Yes', 'Yes, with a payment plan', 'Not right now'];
@@ -81,6 +82,7 @@ export default function Apply() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
           <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>

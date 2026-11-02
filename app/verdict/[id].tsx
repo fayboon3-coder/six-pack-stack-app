@@ -7,6 +7,7 @@ import { C, F } from '../../src/lib/theme';
 import { BackIcon, LockIcon } from '../../src/components/icons';
 import Poster from '../../src/components/Poster';
 import { byId, imageFor, KIND } from '../../src/lib/stackcheck';
+import Backdrop from '../../src/components/Backdrop';
 
 
 /** One verdict. Free users get the verdict and the why; the full breakdown comes with the subscription. */
@@ -22,6 +23,7 @@ export default function VerdictScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 56 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />

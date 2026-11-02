@@ -13,6 +13,7 @@ import { isLocked } from '../src/lib/access';
 import { getStreak } from '../src/lib/streak';
 import RemindersCard from '../src/components/RemindersCard';
 import { FlameIcon, TrophyIcon } from '../src/components/icons';
+import Backdrop from '../src/components/Backdrop';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -118,6 +119,7 @@ export default function Workout() {
   if (finished) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
         <ScrollView contentContainerStyle={{ padding: 24, gap: 16, paddingBottom: 48 }}>
           <View style={st.doneBadge}><CheckIcon color={C.navy} size={30} /></View>
           <Text style={st.doneK}>{(day.t.split('·')[1] || day.t).trim()} done</Text>
@@ -143,6 +145,7 @@ export default function Workout() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       {!!pr && (
         <View style={st.prBanner} accessibilityLiveRegion="polite">
           <TrophyIcon color={C.navy} size={22} />

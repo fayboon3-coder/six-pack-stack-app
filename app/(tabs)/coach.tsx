@@ -7,6 +7,7 @@ import { C, F } from '../../src/lib/theme';
 import { ChevronIcon } from '../../src/components/icons';
 import { useAuth } from '../../src/lib/auth';
 import type { ViewAs } from '../../src/lib/preview';
+import Backdrop from '../../src/components/Backdrop';
 
 type Row = {
   id: string; email: string | null; first_name: string | null; tier: string; start_date: string | null;
@@ -39,6 +40,7 @@ export default function Coach() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}
         refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.white} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />}>
         <Text style={st.kicker}>Coach</Text>

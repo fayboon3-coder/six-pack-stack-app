@@ -9,6 +9,7 @@ import FullHero from '../src/components/FullHero';
 import { BtlCard, CoachingCard } from '../src/components/Offers';
 import { coachingFirst } from '../src/lib/access';
 import { plain } from '../src/lib/program';
+import Backdrop from '../src/components/Backdrop';
 
 const HERO = require('../assets/hero/plan_full.jpg');
 
@@ -38,6 +39,7 @@ export default function Ready() {
   const hot = coachingFirst(profile);
   return (
     <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
         <FullHero image={HERO} pills={[{ text: 'Plan ready', tone: 'green' }, { text: 'Weeks 1–2 free' }]}
           title={`${plan.name}, you're in.`} lede={plain(plan.goal_long)} />

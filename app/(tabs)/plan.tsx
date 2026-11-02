@@ -33,10 +33,10 @@ export default function PlanTab() {
       <View style={{ gap: 16 }}>
         {tab === 'Stack'
           ? <FullHero image={STACK_IMG} pills={[{ text: 'Your stack' }, ...(saved > 0 ? [{ text: `$${saved}/mo saved`, tone: 'green' as const }] : [])]}
-              title="The Stack"
+              title="The| Stack"
               lede={`${(plan.stack || []).length} products that actually work. Everything else got cut.`} />
           : <FullHero image={PLAN_IMG} pills={[{ text: 'Your plan' }, { text: `${plan.kcal} cal · ${plan.protein}g protein`, tone: 'green' }]}
-              title="Eat like this"
+              title="Eat like| this"
               lede="Built only from food you already love. Pick one option per meal and you're on plan." />}
         <Pills items={TABS} value={tab} onChange={setTab} />
       </View>

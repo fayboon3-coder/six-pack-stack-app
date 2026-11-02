@@ -7,6 +7,8 @@ import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { BTL_URL } from '../src/lib/access';
 import { VERDICTS } from '../src/lib/stackcheck';
+import Backdrop from '../src/components/Backdrop';
+import { twoTone } from '../src/components/TwoTone';
 
 const COVER = require('../assets/img/btl_cover.jpg');
 const counts = { worth: 0, situational: 0, skip: 0 } as Record<string, number>;
@@ -27,13 +29,14 @@ export default function Btl() {
   const cw = Math.min(width - 120, 300);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 22, gap: 18, paddingBottom: 56 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <Image source={COVER} style={{ width: cw, height: cw * 1.294, alignSelf: 'center', borderRadius: 6 }} resizeMode="cover" accessibilityLabel="Beyond the Label cover" />
         <Text style={st.k}>Beyond the Label · by Boon Fay</Text>
-        <Text style={st.h}>The truth behind what you're buying.</Text>
+        <Text style={st.h}>{twoTone("The truth behind| what you're buying.")}</Text>
         <Text style={st.body}>I wasted years and a lot of money on supplements that did nothing. This is everything I found when I investigated them properly.</Text>
 
         <View style={st.score}>

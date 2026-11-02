@@ -6,6 +6,8 @@ import { C, F } from '../src/lib/theme';
 import { BackIcon, SearchIcon } from '../src/components/icons';
 import Poster from '../src/components/Poster';
 import { imageFor, KIND, search, Verdict, VERDICTS } from '../src/lib/stackcheck';
+import Backdrop from '../src/components/Backdrop';
+import { twoTone } from '../src/components/TwoTone';
 
 const FILTERS = ['All', 'Worth it', 'Depends', 'Skip it'] as const;
 
@@ -20,6 +22,7 @@ export default function StackCheck() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <FlatList
         data={list}
         keyExtractor={(v) => v.id}
@@ -31,7 +34,7 @@ export default function StackCheck() {
               <BackIcon />
             </Pressable>
             <Text style={st.k}>Stack Check</Text>
-            <Text style={st.h}>Before you buy it, check it.</Text>
+            <Text style={st.h}>{twoTone('Before you buy it,| check it.')}</Text>
             <Text style={st.body}>{VERDICTS.length} products I investigated for Beyond the Label. Type a brand or what it claims to do.</Text>
             <View style={st.search}>
               <SearchIcon color={C.white} />

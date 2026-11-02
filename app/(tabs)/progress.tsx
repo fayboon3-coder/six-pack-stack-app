@@ -10,6 +10,8 @@ import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import { daysToSunday, phaseOf, PHOTO_WEEKS, plain, weekOf } from '../../src/lib/program';
 import type { Checkin } from '../../src/lib/types';
+import Backdrop from '../../src/components/Backdrop';
+import { twoTone } from '../../src/components/TwoTone';
 import {
   BoltIcon, CalendarIcon, CameraIcon, CheckIcon, DumbbellIcon, FlagIcon, ForkIcon, PlayIcon, ScaleIcon, TargetIcon, TrendIcon, TrophyIcon,
 } from '../../src/components/icons';
@@ -90,7 +92,9 @@ export default function Progress() {
   const name = plan.name || profile?.first_name || '';
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: C.navy }} contentContainerStyle={{ paddingBottom: 48 }}>
+    <View style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
+    <ScrollView style={{ flex: 1, backgroundColor: 'transparent' }} contentContainerStyle={{ paddingBottom: 48 }}>
       {/* Hero */}
       <View style={{ width: hw, height: hh, alignSelf: 'center' }}>
         <Image source={HERO} style={{ width: hw, height: hh }} resizeMode="cover" accessibilityIgnoresInvertColors />
@@ -101,7 +105,7 @@ export default function Progress() {
             <View style={st.pill}><Text style={st.pillText}>Week {week} of 12 · {phase.name}</Text></View>
             {PHOTO_WEEKS.includes(week) && <View style={[st.pill, { backgroundColor: C.green }]}><CameraIcon size={12} color={C.navy} /><Text style={[st.pillText, { color: C.navy }]}>Photo week</Text></View>}
           </View>
-          <Text style={st.title} accessibilityRole="header">Your results</Text>
+          <Text style={st.title} accessibilityRole="header">{twoTone('Your| results')}</Text>
           <Text style={st.lede}>{name ? `${name}, every` : 'Every'} Sunday adds a point to your line. Watch the trend, not one morning on the scale.</Text>
         </View>
       </View>
@@ -217,6 +221,7 @@ export default function Progress() {
         ))}
       </View>
     </ScrollView>
+    </View>
   );
 }
 

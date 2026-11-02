@@ -6,6 +6,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../src/lib/theme';
 import type { Want } from '../src/lib/lead';
 import { BTL_URL, COACHING_URL } from '../src/lib/access';
+import Backdrop from '../src/components/Backdrop';
+import { twoTone } from '../src/components/TwoTone';
 
 const PLAN = require('../assets/img/tile_plan.jpg');
 const APP = require('../assets/img/cover_program.jpg');
@@ -31,6 +33,7 @@ export default function Welcome() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 48, gap: 14 }}>
         <View style={st.brand}>
           <Image source={LOGO} style={{ width: 36, height: 36 }} />
@@ -38,7 +41,7 @@ export default function Welcome() {
         </View>
         <View style={{ gap: 10, marginTop: 18, marginBottom: 8 }}>
           <Text style={st.kicker}>Build the body. Skip the BS.</Text>
-          <Text style={st.h} accessibilityRole="header">What are you here for?</Text>
+          <Text style={st.h} accessibilityRole="header">{twoTone('What are you|\nhere for?')}</Text>
           <Text style={st.sub}>Pick one to start. The others are always here.</Text>
         </View>
         {PATHS.map((p, i) => (

@@ -42,7 +42,7 @@ export default function Train() {
   return (
     <Screen header={
       <View style={{ gap: 18 }}>
-        <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This week"
+        <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This| week"
           subtitle={`${doneCount} of ${plan.train.d.length} workouts done`} week={week} />
 
         {/* Week strip: every day at a glance */}

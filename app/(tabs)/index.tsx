@@ -19,6 +19,7 @@ import { LockedWeek } from '../../src/components/Offers';
 import StackCheckCard from '../../src/components/StackCheckCard';
 import { getStreak } from '../../src/lib/streak';
 import { FlameIcon } from '../../src/components/icons';
+import Backdrop from '../../src/components/Backdrop';
 
 
 export default function Today() {
@@ -68,11 +69,12 @@ export default function Today() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <ScrollView contentContainerStyle={{ paddingBottom: 48 }}
         refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.white}
           onRefresh={async () => { setRefreshing(true); await refresh(); await load(); setRefreshing(false); }} />}>
 
-        <PageHeader kicker={`Week ${week} of 12 · ${phase.name}`} title={`${greet}, ${plan.name}`} week={week} />
+        <PageHeader kicker={`Week ${week} of 12 · ${phase.name}`} title={`${greet}, |${plan.name}`} week={week} />
         {!!streak && streak.workouts > 0 && (
           <View style={st.streak} accessibilityLabel={`${streak.weeks} week streak, ${streak.workouts} workouts logged`}>
             <FlameIcon size={18} />

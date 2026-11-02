@@ -12,6 +12,7 @@ import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '..
 import { kitTag } from '../src/lib/kit';
 import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
+import Backdrop from '../src/components/Backdrop';
 
 const BOON = require('../assets/hero/boon_jacked.jpg');
 
@@ -86,6 +87,7 @@ export default function QuizScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={st.top}>
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={back} hitSlop={10} style={st.back}><BackIcon /></Pressable>

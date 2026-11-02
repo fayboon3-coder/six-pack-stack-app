@@ -15,6 +15,8 @@ import {
 import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
 import { isCoached } from '../src/lib/access';
 import { isPreviewing } from '../src/lib/preview';
+import Backdrop from '../src/components/Backdrop';
+import { twoTone } from '../src/components/TwoTone';
 
 const HERO = require('../assets/hero/checkin.jpg');
 type Angle = 'front' | 'side' | 'back';
@@ -166,6 +168,7 @@ export default function CheckinScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
           {/* Hero photo */}
@@ -181,7 +184,7 @@ export default function CheckinScreen() {
                 <View style={st.pill}><Text style={st.pillText}>Week {week} of 12</Text></View>
                 {photoWeek && <View style={[st.pill, { backgroundColor: C.green }]}><CameraIcon size={12} color={C.navy} /><Text style={[st.pillText, { color: C.navy }]}>Photo week</Text></View>}
               </View>
-              <Text style={st.title} accessibilityRole="header">Sunday Check-in</Text>
+              <Text style={st.title} accessibilityRole="header">{twoTone('Sunday| Check-in')}</Text>
               <Text style={st.lede}>{name ? `${name}, this` : 'This'} takes 2 minutes. {!isCoached(profile) ? 'Your numbers build your trend on the Progress tab, so you can see exactly what is working.' : 'I read every answer myself and send your adjustments within 24 hours.'}</Text>
             </View>
           </View>

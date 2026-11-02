@@ -8,6 +8,7 @@ import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { captureLead, readLead, Want } from '../src/lib/lead';
+import Backdrop from '../src/components/Backdrop';
 
 const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next: string }> = {
   plan: { k: 'The Free Stack · 2 weeks free', h: 'Where should I send your plan?', sub: 'Next: a 2-minute quiz, then your plan is built from your answers.', cta: 'Build my plan', next: '/quiz' },
@@ -47,6 +48,7 @@ export default function LeadScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 22, gap: 16, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, ImageSourcePropType, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../lib/theme';
+import { twoTone } from './TwoTone';
 
 /** Edge-to-edge photo with pills, a big title and one line under it (Check-in / Results style). */
 export default function FullHero({ image, pills, title, lede, ratio = 0.92 }: {
@@ -25,7 +26,7 @@ export default function FullHero({ image, pills, title, lede, ratio = 0.92 }: {
             ))}
           </View>
         )}
-        <Text style={st.title} accessibilityRole="header">{title}</Text>
+        <Text style={st.title} accessibilityRole="header">{twoTone(title)}</Text>
         {!!lede && <Text style={st.lede}>{lede}</Text>}
       </View>
     </View>
