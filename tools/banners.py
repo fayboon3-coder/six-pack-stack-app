@@ -117,7 +117,7 @@ d.text((ax+146,240),'175',font=fb9,fill=RED)
 f8=ImageFont.truetype(F8,44); d.text((92,420),'LBS. NO SHORTCUTS.',font=f8,fill=WHITE)
 chip(im,'NO SPONSORS',90+140,550,NAVY2,size=26)
 chip(im,'NO AFFILIATE LINKS',90+140+300,550,NAVY2,size=26)
-im.convert('RGB').save(A+'hero/boon_wide.jpg',quality=90)
+im.convert('RGB').save(A+'hero/boon_quiz.jpg',quality=90)
 
 fs=['stack_full','plan_full','progress_full']
 ims=[Image.open(A+'hero/'+f+'.jpg').resize((400,368)) for f in fs]+[Image.open(A+'hero/boon_wide.jpg').resize((654,368))]
