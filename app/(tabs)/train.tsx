@@ -53,7 +53,7 @@ export default function Train() {
                 accessibilityLabel={k >= 0 ? `${d}: ${metas[k].type}${isDone ? ', done' : ''}` : `${d}: rest day`} style={st.weekDay}>
                 <Text style={[st.weekLabel, i === todayDow && { color: C.red2 }]}>{d}</Text>
                 <View style={[st.weekDot, k < 0 && st.rest, isNext && { backgroundColor: C.red, borderColor: C.red }, isDone && { backgroundColor: C.green, borderColor: C.green }]}>
-                  {isDone ? <CheckIcon size={13} /> : k >= 0 ? <Text style={st.weekType}>{metas[k].type.split(/\s|\+/)[0].slice(0, 3).toUpperCase()}</Text> : <Text style={st.restText}>–</Text>}
+                  {isDone ? <CheckIcon size={13} /> : k >= 0 ? <Text style={st.weekType}>{metas[k].type.split(/\s|\+/)[0].slice(0, 5).toUpperCase()}</Text> : <Text style={st.restText}>–</Text>}
                 </View>
               </Pressable>
             );
@@ -123,7 +123,7 @@ const st = StyleSheet.create({
   weekDot: { width: 42, height: 42, borderRadius: 21, borderWidth: 2, borderColor: C.line, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center' },
   rest: { backgroundColor: 'transparent', borderStyle: 'dashed' },
   restText: { fontFamily: F.bold, fontSize: 14, color: C.white },
-  weekType: { fontFamily: F.black, fontSize: 10, color: C.white, letterSpacing: 0.3 },
+  weekType: { fontFamily: F.black, fontSize: 9, color: C.white, letterSpacing: 0.3 },
   listTitle: { fontFamily: F.black, fontSize: 21, color: C.white, marginTop: 8 },
   card: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 12 },
   cardNext: { borderColor: C.red, borderWidth: 2 },
