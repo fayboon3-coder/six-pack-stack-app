@@ -69,6 +69,7 @@ export default function Boon() {
       </Text>
       <View style={{ marginTop: 8, gap: 8 }}>
         <Text style={st.sub}>Signed in as {profile?.email || session?.user.email}</Text>
+        <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium' }]}>App update: Nov 1 · free plan + quiz</Text>
         <Button title="Sign out" variant="ghost" onPress={signOut} />
       </View>
     </Screen>

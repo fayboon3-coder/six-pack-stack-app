@@ -11,7 +11,7 @@ import { AuthProvider, useAuth } from '../src/lib/auth';
 import { C } from '../src/lib/theme';
 
 function Gate() {
-  const { session, loading } = useAuth();
+  const { session, loading, profile } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -20,8 +20,8 @@ function Gate() {
     const seg = segments[0] as string | undefined;
     const open = ['sign-in', 'auth', 'welcome', 'quiz'].includes(seg || '');
     if (!session && !open) router.replace('/welcome');
-    if (session && (seg === 'sign-in' || seg === 'welcome')) router.replace('/');
-  }, [session, loading, segments, router]);
+    if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) router.replace('/');
+  }, [session, loading, segments, router, profile]);
 
   if (loading) {
     return (

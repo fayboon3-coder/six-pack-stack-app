@@ -41,6 +41,18 @@ export default function Coach() {
         <Text style={st.title}>{due ? `${due} check-in${due > 1 ? 's' : ''} to review` : 'All caught up'}</Text>
         <Text style={st.sub}>{coached.length} coaching client{coached.length === 1 ? '' : 's'} · {rows.length} in the app</Text>
 
+        <View style={st.preview}>
+          <Text style={st.section}>See what new people see</Text>
+          <Text style={st.meta}>Preview only. Nothing gets saved or sent to Kit.</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {[['Welcome', '/welcome'], ['Quiz', '/quiz'], ['Unlock screen', '/unlock'], ['Application', '/apply']].map(([l, h]) => (
+              <Pressable key={h} accessibilityRole="button" onPress={() => router.push(h as any)} style={st.pbtn}>
+                <Text style={st.pbtnText}>{l}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
         {rows.map((r) => (
           <Pressable key={r.id} accessibilityRole="button" onPress={() => router.push({ pathname: '/client/[id]', params: { id: r.id } })}
             style={[st.row, r.needs_review && { borderColor: C.red, borderWidth: 2 }]}>
@@ -76,6 +88,9 @@ export default function Coach() {
 }
 
 const st = StyleSheet.create({
+  preview: { borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 14, gap: 8 },
+  pbtn: { minHeight: 44, borderRadius: 999, backgroundColor: C.red, paddingHorizontal: 16, justifyContent: 'center' },
+  pbtnText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase', letterSpacing: 0.5 },
   kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2, marginTop: 10 },
   title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white },
   sub: { fontFamily: F.semi, fontSize: 14, color: C.white },

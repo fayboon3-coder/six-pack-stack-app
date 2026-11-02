@@ -10,6 +10,7 @@ import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '../src/lib/quiz';
 import { kitTag } from '../src/lib/kit';
+import { useAuth } from '../src/lib/auth';
 
 const BOON = require('../assets/hero/boon_full.jpg');
 
@@ -283,8 +284,12 @@ function AccountStep({ a, set, onDone }: { a: Quiz; set: (k: keyof Quiz, v: any)
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [note, setNote] = useState('');
+  const { profile } = useAuth();
+  const router = useRouter();
   const submit = async () => {
     setErr(''); setNote('');
+    // Boon previewing from the Coach tab: show what's next without creating anything.
+    if (profile?.role === 'coach') return router.replace('/unlock');
     const email = a.email.trim().toLowerCase();
     if (a.first_name.trim().length < 2) return setErr('Add your first name.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErr('Enter a valid email.');
