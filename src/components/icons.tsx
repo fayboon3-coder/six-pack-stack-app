@@ -40,3 +40,21 @@ export const LockIcon = ({ color = '#fff', size = 18 }: P) => (
 export const DotIcon = ({ color = '#e2433b', size = 8 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 8 8"><Circle cx={4} cy={4} r={4} fill={color} /></Svg>
 );
+export const ClockIcon = ({ color = '#fff', size = 16 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={9} {...base(color)} /><Path d="M12 7v5l3 2" {...base(color)} /></Svg>
+);
+export const DumbbellIcon = ({ color = '#fff', size = 16 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11" {...base(color)} strokeWidth={2.4} /></Svg>
+);
+export const LayersIcon = ({ color = '#fff', size = 16 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M12 3l9 5-9 5-9-5z" {...base(color)} /><Path d="M3 13l9 5 9-5" {...base(color)} /></Svg>
+);
+export const TargetIcon = ({ color = '#fff', size = 16 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={9} {...base(color)} /><Circle cx={12} cy={12} r={5} {...base(color)} /><Circle cx={12} cy={12} r={1.5} fill={color} /></Svg>
+);
+export const NoteIcon = ({ color = '#fff', size = 14 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={9} {...base(color)} /><Path d="M12 11v5M12 8h.01" {...base(color)} strokeWidth={2.6} /></Svg>
+);
+export const ChevronIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M9 6l6 6-6 6" {...base(color)} strokeWidth={2.4} /></Svg>
+);

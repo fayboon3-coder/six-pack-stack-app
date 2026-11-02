@@ -3,6 +3,7 @@ import { Image, KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth';
+import { thumb } from '../src/lib/workoutMeta';
 import { C, F } from '../src/lib/theme';
 import { Button, s as ui } from '../src/components/ui';
 import { BackIcon, CheckIcon, PlayIcon } from '../src/components/icons';
@@ -98,7 +99,7 @@ export default function Workout() {
           {!!info?.video && (
             <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${info.name}`} style={st.video}
               onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
-              <Image source={{ uri: `https://i.ytimg.com/vi/${info.video}/hqdefault.jpg` }} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
+              <Image source={thumb(info.video, 'hq')} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
               <View style={st.shade} />
               <View style={st.play}><PlayIcon size={22} /></View>
               <Text style={[ui.label, st.videoLabel]}>Watch form video</Text>

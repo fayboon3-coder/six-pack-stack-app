@@ -8,13 +8,13 @@ import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import Poster from '../../src/components/Poster';
 import PageHeader from '../../src/components/PageHeader';
-import HeroCard from '../../src/components/HeroCard';
+import WorkoutPreview from '../../src/components/WorkoutPreview';
+import { dayMeta } from '../../src/lib/workoutMeta';
 import { CheckIcon } from '../../src/components/icons';
 import { daysToSunday, exercises, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { flushQueue, isoDate, loggedDays } from '../../src/lib/logs';
 import { productImage } from '../../src/lib/images';
 
-const HERO_IMG = require('../../assets/hero/today.jpg');
 
 export default function Today() {
   const { profile, plan, session, refresh } = useAuth();
@@ -78,11 +78,9 @@ export default function Today() {
           </Pressable>
         )}
 
-        <HeroCard
-          image={HERO_IMG}
-          badge={doneToday ? 'Done today ✓' : isToday ? "Today's workout" : `Next workout · ${dayName}`}
-          title={dayType || dayName}
-          subtitle={`${day.x.length} exercises · about 45 min · starts with ${exercises[day.x[0][0]]?.name || day.x[0][0]}`}
+        <WorkoutPreview
+          meta={dayMeta(day)}
+          badge={doneToday ? 'Done today ✓' : isToday ? "Today's workout" : `Next up · ${dayName}`}
           cta={doneToday ? 'Review workout' : isToday ? 'Start workout' : 'Preview workout'}
           onPress={() => router.push({ pathname: '/workout', params: { d: String(index) } })}
         />
