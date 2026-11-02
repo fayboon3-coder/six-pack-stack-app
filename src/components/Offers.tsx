@@ -53,7 +53,7 @@ export function CoachingCard() {
 export function BtlCard() {
   return (
     <View style={[st.card, { padding: 0, overflow: 'hidden' }]}>
-      <Image source={BTL_IMG} style={{ width: '100%', height: 150 }} resizeMode="cover" accessibilityIgnoresInvertColors />
+      <Image source={BTL_IMG} style={{ width: '100%', aspectRatio: 1200 / 1104 }} resizeMode="cover" accessibilityIgnoresInvertColors />
       <View style={{ padding: 18, gap: 10 }}>
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>

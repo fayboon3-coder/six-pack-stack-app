@@ -14,7 +14,7 @@ import { isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 
 const HERO_IMG = require('../../assets/hero/boon.jpg');
-const FACE_IMG = require('../../assets/hero/boon_full.jpg');
+const FACE_IMG = require('../../assets/hero/boon_ba.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -36,7 +36,7 @@ export default function Boon() {
       <View style={{ gap: 18 }}>
         <PageHeader kicker="Your coach" title="Boon" subtitle="I went from 225 to 175 lbs after wasting years on supplements that did nothing. Now I do for you what I wish someone did for me." right={<View />} />
         {free ? (
-          <HeroCard image={FACE_IMG} imageRatio={1200 / 640} badge="1:1 coaching" title="Want me in your corner?"
+          <HeroCard image={FACE_IMG} imageRatio={16 / 9} title="Want me in your corner?"
             subtitle="I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp." cta="Apply for coaching"
             onPress={() => router.push('/apply')} />
         ) : (
