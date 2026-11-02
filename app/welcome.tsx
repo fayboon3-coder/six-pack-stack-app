@@ -43,8 +43,8 @@ export default function Welcome() {
         </View>
         <View style={{ gap: 10, marginTop: 18, marginBottom: 8 }}>
           <Text style={st.kicker}>Your body. Your plan.</Text>
-          <Text style={st.h} accessibilityRole="header">{twoTone('Get your|\npersonalized\nprogram.')}</Text>
-          <Text style={st.sub}>Which service are you here for? Pick one below. You can always come back for the others.</Text>
+          <Text style={st.h} accessibilityRole="header">{twoTone('Which service\nare you|\nhere for?')}</Text>
+          <Text style={st.sub}>Get your free personalized program right{'\u00A0'}now.</Text>
         </View>
         {PATHS.map((p, i) => (
           <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
