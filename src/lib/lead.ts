@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { KIT_FORMS, kitForm, kitTag } from './kit';
+import { kitTag } from './kit';
 
 export type Want = 'plan' | 'btl' | 'sub' | 'coaching';
 export type Lead = { first_name: string; email: string; want: Want; src?: string };
@@ -11,12 +11,11 @@ export const readLead = async (): Promise<Lead | null> => {
 
 /**
  * Someone picked a path on the welcome screen and gave their email.
- * They join the Fad Free list (Boon's existing welcome + nurture emails, which sell
- * Beyond the Label and coaching) and get tagged with what they picked.
+ * The app-lead tag starts Kit's "App Lead → Nurture (24) → Beyond the Label" automation:
+ * the 24 coaching emails first, then the Beyond the Label emails.
  */
 export async function captureLead(l: Lead) {
   await AsyncStorage.setItem(KEY, JSON.stringify(l));
   const source = l.src ? `app:${l.src}` : 'app';
-  await kitForm(KIT_FORMS.guide, l.email, l.first_name, { lead_source: source, app_tier: 'lead' });
-  await kitTag(l.email, l.first_name, ['app-lead', 'src-app', `app-want-${l.want}`], { lead_source: source });
+  await kitTag(l.email, l.first_name, ['app-lead', 'src-app', `app-want-${l.want}`], { lead_source: source, app_tier: 'lead' });
 }

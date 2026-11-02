@@ -57,10 +57,6 @@ export default function LeadScreen() {
             style={st.input} autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
           <TextInput accessibilityLabel="Email" value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#ffffff77"
             style={st.input} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" returnKeyType="go" onSubmitEditing={go} />
-          <View style={st.bonus}>
-            <View style={st.tick}><CheckIcon size={12} /></View>
-            <Text style={st.bonusText}>Plus my free Fad Free guide in your inbox right now.</Text>
-          </View>
           {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
           <Button title={c.cta} onPress={go} loading={busy} />
           <Text style={st.fine}>I'll email you tips and offers. Unsubscribe anytime. No spam, no selling your email.</Text>
