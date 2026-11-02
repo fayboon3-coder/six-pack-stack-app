@@ -15,7 +15,7 @@ import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Of
 import RemindersCard from '../../src/components/RemindersCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
 
-const FACE_IMG = require('../../assets/hero/boon_jacked.jpg');
+const FACE_IMG = require('../../assets/hero/boon_wide.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 

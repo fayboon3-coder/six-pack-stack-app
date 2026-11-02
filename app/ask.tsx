@@ -12,7 +12,7 @@ import { WHATSAPP } from '../src/components/NoPlan';
 import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import { isCoached, isFree } from '../src/lib/access';
 
-const LOGO = require('../assets/logo-b.png');
+const FACE = require('../assets/hero/boon_avatar.jpg');
 
 /** Ask Boon: an AI chat trained on Boon's method, this person's plan and his product verdicts. */
 export default function Ask() {
@@ -67,7 +67,7 @@ export default function Ask() {
       <Backdrop />
       <View style={st.top}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12} style={st.back}><BackIcon /></Pressable>
-        <Image source={LOGO} style={st.avatar} />
+        <Image source={FACE} style={st.avatar} />
         <View style={{ flex: 1 }}>
           <Text style={st.topT}>{twoTone('Ask| Boon')}</Text>
           <Text style={st.topS}>AI coach · knows your plan</Text>
@@ -138,7 +138,7 @@ function Bubble({ role, content }: { role: 'user' | 'assistant'; content: string
   const me = role === 'user';
   return (
     <View style={[st.row, me && { justifyContent: 'flex-end' }]}>
-      {!me && <Image source={LOGO} style={st.mini} />}
+      {!me && <Image source={FACE} style={st.mini} />}
       <View style={[st.bubble, me ? st.me : st.ai]}>
         <Rich text={content} style={[st.msg, me && { color: C.white }]} />
       </View>
@@ -160,7 +160,7 @@ function Typing() {
   }, []);
   return (
     <View style={st.row} accessibilityLabel="Boon AI is typing">
-      <Image source={LOGO} style={st.mini} />
+      <Image source={FACE} style={st.mini} />
       <View style={[st.bubble, st.ai, { flexDirection: 'row', gap: 6, paddingVertical: 16 }]}>
         {dots.map((d, i) => <Animated.View key={i} style={[st.dot, { opacity: d, transform: [{ scale: d }] }]} />)}
       </View>
@@ -171,12 +171,12 @@ function Typing() {
 const st = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   back: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 40, height: 40, borderRadius: 11 },
+  avatar: { width: 40, height: 40, borderRadius: 20 },
   topT: { fontFamily: F.black, fontSize: 20, color: C.white },
   topS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 1 },
   list: { padding: 16, gap: 12, paddingBottom: 24 },
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  mini: { width: 26, height: 26, borderRadius: 7 },
+  mini: { width: 26, height: 26, borderRadius: 13 },
   bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 11 },
   ai: { backgroundColor: 'rgba(20,38,69,0.92)', borderWidth: 1, borderColor: C.line, borderBottomLeftRadius: 6 },
   me: { backgroundColor: C.red, borderBottomRightRadius: 6 },
