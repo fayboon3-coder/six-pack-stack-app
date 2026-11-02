@@ -13,6 +13,11 @@ export const KIT_TAGS: Record<string, string> = {
   'app-want-btl': '25303712',
   'app-want-coaching': '25303713',
   'app-want-sub': '25303949',
+  // Payment stages (phase 3: RevenueCat events apply these; each starts its own Kit sequence)
+  'trial-started': '25304554',
+  'trial-lapsed': '25304555',
+  'sub-active': '25304556',
+  'sub-cancelled': '25304557',
 };
 
 type Fields = Record<string, string>;
