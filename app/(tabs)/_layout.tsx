@@ -1,9 +1,12 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { C, F } from '../../src/lib/theme';
-import { HomeIcon, TrainIcon, PlanIcon, ProgressIcon, ChatIcon } from '../../src/components/icons';
+import { HomeIcon, TrainIcon, PlanIcon, ProgressIcon, ChatIcon, TargetIcon } from '../../src/components/icons';
+import { useAuth } from '../../src/lib/auth';
 
 export default function TabsLayout() {
+  const { profile } = useAuth();
+  const coach = profile?.role === 'coach';
   return (
     <Tabs
       screenOptions={{
@@ -20,6 +23,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="plan" options={{ title: 'Plan', tabBarIcon: ({ color }) => <PlanIcon color={String(color)} /> }} />
       <Tabs.Screen name="progress" options={{ title: 'Progress', tabBarIcon: ({ color }) => <ProgressIcon color={String(color)} /> }} />
       <Tabs.Screen name="boon" options={{ title: 'Boon', tabBarIcon: ({ color }) => <ChatIcon color={String(color)} /> }} />
+      <Tabs.Screen name="coach" options={{ title: 'Coach', href: coach ? undefined : null, tabBarIcon: ({ color }) => <TargetIcon color={String(color)} size={22} /> }} />
     </Tabs>
   );
 }
