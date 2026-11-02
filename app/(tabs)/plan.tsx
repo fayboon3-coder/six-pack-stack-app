@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { isCoached } from '../../src/lib/access';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
 import { Body, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
@@ -37,7 +38,7 @@ export default function PlanTab() {
               lede={`${(plan.stack || []).length} products that actually work. Everything else got cut.`} />
           : <FullHero image={PLAN_IMG} pills={[{ text: 'Your plan' }, { text: `${plan.kcal} cal · ${plan.protein}g protein`, tone: 'green' }]}
               title="Eat like| this"
-              lede="Built only from food you already love. Pick one option per meal and you're on plan." />}
+              lede={isCoached(profile) || profile?.role === 'coach' ? "Built only from food you already love. Pick one option per meal and you're on plan." : "Every option is sized to your calories and protein. Pick one per meal and you're on plan."} />}
         <Pills items={TABS} value={tab} onChange={setTab} />
       </View>
     }>
