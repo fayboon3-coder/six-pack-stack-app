@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { readHandoff } from '../src/lib/handoff';
 import * as Linking from 'expo-linking';
 import { COACHING_URL } from '../src/lib/access';
 import { C, F } from '../src/lib/theme';
@@ -30,7 +31,10 @@ export default function LeadScreen() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    readLead().then((l) => { if (l) { setName(l.first_name); setEmail(l.email); } });
+    readLead().then((l) => {
+      if (l) { setName(l.first_name); setEmail(l.email); return; }
+      const h = readHandoff(); if (h?.email) setEmail(h.email); // came from the Stack Score
+    });
     Linking.getInitialURL().then((u) => { const s = u ? Linking.parse(u).queryParams?.src : undefined; if (s) setSrc(String(s).slice(0, 80)); }).catch(() => {});
   }, []);
 

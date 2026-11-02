@@ -35,6 +35,8 @@ export type Plan = {
   phase3?: string;
   injury_note?: string;
   train: { n: string; s: string; e: number; note?: string; d: TrainDay[] };
+  /** Weeks whose check-in already re-set the numbers (The Full Stack: 4 and 8). */
+  resets?: number[];
 };
 
 export type Checkin = {

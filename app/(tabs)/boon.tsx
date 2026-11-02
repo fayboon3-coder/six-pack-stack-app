@@ -10,7 +10,7 @@ import { WHATSAPP } from '../../src/components/NoPlan';
 import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 import { useRouter } from 'expo-router';
-import { COACHING_URL, isCoached, isFree } from '../../src/lib/access';
+import { COACHING_URL, isCoached, isFree, PRIVACY_URL, TERMS_URL } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
@@ -88,12 +88,18 @@ export default function Boon() {
       <View style={{ marginTop: 8, gap: 8 }}>
         <Text style={st.sub}>Signed in as {profile?.email || session?.user.email}</Text>
         <Button title="Sign out" variant="ghost" onPress={signOut} />
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 18, flexWrap: 'wrap', marginTop: 4 }}>
+          <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={st.legal}>Terms</Text>
+          <Text accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} style={st.legal}>Privacy</Text>
+          {profile?.role !== 'coach' && <Text accessibilityRole="link" onPress={() => router.push('/delete-account')} style={st.legal}>Delete my account</Text>}
+        </View>
       </View>
     </Screen>
   );
 }
 
 const st = StyleSheet.create({
+  legal: { fontFamily: F.bold, fontSize: 13, color: C.white, textDecorationLine: 'underline', paddingVertical: 6 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   avatarText: { fontFamily: F.black, fontSize: 20, color: C.white },

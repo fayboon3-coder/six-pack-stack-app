@@ -9,6 +9,8 @@ export const isCoached = (p?: Profile | null) => !!p && p.role === 'client' && p
 export const isSubscriber = (p?: Profile | null) => !!p && p.role === 'client' && p.tier === 'self';
 export const isLocked = (p: Profile | null | undefined, week: number) => isFree(p) && week > FREE_WEEKS;
 
+export const TERMS_URL = 'https://six-pack-stack.vercel.app/terms';
+export const PRIVACY_URL = 'https://six-pack-stack.vercel.app/privacy';
 export const BTL_URL = 'https://boon-fay.kit.com/a9cb0690c3';
 /** Six-Pack Stack 1:1 coaching landing page (its Apply button goes to the same application form). */
 export const COACHING_URL = 'https://six-pack-stack.vercel.app/?src=app';

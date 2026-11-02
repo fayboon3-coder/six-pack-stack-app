@@ -15,6 +15,7 @@ import {
 import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
 import { isCoached } from '../src/lib/access';
 import { isPreviewing } from '../src/lib/preview';
+import { autoReset, RESET_WEEKS } from '../src/lib/reset';
 import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { twoTone } from '../src/components/TwoTone';
@@ -103,7 +104,7 @@ function Note({ icon, label, value, onChange, placeholder }: {
 }
 
 export default function CheckinScreen() {
-  const { plan, session, profile } = useAuth();
+  const { plan, session, profile, refresh } = useAuth();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const week = weekOf(plan?.train.s);
@@ -125,6 +126,7 @@ export default function CheckinScreen() {
   const [photos, setPhotos] = useState<Partial<Record<Angle, string>>>({});
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [newNums, setNewNums] = useState<{ kcal: string; protein: string; before: string } | null>(null);
 
   const done = {
     numbers: !!weight,
@@ -161,11 +163,17 @@ export default function CheckinScreen() {
       const up = await supabase.storage.from('progress-photos').upload(path, body, { contentType: 'image/jpeg' });
       if (!up.error) await supabase.from('photos').insert({ user_id: uid, checkin_id: data.id, angle, path });
     }
+    if (plan && profile) {
+      const r = await autoReset(uid, profile, plan, week, Number(weight)).catch(() => null);
+      if (r) { setNewNums(r); await refresh(); }
+    }
     setSaved(true);
   };
   const finish = () => {
     setBusy(false);
-    Alert.alert('Got it. Nice work this week.', isCoached(profile) ? 'I\'ll go through everything and send your adjustments within 24 hours.' : 'Your numbers are saved. Check the trend on your Progress tab.');
+    Alert.alert('Got it. Nice work this week.', isCoached(profile) ? 'I\'ll go through everything and send your adjustments within 24 hours.'
+      : newNums ? `Week ${week} re-set: your new numbers are ${newNums.kcal} calories and ${newNums.protein} g of protein a day (were ${newNums.before}). Your meals are updated.`
+      : 'Your numbers are saved. Check the trend on your Progress tab.');
     router.back();
   };
 
@@ -264,6 +272,7 @@ export default function CheckinScreen() {
             'Saving your numbers',
             ...(Object.keys(photos).length ? ['Uploading your progress photos'] : []),
             isCoached(profile) ? 'Sending it to Boon' : 'Updating your weight trend',
+            ...(profile?.tier === 'self' && RESET_WEEKS.includes(week) ? [`Re-setting your calories for week ${week + 1}`] : []),
           ]}
           stepMs={550}
           done={saved}

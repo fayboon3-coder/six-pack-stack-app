@@ -10,6 +10,8 @@ import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '../src/lib/quiz';
 import { kitTag } from '../src/lib/kit';
+import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
+import { quizFromHandoff, readHandoff } from '../src/lib/handoff';
 import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
 import Backdrop from '../src/components/Backdrop';
@@ -55,7 +57,8 @@ export default function QuizScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ src?: string; name?: string; email?: string }>();
   const [i, setI] = useState(0);
-  const [a, setA] = useState<Quiz>(EMPTY);
+  // Answers already given in the Stack Score (web) come pre-selected. They can still change them.
+  const [a, setA] = useState<Quiz>(() => { const { email, ...pre } = quizFromHandoff(readHandoff()); return { ...EMPTY, ...pre }; });
   const [err, setErr] = useState('');
   const step = STEPS[i];
   const asked = STEPS.filter((s) => !['spend', 'story', 'chart'].includes(s.kind)).length;
@@ -338,7 +341,9 @@ function AccountStep({ a, set, onDone }: { a: Quiz; set: (k: keyof Quiz, v: any)
       {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
       {!!note && <Text style={st.note} accessibilityLiveRegion="polite">{note}</Text>}
       <Button title="Show me my plan" onPress={submit} loading={busy} />
-      <Text style={st.fine}>By continuing you agree to the Terms and Privacy Policy. I'll email you your plan and tips. Unsubscribe anytime.</Text>
+      <Text style={st.fine}>By continuing you agree to the{' '}
+        <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ textDecorationLine: 'underline' }}>Terms</Text> and{' '}
+        <Text accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} style={{ textDecorationLine: 'underline' }}>Privacy Policy</Text>. I'll email you your plan and tips. Unsubscribe anytime.</Text>
     </>
   );
 }
