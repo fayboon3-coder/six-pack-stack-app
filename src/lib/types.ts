@@ -24,7 +24,7 @@ export type Plan = {
   after?: number;
   audit?: { product: string; cost: number; verdict: string; why: string; instead?: string }[];
   stack?: { product: string; why: string; dose: string; when: string; cost: string; buy?: string; buy_text?: string }[];
-  meals?: { slot: string; target: string; options: { name: string; detail: string; kcal: string; protein: string }[] }[];
+  meals?: { slot: string; target: string; options: { name: string; detail: string; kcal: string; protein: string; ids?: string[] }[] }[];
   meal_note?: string;
   rules?: string[];
   eat_out?: { where: string; order: string; kcal: string; protein: string }[];

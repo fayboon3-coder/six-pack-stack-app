@@ -9,7 +9,10 @@ import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '../src/lib/quiz';
-import { FOODS, SPOTS } from '../src/lib/menu';
+import { SPOTS } from '../src/lib/menu';
+import FoodPicker from '../src/components/FoodPicker';
+import { whatsMissing } from '../src/lib/mealplan';
+import { foodById, type Food } from '../src/data/foods';
 import { kitTag } from '../src/lib/kit';
 import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
 import { quizFromHandoff, readHandoff } from '../src/lib/handoff';
@@ -24,7 +27,7 @@ type Step =
   | { id: 'tried' | 'likes' | 'spots'; kind: 'multi'; q: string; sub?: string; opts: readonly string[]; none?: string; min?: number }
   | { id: keyof Quiz; kind: 'num'; q: string; sub?: string; unit: string; min: number; max: number; ph: string }
   | { id: 'height'; kind: 'height'; q: string }
-  | { id: string; kind: 'spend' | 'story' | 'chart' | 'account' };
+  | { id: string; kind: 'spend' | 'story' | 'chart' | 'account' | 'foods' };
 
 const STEPS: Step[] = [
   { id: 'goal', kind: 'one', q: "What's your main goal?", opts: GOALS },
@@ -40,7 +43,7 @@ const STEPS: Step[] = [
   { id: 'monthly_spend', kind: 'one', q: 'About how much do you spend on supplements a month?', opts: ['Under $50', '$50–$100', '$100–$200', '$200+'] },
   { id: 'spend', kind: 'spend' },
   { id: 'eat_out', kind: 'one', q: 'How often do you eat out or order in?', opts: ['Rarely', '1–3 times a week', '4+ times a week'] },
-  { id: 'likes', kind: 'multi', q: 'Which of these would you happily eat every week?', sub: 'Pick at least 3. Your meals are built from these.', opts: FOODS, min: 3 },
+  { id: 'foods', kind: 'foods' },
   { id: 'spots', kind: 'multi', q: 'Where do you usually grab food?', sub: "Pick all that apply. You'll get the best order at each one.", opts: [...SPOTS, 'None of these'], none: 'None of these' },
   { id: 'struggle', kind: 'one', q: "What's been the hardest part so far?", opts: ['Cravings and snacking', 'Weekends', 'No time', "Not knowing what to eat", 'Staying consistent'] },
   { id: 'story', kind: 'story' },
@@ -52,7 +55,7 @@ const STEPS: Step[] = [
 
 const EMPTY: Quiz = {
   goal: '', sex: '', age: '', height_ft: '', height_in: '', weight: '', goal_weight: '', where_train: '', days: '',
-  experience: '', tried: [], likes: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
+  experience: '', tried: [], likes: [], foods: [], custom_foods: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
   first_name: '', email: '',
 };
 
@@ -171,6 +174,20 @@ export default function QuizScreen() {
               <Button title="Next" onPress={() => {
                 const ft = Number(a.height_ft), inch = Number(a.height_in || 0);
                 if (!ft || ft < 4 || ft > 7 || inch < 0 || inch > 11) return setErr('Enter feet (4–7) and inches (0–11).');
+                next();
+              }} />
+            </>
+          )}
+
+          {step.kind === 'foods' && (
+            <>
+              <Q q="Add every food you'd happily eat." sub="Your meal plan is built only from these, with portions sized to hit your calories and protein. The more you add, the more options you get." />
+              <FoodPicker ids={a.foods || []} custom={a.custom_foods || []} onChange={(ids, custom) => { set('foods', ids); set('custom_foods', custom); }} />
+              {!!err && <Text style={st.err}>{err}</Text>}
+              <Button title="Next" onPress={() => {
+                const chosen = (a.foods || []).map((id) => (a.custom_foods || []).find((f: Food) => f.id === id) || foodById(id)).filter(Boolean) as Food[];
+                const miss = whatsMissing(chosen);
+                if (miss.length) return setErr(`Add ${miss.join(', ')} so every meal has options.`);
                 next();
               }} />
             </>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { isCoached } from '../../src/lib/access';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
 import { Body, Card, Eyebrow, H1, s as ui } from '../../src/components/ui';
@@ -25,6 +26,7 @@ const VERDICT_COLOR: Record<string, string> = { CUT: C.red, KEEP: C.green, SWAP:
 
 export default function PlanTab() {
   const { plan, profile } = useAuth();
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>('Stack');
   if (!plan) return <NoPlan name={profile?.first_name} />;
   const saved = (plan.before ?? 0) - (plan.after ?? 0);
@@ -119,6 +121,15 @@ export default function PlanTab() {
       {tab === 'Meals' && (
         <>
           {!!plan.meal_note && <Body>{plain(plan.meal_note)}</Body>}
+          {!isCoached(profile) && profile?.role !== 'coach' && (
+            <Pressable accessibilityRole="button" onPress={() => router.push('/foods')} style={st.editFoods}>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={st.editK}>Your foods</Text>
+                <Text style={st.editT}>Add or swap foods and rebuild your meals</Text>
+              </View>
+              <Text style={st.editChev}>›</Text>
+            </Pressable>
+          )}
           {(plan.meals || []).map((m, k) => (
             <Card key={k}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -170,6 +181,10 @@ const Num = ({ v, l }: { v: string; l: string }) => (
 );
 
 const st = StyleSheet.create({
+  editFoods: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.navy2, padding: 16 },
+  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  editT: { fontFamily: F.black, fontSize: 15, color: C.white },
+  editChev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
   tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tab: { height: 38, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: C.line, justifyContent: 'center' },
   tabText: { fontFamily: F.xbold, fontSize: 13, color: C.white },
