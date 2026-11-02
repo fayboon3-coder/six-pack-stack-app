@@ -16,6 +16,7 @@ import RemindersCard from '../../src/components/RemindersCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
 
 const FACE_IMG = require('../../assets/hero/boon_wide.jpg');
+const COACH_COVER = require('../../assets/img/cover_coaching.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -40,7 +41,7 @@ export default function Boon() {
         <PageHeader kicker="Your coach" title="Meet| Boon" subtitle="I went from 225 to 175 lbs after wasting years on supplements that did nothing. Now I do for you what I wish someone did for me." right={<View />} />
         <AskBoonCard title="Ask Stack anything, any time." sub="Stack, our AI, knows your plan, your numbers and every product I've investigated. Answers in seconds." />
         {free || sub ? (
-          <HeroCard image={FACE_IMG} imageRatio={16 / 9} title="Want me in your corner?"
+          <HeroCard image={COACH_COVER} imageRatio={935 / 1210} title="Want me in your corner?"
             subtitle={sub
               ? "You've got The Full Stack. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
               : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
