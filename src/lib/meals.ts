@@ -20,11 +20,19 @@ export const MEAL_IMG = {
   pizza: require('../../assets/meals/pizza.jpg'),
   burger: require('../../assets/meals/burger.jpg'),
   beer: require('../../assets/meals/beer.jpg'),
+  subway: require('../../assets/meals/subway.jpg'),
+  chickfila: require('../../assets/meals/chickfila.jpg'),
+  mcdonalds: require('../../assets/meals/mcdonalds.jpg'),
+  panda: require('../../assets/meals/panda.jpg'),
 } as const;
 
 const RULES: [RegExp, keyof typeof MEAL_IMG][] = [
   [/starbucks|egg bites/i, 'starbucks'],
   [/chipotle|burrito/i, 'chipotle'],
+  [/subway/i, 'subway'],
+  [/chick-?fil-?a/i, 'chickfila'],
+  [/mcdonald|mcdouble/i, 'mcdonalds'],
+  [/panda express/i, 'panda'],
   [/pizza/i, 'pizza'],
   [/burger/i, 'burger'],
   [/beer|drinks|\bat the bar\b|\bbar tab\b/i, 'beer'],
