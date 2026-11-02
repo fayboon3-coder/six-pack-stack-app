@@ -67,7 +67,7 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
 
 const st = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  ring: { position: 'absolute', width: 120, height: 120, borderRadius: 60, borderWidth: 3, borderColor: C.red },
+  ring: { position: 'absolute', width: 120, height: 120, borderRadius: 30, borderWidth: 3, borderColor: C.red },
   word: { fontFamily: 'Montserrat_900Black', fontSize: 26, letterSpacing: 3, color: C.white },
   tag: { fontFamily: 'Montserrat_800ExtraBold', fontSize: 11, letterSpacing: 4, color: C.red2 },
   track: { width: 140, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.12)', marginTop: 28, overflow: 'hidden' },
