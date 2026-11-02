@@ -57,7 +57,7 @@ export default function DeleteAccount() {
           <Text style={st.h}>{twoTone('Delete your| account')}</Text>
           <Text style={st.body}>This permanently deletes:</Text>
           <View style={{ gap: 6 }}>
-            {['Your account and login', 'Your plan, meals and training', 'Every workout you logged', 'Your check-ins and progress photos', 'Your Ask Boon chats'].map((t) => (
+            {['Your account and login', 'Your plan, meals and training', 'Every workout you logged', 'Your check-ins and progress photos', 'Your Stack AI chats'].map((t) => (
               <Text key={t} style={st.li}>•  {t}</Text>
             ))}
           </View>

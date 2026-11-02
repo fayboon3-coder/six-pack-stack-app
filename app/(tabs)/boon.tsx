@@ -38,7 +38,7 @@ export default function Boon() {
     <Screen header={
       <View style={{ gap: 18 }}>
         <PageHeader kicker="Your coach" title="Meet| Boon" subtitle="I went from 225 to 175 lbs after wasting years on supplements that did nothing. Now I do for you what I wish someone did for me." right={<View />} />
-        <AskBoonCard title="Ask me anything, any time." sub="My AI knows your plan, your numbers and every product I've investigated. Answers in seconds." />
+        <AskBoonCard title="Ask Stack anything, any time." sub="Stack, our AI, knows your plan, your numbers and every product I've investigated. Answers in seconds." />
         {free || sub ? (
           <HeroCard image={FACE_IMG} imageRatio={16 / 9} title="Want me in your corner?"
             subtitle={sub

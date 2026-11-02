@@ -12,9 +12,9 @@ import { WHATSAPP } from '../src/components/NoPlan';
 import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import { isCoached, isFree } from '../src/lib/access';
 
-const FACE = require('../assets/hero/boon_avatar.jpg');
+const FACE = require('../assets/logo-b.png');
 
-/** Ask Boon: an AI chat trained on Boon's method, this person's plan and his product verdicts. */
+/** Stack: the Six-Pack Stack AI, a chat trained on Boon's method, this person's plan and his product verdicts. */
 export default function Ask() {
   const { q } = useLocalSearchParams<{ q?: string }>();
   const { session, profile, plan, viewAs, isCoachAccount } = useAuth();
@@ -69,8 +69,8 @@ export default function Ask() {
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12} style={st.back}><BackIcon /></Pressable>
         <Image source={FACE} style={st.avatar} />
         <View style={{ flex: 1 }}>
-          <Text style={st.topT}>{twoTone('Ask| Boon')}</Text>
-          <Text style={st.topS}>AI coach · knows your plan</Text>
+          <Text style={st.topT}>{twoTone('Stack| AI')}</Text>
+          <Text style={st.topS}>The Six-Pack Stack AI · knows your plan</Text>
         </View>
       </View>
 
@@ -99,7 +99,7 @@ export default function Ask() {
           )}
           {blocked === 'not_live' && (
             <View style={st.wall}>
-              <Text style={st.wallT}>Ask Boon is almost ready.</Text>
+              <Text style={st.wallT}>Stack is almost ready.</Text>
               <Text style={st.wallB}>It switches on as soon as the AI key is added on the server.</Text>
             </View>
           )}
@@ -107,7 +107,7 @@ export default function Ask() {
 
         <View style={st.bar}>
           <View style={st.inputRow}>
-            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask me anything…'} placeholderTextColor="rgba(255,255,255,0.45)"
+            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask Stack anything…'} placeholderTextColor="rgba(255,255,255,0.45)"
               style={st.input} multiline maxLength={1500} editable={!blocked} onSubmitEditing={() => send()} blurOnSubmit={false}
               accessibilityLabel="Your question" />
             <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => send()} disabled={!text.trim() || thinking || !!blocked}
@@ -159,7 +159,7 @@ function Typing() {
     return () => loops.forEach((l) => l.stop());
   }, []);
   return (
-    <View style={st.row} accessibilityLabel="Boon AI is typing">
+    <View style={st.row} accessibilityLabel="Stack is typing">
       <Image source={FACE} style={st.mini} />
       <View style={[st.bubble, st.ai, { flexDirection: 'row', gap: 6, paddingVertical: 16 }]}>
         {dots.map((d, i) => <Animated.View key={i} style={[st.dot, { opacity: d, transform: [{ scale: d }] }]} />)}
@@ -171,12 +171,12 @@ function Typing() {
 const st = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   back: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 40, height: 40, borderRadius: 20 },
+  avatar: { width: 40, height: 40, borderRadius: 11 },
   topT: { fontFamily: F.black, fontSize: 20, color: C.white },
   topS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 1 },
   list: { padding: 16, gap: 12, paddingBottom: 24 },
   row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  mini: { width: 26, height: 26, borderRadius: 13 },
+  mini: { width: 26, height: 26, borderRadius: 7 },
   bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 11 },
   ai: { backgroundColor: 'rgba(20,38,69,0.92)', borderWidth: 1, borderColor: C.line, borderBottomLeftRadius: 6 },
   me: { backgroundColor: C.red, borderBottomRightRadius: 6 },
