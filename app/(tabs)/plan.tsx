@@ -17,6 +17,7 @@ const PLAN_IMG = require('../../assets/hero/plan_full.jpg');
 const STACK_IMG = require('../../assets/hero/stack_full.jpg');
 import { productImage } from '../../src/lib/images';
 import { mealImage } from '../../src/lib/meals';
+import { mealTiles, type Tile } from '../../src/lib/foodPhotos';
 import StackCheckCard from '../../src/components/StackCheckCard';
 
 const TABS = ['Stack', 'Meals', 'Eating out', 'Groceries', 'Overview'] as const;
@@ -140,7 +141,7 @@ export default function PlanTab() {
               <View style={{ gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
-                  <FoodPhoto source={mealImage(o.name, o.detail)} />
+                  <MealPhoto name={o.name} ids={o.ids} fallback={mealImage(o.name, o.detail)} />
                   <Text style={st.optName}>{o.name}</Text>
                   <Body style={{ fontSize: 13 }}>{o.detail}</Body>
                   <Text style={st.macro}>{o.kcal} cal · {o.protein} protein</Text>
@@ -176,6 +177,30 @@ const FoodPhoto = ({ source }: { source: ReturnType<typeof mealImage> }) =>
     </View>
   ) : null;
 
+/** The meal's own foods, photographed: one big tile plus up to two more. */
+function MealPhoto({ name, ids, fallback }: { name: string; ids?: string[]; fallback: ReturnType<typeof mealImage> }) {
+  const tiles = mealTiles(name, ids);
+  if (!tiles.length) return <FoodPhoto source={fallback} />;
+  const T = ({ t, style }: { t: Tile; style?: any }) => (
+    <View style={[{ overflow: 'hidden', backgroundColor: C.navy }, style]}>
+      <Image source={t.source} resizeMode="cover" accessibilityIgnoresInvertColors style={{ width: '100%', height: '100%' }} />
+      <View style={st.tileTag}><Text style={st.tileTagT} numberOfLines={1}>{t.label}</Text></View>
+    </View>
+  );
+  return (
+    <View style={[st.photo, { flexDirection: 'row', gap: 3, backgroundColor: 'transparent' }]} accessibilityLabel={`Photo: ${tiles.map((t) => t.label).join(', ')}`}>
+      <T t={tiles[0]} style={{ flex: tiles.length === 3 ? 1.5 : 1 }} />
+      {tiles.length === 2 && <T t={tiles[1]} style={{ flex: 1 }} />}
+      {tiles.length === 3 && (
+        <View style={{ flex: 1, gap: 3 }}>
+          <T t={tiles[1]} style={{ flex: 1 }} />
+          <T t={tiles[2]} style={{ flex: 1 }} />
+        </View>
+      )}
+    </View>
+  );
+}
+
 const Num = ({ v, l }: { v: string; l: string }) => (
   <View style={{ width: '31%', gap: 2 }}><Text style={st.num}>{v}</Text><Text style={st.numL}>{l}</Text></View>
 );
@@ -198,6 +223,8 @@ const st = StyleSheet.create({
   buyText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase' },
   pill: { fontFamily: F.black, fontSize: 11, letterSpacing: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden', alignSelf: 'flex-start' },
   option: { borderTopWidth: 1, borderTopColor: C.line, paddingTop: 14, gap: 4 },
+  tileTag: { position: 'absolute', left: 6, bottom: 6, maxWidth: '90%', backgroundColor: 'rgba(9,20,42,0.82)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3 },
+  tileTagT: { fontFamily: F.xbold, fontSize: 11, color: C.white },
   photo: { width: '100%', aspectRatio: 16 / 10, borderRadius: 14, overflow: 'hidden', marginBottom: 8, backgroundColor: C.navy },
   optName: { fontFamily: F.xbold, fontSize: 15, color: C.white },
   macro: { fontFamily: F.xbold, fontSize: 12, color: C.green },

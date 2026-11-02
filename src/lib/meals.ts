@@ -27,7 +27,7 @@ const RULES: [RegExp, keyof typeof MEAL_IMG][] = [
   [/chipotle|burrito/i, 'chipotle'],
   [/pizza/i, 'pizza'],
   [/burger/i, 'burger'],
-  [/beer|drinks|bar\b/i, 'beer'],
+  [/beer|drinks|\bat the bar\b|\bbar tab\b/i, 'beer'],
   [/latte|cold brew|coffee/i, 'latte'],
   [/shake|smoothie/i, 'shake'],
   [/jerky/i, 'jerky'],
