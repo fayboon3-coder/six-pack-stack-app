@@ -9,12 +9,17 @@ const FN = `${SUPABASE_URL}/functions/v1/ask-boon`;
 let live: boolean | null = null;
 let checking: Promise<boolean> | null = null;
 
-/** Is the chat switched on? (False until Boon adds the AI key on the server.) */
+/** Is the chat switched on? (False until Boon adds the AI key on the server.)
+ *  Uses the signed-in person's token, so Supabase's sign-in check stays on. */
 export function checkLive(): Promise<boolean> {
   if (live !== null) return Promise.resolve(live);
-  checking ||= fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }, body: JSON.stringify({ ping: true }) })
-    .then((r) => (r.ok ? r.json() : { live: false }))
-    .then((j) => (live = !!j.live))
+  checking ||= supabase.auth.getSession()
+    .then(({ data: { session } }) => {
+      if (!session) return { live: null };
+      return fetch(FN, { method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${session.access_token}` }, body: JSON.stringify({ ping: true }) })
+        .then((r) => (r.ok ? r.json() : { live: false }));
+    })
+    .then((j: any) => { if (j.live === null) return false; live = !!j.live; return live; }) // signed out: ask again later
     .catch(() => false)
     .finally(() => { checking = null; });
   return checking;
