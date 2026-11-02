@@ -43,7 +43,7 @@ export default function Welcome() {
         </View>
         <View style={{ gap: 10, marginTop: 18, marginBottom: 8 }}>
           <Text style={st.kicker}>Your body. Your pace. Your call.</Text>
-          <Text style={st.h} accessibilityRole="header">{twoTone('Pick your|\nstack.')}</Text>
+          <Text style={st.h} accessibilityRole="header">{twoTone('Which service\nare you|\nhere for?')}</Text>
           <Text style={st.sub}>Start free, do it yourself, or get me in your corner. You choose. You can always come back for the others.</Text>
         </View>
         {PATHS.map((p, i) => (
