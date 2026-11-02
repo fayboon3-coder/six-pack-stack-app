@@ -20,6 +20,7 @@ language sql security definer set search_path = public as $$
   returning questions;
 $$;
 revoke all on function public.ai_bump(uuid, date) from public, anon, authenticated;
+grant execute on function public.ai_bump(uuid, date) to service_role;
 
 create index if not exists chat_messages_user_time on public.chat_messages (user_id, created_at desc);
 
