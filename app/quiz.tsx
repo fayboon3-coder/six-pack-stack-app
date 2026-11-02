@@ -12,7 +12,7 @@ import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '..
 import { kitTag } from '../src/lib/kit';
 import { useAuth } from '../src/lib/auth';
 
-const BOON = require('../assets/hero/boon_ba.jpg');
+const BOON = require('../assets/hero/boon_jacked.jpg');
 
 type Step =
   | { id: keyof Quiz; kind: 'one'; q: string; sub?: string; opts: string[] }
@@ -217,7 +217,7 @@ function StoryStep({ onNext }: { onNext: () => void }) {
   const w = Math.min(width, 520) - 44;
   return (
     <>
-      <Image source={BOON} style={{ width: w, height: w * 9 / 16, borderRadius: 22 }} resizeMode="cover" accessibilityLabel="Boon before at 225 lbs and after at 175 lbs" />
+      <Image source={BOON} style={{ width: w, height: w * 9 / 16, borderRadius: 22 }} resizeMode="cover" accessibilityLabel="Boon at 175 lbs" />
       <Text style={st.kicker}>Who built your plan</Text>
       <Text style={st.q}>I went from 225 to 175 lbs.</Text>
       <Text style={st.sub}>And I wasted years on supplements that did nothing before I got there.</Text>

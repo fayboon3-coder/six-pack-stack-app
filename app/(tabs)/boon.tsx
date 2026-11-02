@@ -14,7 +14,7 @@ import { isFree } from '../../src/lib/access';
 import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 
 const HERO_IMG = require('../../assets/hero/boon.jpg');
-const FACE_IMG = require('../../assets/hero/boon_ba.jpg');
+const FACE_IMG = require('../../assets/hero/boon_jacked.jpg');
 
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
