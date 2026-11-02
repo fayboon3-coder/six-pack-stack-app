@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth';
@@ -10,6 +10,7 @@ import { BtlCard, CoachingCard } from '../src/components/Offers';
 import { coachingFirst } from '../src/lib/access';
 import { plain } from '../src/lib/program';
 import Backdrop from '../src/components/Backdrop';
+import LoadingScreen from '../src/components/LoadingScreen';
 
 const HERO = require('../assets/hero/plan_full.jpg');
 
@@ -18,6 +19,9 @@ export default function Ready() {
   const { plan, profile, refresh } = useAuth();
   const router = useRouter();
   const [tries, setTries] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const reveal = useRef(new Animated.Value(0)).current;
+  useEffect(() => { if (revealed) Animated.timing(reveal, { toValue: 1, duration: 450, useNativeDriver: true }).start(); }, [revealed]);
 
   useEffect(() => {
     if (plan || tries > 8) return;
@@ -25,12 +29,20 @@ export default function Ready() {
     return () => clearTimeout(t);
   }, [plan, tries, refresh]);
 
-  if (!plan) {
+  if (!plan || !revealed) {
+    const slow = !plan && tries > 8;
     return (
-      <SafeAreaView style={st.center}>
-        <ActivityIndicator color={C.red} size="large" />
-        <Text style={st.loading}>{tries > 8 ? 'Taking longer than usual. Pull to refresh on the Today tab.' : 'Building your plan…'}</Text>
-        {tries > 8 && <Button title="Go to Today" onPress={() => router.replace('/')} />}
+      <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
+        <LoadingScreen
+          title={slow ? 'Almost| there' : 'Building your| plan'}
+          sub={slow ? 'This is taking longer than usual. Your plan will be on the Today tab.' : 'Made from your answers. Nothing generic.'}
+          steps={['Setting your calories and protein', 'Building meals from food you like', 'Writing your training split', 'Cutting your supplement stack', 'Mapping your 12 weeks']}
+          stepMs={700}
+          done={!!plan}
+          onFinish={() => setRevealed(true)}
+        >
+          {slow && <View style={{ marginTop: 24, alignSelf: 'stretch' }}><Button title="Go to Today" onPress={() => router.replace('/')} /></View>}
+        </LoadingScreen>
       </SafeAreaView>
     );
   }
@@ -40,7 +52,7 @@ export default function Ready() {
   return (
     <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
       <Backdrop />
-      <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
+      <Animated.ScrollView style={{ opacity: reveal, transform: [{ translateY: reveal.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }} contentContainerStyle={{ paddingBottom: 48 }}>
         <FullHero image={HERO} pills={[{ text: 'Plan ready', tone: 'green' }, { text: 'Weeks 1–2 free' }]}
           title={`${plan.name}, you're in.`} lede={plain(plan.goal_long)} />
         <View style={{ paddingHorizontal: 20, gap: 14, marginTop: 16 }}>
@@ -54,7 +66,7 @@ export default function Ready() {
           {hot ? <CoachingCard /> : <BtlCard />}
           {hot ? <BtlCard /> : <CoachingCard />}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
     </SafeAreaView>
   );
 }

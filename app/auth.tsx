@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import LoadingScreen from '../src/components/LoadingScreen';
+import Backdrop from '../src/components/Backdrop';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
@@ -19,19 +21,16 @@ export default function AuthCallback() {
     });
   }, [code, router]);
 
+  if (!err) return <View style={{ flex: 1, backgroundColor: C.navy }}><LoadingScreen title="Signing you| in" sub="One second. Your plan is on its way." /></View>;
   return (
     <View style={{ flex: 1, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 }}>
+      <Backdrop />
       {err ? (
         <>
           <Text style={{ fontFamily: F.bold, fontSize: 16, color: C.white, textAlign: 'center' }}>{err}</Text>
           <Button title="Back to sign in" onPress={() => router.replace('/sign-in')} style={{ alignSelf: 'stretch' }} />
         </>
-      ) : (
-        <>
-          <ActivityIndicator color={C.red} />
-          <Text style={{ fontFamily: F.bold, fontSize: 15, color: C.white }}>Signing you in…</Text>
-        </>
-      )}
+      ) : null}
     </View>
   );
 }

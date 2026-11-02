@@ -6,7 +6,8 @@ import { supabase } from '../../src/lib/supabase';
 import { C, F } from '../../src/lib/theme';
 import { ChevronIcon } from '../../src/components/icons';
 import { useAuth } from '../../src/lib/auth';
-import type { ViewAs } from '../../src/lib/preview';
+import { VIEW_AS_LABEL, type ViewAs } from '../../src/lib/preview';
+import LoadingScreen from '../../src/components/LoadingScreen';
 import Backdrop from '../../src/components/Backdrop';
 
 type Row = {
@@ -19,7 +20,8 @@ type Invite = { email: string; first_name: string | null; created_at: string };
 export default function Coach() {
   const router = useRouter();
   const { setViewAs } = useAuth();
-  const viewAs = (v: ViewAs) => { setViewAs(v); router.replace('/'); };
+  const [opening, setOpening] = useState<ViewAs | null>(null);
+  const viewAs = (v: ViewAs) => setOpening(v);
   const [rows, setRows] = useState<Row[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -107,6 +109,15 @@ export default function Coach() {
           </View>
         )}
       </ScrollView>
+      {opening && (
+        <LoadingScreen overlay
+          title={`Opening| ${VIEW_AS_LABEL[opening]}`}
+          sub={'Viewing as "Jake", a sample client. Nothing saves.'}
+          steps={['Loading Jake\'s plan', opening === 'free' ? 'Locking weeks 3–12' : opening === 'self' ? 'Unlocking all 12 weeks' : 'Turning on Boon\'s reviews']}
+          stepMs={500}
+          onFinish={() => { const v = opening; setOpening(null); setViewAs(v); router.replace('/'); }}
+        />
+      )}
     </SafeAreaView>
   );
 }

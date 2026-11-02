@@ -16,6 +16,7 @@ import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
 import { isCoached } from '../src/lib/access';
 import { isPreviewing } from '../src/lib/preview';
 import Backdrop from '../src/components/Backdrop';
+import LoadingScreen from '../src/components/LoadingScreen';
 import { twoTone } from '../src/components/TwoTone';
 
 const HERO = require('../assets/hero/checkin.jpg');
@@ -123,6 +124,7 @@ export default function CheckinScreen() {
   const [shareWin, setShareWin] = useState(false);
   const [photos, setPhotos] = useState<Partial<Record<Angle, string>>>({});
   const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const done = {
     numbers: !!weight,
@@ -144,6 +146,7 @@ export default function CheckinScreen() {
     if (!session) return;
     if (!weight) return Alert.alert('Add your weight first', 'Use your 7-day average. If you only weighed once, that works too.');
     if (isPreviewing()) { Alert.alert('Preview only', 'This is what they see. Nothing was saved.'); return router.back(); }
+    setSaved(false);
     setBusy(true);
     const uid = session.user.id;
     const { data, error } = await supabase.from('checkins').insert({
@@ -158,6 +161,9 @@ export default function CheckinScreen() {
       const up = await supabase.storage.from('progress-photos').upload(path, body, { contentType: 'image/jpeg' });
       if (!up.error) await supabase.from('photos').insert({ user_id: uid, checkin_id: data.id, angle, path });
     }
+    setSaved(true);
+  };
+  const finish = () => {
     setBusy(false);
     Alert.alert('Got it. Nice work this week.', isCoached(profile) ? 'I\'ll go through everything and send your adjustments within 24 hours.' : 'Your numbers are saved. Check the trend on your Progress tab.');
     router.back();
@@ -250,6 +256,20 @@ export default function CheckinScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+      {busy && (
+        <LoadingScreen overlay
+          title={isCoached(profile) ? 'Sending to| Boon' : 'Saving your| week'}
+          sub={`Week ${week} check-in`}
+          steps={[
+            'Saving your numbers',
+            ...(Object.keys(photos).length ? ['Uploading your progress photos'] : []),
+            isCoached(profile) ? 'Sending it to Boon' : 'Updating your weight trend',
+          ]}
+          stepMs={550}
+          done={saved}
+          onFinish={finish}
+        />
+      )}
     </View>
   );
 }

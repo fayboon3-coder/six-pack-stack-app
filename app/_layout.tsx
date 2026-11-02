@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { View } from 'react-native';
+import LoadingScreen from '../src/components/LoadingScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   useFonts, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold,
@@ -27,8 +28,8 @@ function Gate() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator color={C.red} />
+      <View style={{ flex: 1, backgroundColor: C.navy }}>
+        <LoadingScreen title="Loading your| plan" />
       </View>
     );
   }
