@@ -31,17 +31,19 @@ export function SubscriptionCard({ onStart }: { onStart?: (plan: 'yearly' | 'mon
   return (
     <View style={[st.card, { borderColor: C.red }]}>
       <Text style={st.kicker}>The full app</Text>
-      <Text style={st.title}>All 12 weeks + Stack Check</Text>
+      <Text style={st.title}>The Full 12-Week Program</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Opt id="yearly" title="Yearly" price="$99" per="/yr" note="$1.90 a week · 7-day free trial" best />
         <Opt id="monthly" title="Monthly" price="$19.99" per="/mo" note="Cancel anytime" />
       </View>
       <View style={{ gap: 8 }}>
-        <Tick>Weeks 3–12 of your program, with re-sets at weeks 4 and 8</Tick>
-        <Tick>Your meal plan, swaps and eating-out orders</Tick>
-        <Tick>Every supplement verdict from Beyond the Label</Tick>
-        <Tick>Progress photos, trends and weekly check-ins</Tick>
+        <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>
+        <Tick>Calories re-set at weeks 4 and 8 so you never stall</Tick>
+        <Tick>Your meal plan, swaps, eating-out orders and grocery list</Tick>
+        <Tick>Stack Check: all 47 Beyond the Label verdicts ($39.99 on its own)</Tick>
+        <Tick>Weekly check-ins, progress photos, streaks and PR alerts</Tick>
       </View>
+      <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
       <Pressable accessibilityRole="button" onPress={() => onStart?.(plan)} disabled={!onStart} style={[st.btn, !onStart && { opacity: 0.55 }]}>
         <Text style={st.btnText}>{!onStart ? 'Opens with the App Store launch' : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly'}</Text>
       </Pressable>
