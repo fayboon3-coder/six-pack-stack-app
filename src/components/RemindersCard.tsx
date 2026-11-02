@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { useAuth } from '../lib/auth';
 import { C, F } from '../lib/theme';
-import { applyReminders, askPermission, DEFAULT_PREFS, readPrefs, ReminderPrefs, timeLabel } from '../lib/reminders';
+import { applyReminders, askPermission, DEFAULT_PREFS, hasPermission, readPrefs, ReminderPrefs, timeLabel } from '../lib/reminders';
 import { isFree } from '../lib/access';
 
 const TIMES: [number, number][] = [[6, 0], [12, 0], [17, 30], [19, 0]];
@@ -12,15 +12,17 @@ export default function RemindersCard({ compact }: { compact?: boolean }) {
   const { plan, profile } = useAuth();
   const [p, setP] = useState<ReminderPrefs>(DEFAULT_PREFS);
   const [note, setNote] = useState('');
-  useEffect(() => { readPrefs().then(setP); }, []);
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => { readPrefs().then(setP); hasPermission().then(setAllowed); }, []);
 
   const save = async (next: ReminderPrefs) => {
     setNote('');
-    if (next.on && !(await askPermission())) {
+    if ((next.on || next.checkin) && !(await askPermission())) {
       setNote('Notifications are off for this app. Turn them on in your phone Settings, then try again.');
-      next = { ...next, on: false };
+      next = { ...next, on: false, checkin: false };
     }
     setP(next);
+    setAllowed(await hasPermission());
     await applyReminders(plan, next, { free: isFree(profile) });
   };
   const days = (plan?.train.d || []).map((d) => d.t.split(' ')[0].slice(0, 3)).join(', ');
@@ -30,9 +32,9 @@ export default function RemindersCard({ compact }: { compact?: boolean }) {
       <View style={st.row}>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={st.t}>Workout reminders</Text>
-          <Text style={st.sub}>{days || 'Your training days'} at {timeLabel(p.hour, p.minute)}, plus Sunday check-in at 9:00 am</Text>
+          <Text style={st.sub}>{days || 'Your training days'} at {timeLabel(p.hour, p.minute)}</Text>
         </View>
-        <Switch value={p.on} onValueChange={(on) => save({ ...p, on })} trackColor={{ true: C.green, false: C.line }} accessibilityLabel="Workout reminders" />
+        <Switch value={p.on && allowed} onValueChange={(on) => save({ ...p, on })} trackColor={{ true: C.green, false: C.line }} accessibilityLabel="Workout reminders" />
       </View>
       {p.on && !compact && (
         <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
@@ -44,6 +46,15 @@ export default function RemindersCard({ compact }: { compact?: boolean }) {
               </Pressable>
             );
           })}
+        </View>
+      )}
+      {!compact && (
+        <View style={st.row}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={st.t}>Sunday check-in reminder</Text>
+            <Text style={st.sub}>Sunday at 9:00 am, plus a nudge at 6:00 pm if you haven't done it yet</Text>
+          </View>
+          <Switch value={p.checkin && allowed} onValueChange={(checkin) => save({ ...p, checkin })} trackColor={{ true: C.green, false: C.line }} accessibilityLabel="Sunday check-in reminder" />
         </View>
       )}
       {!!note && <Text style={st.note}>{note}</Text>}

@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { Plan, TrainDay } from './types';
 import SAMPLE from '../data/samplePlan.json';
+import { buildEatOut, buildGrocery, buildMenu } from './menu';
 
 /** Everything the quiz collects. Strings are the exact option labels (they go to Kit as-is). */
 export type Quiz = {
@@ -8,6 +9,8 @@ export type Quiz = {
   weight: string; goal_weight: string; where_train: string; days: string; experience: string;
   tried: string[]; monthly_spend: string; eat_out: string; struggle: string;
   start_timing: string; ready_to_invest: string;
+  /** Foods they'd eat every week and where they eat out (meal plan is built from these). */
+  likes?: string[]; spots?: string[];
   first_name: string; email: string; src?: string; done_at?: string;
 };
 
@@ -94,8 +97,11 @@ export function buildTraining(q: Quiz) {
 const meal = (o: { name: string; detail: string; kcal: string; protein: string }) => o;
 const MEALS = SAMPLE.meals as Plan['meals'];
 
-export function buildFreePlan(q: Quiz): Plan {
-  const t = targets(q);
+/** kcalOverride: the re-set's capped calories (weeks 4 and 8). */
+export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
+  const t0 = targets(q);
+  const t = kcalOverride ? { ...t0, kcal: kcalOverride, carbs: Math.max(50, round((kcalOverride - t0.protein * 4 - t0.fat * 9) / 4, 5)) } : t0;
+  const picked = (q.likes || []).length > 0;
   const p = projection(q);
   const tr = buildTraining(q);
   const name = q.first_name.trim().split(' ')[0] || 'You';
@@ -125,11 +131,12 @@ export function buildFreePlan(q: Quiz): Plan {
       { product: 'Whey protein (Optimum Nutrition Gold Standard)', why: `Only if food alone won't get you to ${t.protein} g of protein. One scoop closes the gap.`, dose: '1 scoop', when: 'When you are short on protein', cost: 'about $58', buy: 'https://www.vitacost.com/products/optimum-nutrition-gold-standard-100-whey-protein-french-vanilla-creme-5-lb-2-26-kg-27511' },
       { product: 'Black coffee', why: 'Caffeine is the part of most pre-workouts that actually works. Coffee does it for pennies.', dose: '1 cup', when: '30 min before training', cost: '$0 extra', buy_text: 'Your kitchen' },
     ],
-    meals: (MEALS || []).map((m, k) => ({
+    meals: picked ? buildMenu(t.kcal, t.protein, q.likes, q.spots) : (MEALS || []).map((m, k) => ({
       ...m,
       target: `about ${fmt(round(t.kcal * share[k], 50))} calories · ${round(t.protein * proteinShare[k], 5)} g protein`,
       options: m.options.map(meal),
     })),
+    ...(picked ? { food: 'picked' } : {}),
     meal_note: `Pick one option per meal. Any 4 picks land close to ${fmt(t.kcal)} calories and ${t.protein} g of protein.`,
     rules: [
       'Protein first at every meal.',
@@ -146,8 +153,8 @@ export function buildFreePlan(q: Quiz): Plan {
       'Weigh in every morning',
       'Sunday: do your check-in in the app',
     ],
-    eat_out: SAMPLE.eat_out,
-    grocery: SAMPLE.grocery.map((g) => ({ ...g, items: g.items.replace(' (no mushrooms)', '') })),
+    eat_out: picked ? buildEatOut(q.spots) : SAMPLE.eat_out,
+    grocery: picked ? buildGrocery(q.likes) : SAMPLE.grocery.map((g) => ({ ...g, items: g.items.replace(' (no mushrooms)', '') })),
     phase1: `Hit all ${sessions} sessions and your protein every day. Steps up to 8,000. Learn the moves.`,
     phase2: 'Add weight or reps every week. Week 4: your calories get re-set to your new weight.',
     phase3: 'Keep the weights heavy while you get leaner. Week 12: final photos and results.',

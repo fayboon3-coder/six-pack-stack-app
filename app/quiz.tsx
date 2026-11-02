@@ -9,6 +9,7 @@ import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { BackIcon, CheckIcon } from '../src/components/icons';
 import { GOALS, projection, Quiz, savePendingQuiz, SPEND_MID, targets } from '../src/lib/quiz';
+import { FOODS, SPOTS } from '../src/lib/menu';
 import { kitTag } from '../src/lib/kit';
 import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
 import { quizFromHandoff, readHandoff } from '../src/lib/handoff';
@@ -20,7 +21,7 @@ const BOON = require('../assets/hero/boon_jacked.jpg');
 
 type Step =
   | { id: keyof Quiz; kind: 'one'; q: string; sub?: string; opts: string[] }
-  | { id: 'tried'; kind: 'multi'; q: string; sub?: string; opts: string[] }
+  | { id: 'tried' | 'likes' | 'spots'; kind: 'multi'; q: string; sub?: string; opts: readonly string[]; none?: string; min?: number }
   | { id: keyof Quiz; kind: 'num'; q: string; sub?: string; unit: string; min: number; max: number; ph: string }
   | { id: 'height'; kind: 'height'; q: string }
   | { id: string; kind: 'spend' | 'story' | 'chart' | 'account' };
@@ -35,10 +36,12 @@ const STEPS: Step[] = [
   { id: 'where_train', kind: 'one', q: 'Where will you train?', opts: ['Gym', 'Home with dumbbells'] },
   { id: 'days', kind: 'one', q: 'How many days a week can you train?', sub: '45–60 minutes each.', opts: ['3 days', '4 days'] },
   { id: 'experience', kind: 'one', q: 'How long have you been lifting?', opts: ['Never lifted', 'Under 1 year', '1–3 years', '3+ years'] },
-  { id: 'tried', kind: 'multi', q: 'Which of these have you bought?', sub: 'Pick all that apply.', opts: ['Fat burners', 'Pre-workout', 'Test boosters', 'Greens powder', 'Protein powder', 'Creatine', 'None of these'] },
+  { id: 'tried', kind: 'multi', q: 'Which of these have you bought?', sub: 'Pick all that apply.', opts: ['Fat burners', 'Pre-workout', 'Test boosters', 'Greens powder', 'Protein powder', 'Creatine', 'None of these'], none: 'None of these' },
   { id: 'monthly_spend', kind: 'one', q: 'About how much do you spend on supplements a month?', opts: ['Under $50', '$50–$100', '$100–$200', '$200+'] },
   { id: 'spend', kind: 'spend' },
   { id: 'eat_out', kind: 'one', q: 'How often do you eat out or order in?', opts: ['Rarely', '1–3 times a week', '4+ times a week'] },
+  { id: 'likes', kind: 'multi', q: 'Which of these would you happily eat every week?', sub: 'Pick at least 3. Your meals are built from these.', opts: FOODS, min: 3 },
+  { id: 'spots', kind: 'multi', q: 'Where do you usually grab food?', sub: "Pick all that apply. You'll get the best order at each one.", opts: [...SPOTS, 'None of these'], none: 'None of these' },
   { id: 'struggle', kind: 'one', q: "What's been the hardest part so far?", opts: ['Cravings and snacking', 'Weekends', 'No time', "Not knowing what to eat", 'Staying consistent'] },
   { id: 'story', kind: 'story' },
   { id: 'start_timing', kind: 'one', q: 'When do you want to start?', opts: ['Today', 'This week', 'Within a month', 'Just looking'] },
@@ -49,7 +52,7 @@ const STEPS: Step[] = [
 
 const EMPTY: Quiz = {
   goal: '', sex: '', age: '', height_ft: '', height_in: '', weight: '', goal_weight: '', where_train: '', days: '',
-  experience: '', tried: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
+  experience: '', tried: [], likes: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
   first_name: '', email: '',
 };
 
@@ -118,16 +121,19 @@ export default function QuizScreen() {
             </>
           )}
 
-          {step.kind === 'multi' && (
+          {step.kind === 'multi' && (() => {
+            const cur = ((a as any)[step.id] || []) as string[];
+            const min = step.min || 1;
+            return (
             <>
               <Q q={step.q} sub={step.sub} />
               <View style={{ gap: 10 }}>
                 {step.opts.map((o) => {
-                  const on = a.tried.includes(o);
+                  const on = cur.includes(o);
                   const toggle = () => {
-                    if (o === 'None of these') return set('tried', on ? [] : [o]);
-                    const rest = a.tried.filter((x) => x !== 'None of these');
-                    set('tried', on ? rest.filter((x) => x !== o) : [...rest, o]);
+                    if (step.none && o === step.none) return set(step.id, on ? [] : [o]);
+                    const rest = cur.filter((x) => x !== step.none);
+                    set(step.id, on ? rest.filter((x) => x !== o) : [...rest, o]);
                   };
                   return (
                     <Pressable key={o} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={toggle} style={[st.opt, on && st.optOn]}>
@@ -138,9 +144,11 @@ export default function QuizScreen() {
                 })}
               </View>
               {!!err && <Text style={st.err}>{err}</Text>}
-              <Button title="Next" onPress={() => (a.tried.length ? next() : setErr('Pick at least one, or "None of these".'))} />
+              <Button title="Next" onPress={() => ((cur.includes(step.none || '\u0000') || cur.length >= min) ? next()
+                : setErr(step.none ? `Pick at least one, or "${step.none}".` : `Pick at least ${min}.`))} />
             </>
-          )}
+            );
+          })()}
 
           {step.kind === 'num' && (
             <NumStep step={step} value={String(a[step.id] || '')} onChange={(v) => set(step.id, v)} err={err}

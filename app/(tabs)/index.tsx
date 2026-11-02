@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,13 +18,15 @@ import { isFree, isLocked, FREE_WEEKS } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
 import StackCheckCard from '../../src/components/StackCheckCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
+import ReminderPrompt from '../../src/components/ReminderPrompt';
+import { applyReminders, hasPermission, readPrefs } from '../../src/lib/reminders';
 import { getStreak } from '../../src/lib/streak';
 import { FlameIcon } from '../../src/components/icons';
 import Backdrop from '../../src/components/Backdrop';
 
 
 export default function Today() {
-  const { profile, plan, session, refresh } = useAuth();
+  const { profile, plan, session, refresh, viewAs } = useAuth();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [doneDays, setDoneDays] = useState<Set<string>>(new Set());
@@ -43,6 +45,8 @@ export default function Today() {
   }, [session, today, plan]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  // Keep reminders current (re-arms this Sunday's 6pm check-in nudge).
+  useEffect(() => { if (plan && !viewAs) hasPermission().then((ok) => { if (ok) readPrefs().then((p) => applyReminders(plan, p, { free: isFree(profile) })); }); }, [plan?.train.s]);
 
   if (!plan) return <NoPlan name={profile?.first_name} />;
 
@@ -111,6 +115,8 @@ export default function Today() {
             <Text style={st.chev}>›</Text>
           </Pressable>
         )}
+
+        <ReminderPrompt style={{ marginHorizontal: 20, marginTop: 14 }} />
 
         <Section title="Hit these today" />
         <View style={st.targets}>

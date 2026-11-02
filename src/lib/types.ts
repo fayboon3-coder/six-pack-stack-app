@@ -37,6 +37,8 @@ export type Plan = {
   train: { n: string; s: string; e: number; note?: string; d: TrainDay[] };
   /** Weeks whose check-in already re-set the numbers (The Full Stack: 4 and 8). */
   resets?: number[];
+  /** 'picked': meals were built from the foods they chose in the quiz. */
+  food?: 'picked';
 };
 
 export type Checkin = {

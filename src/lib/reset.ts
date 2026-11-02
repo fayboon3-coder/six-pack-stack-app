@@ -16,24 +16,16 @@ export async function autoReset(userId: string, profile: Profile, plan: Plan, we
   if (profile.tier !== 'self' || !RESET_WEEKS.includes(week) || (plan.resets || []).includes(week)) return null;
   const quiz = profile.quiz as Quiz | undefined;
   if (!quiz || !weight) return null;
-  const fresh = buildFreePlan({ ...quiz, weight: String(weight) });
-  const oldK = num(plan.kcal), newK0 = num(fresh.kcal);
+  const fresh0 = buildFreePlan({ ...quiz, weight: String(weight) });
+  const oldK = num(plan.kcal), newK0 = num(fresh0.kcal);
   const build = quiz.goal === GOALS[2];
-  const newK = build ? newK0 : Math.max(Math.min(oldK, newK0), oldK - 200);
-  const scale = newK0 ? newK / newK0 : 1;
-  const fmt = (n: number) => (Math.round(n / 50) * 50).toLocaleString('en-US');
-
+  const newK = Math.round((build ? newK0 : Math.max(Math.min(oldK, newK0), oldK - 200)) / 50) * 50;
+  // Same foods they picked, re-sized to the new numbers.
+  const fresh = buildFreePlan({ ...quiz, weight: String(weight) }, newK);
   const next: Plan = {
     ...plan,
-    kcal: fmt(newK),
-    protein: fresh.protein,
-    fat: fresh.fat,
-    carbs: fresh.carbs ? String(Math.max(50, Math.round((newK - num(fresh.protein) * 4 - num(fresh.fat) * 9) / 4 / 5) * 5)) : plan.carbs,
-    meals: (fresh.meals || plan.meals)?.map((m) => ({
-      ...m,
-      target: m.target.replace(/about ([\d,]+) calories/, (_, k) => `about ${fmt(num(k) * scale)} calories`),
-    })),
-    meal_note: `Pick one option per meal. Any 4 picks land close to ${fmt(newK)} calories and ${fresh.protein} g of protein.`,
+    kcal: fresh.kcal, protein: fresh.protein, fat: fresh.fat, carbs: fresh.carbs,
+    meals: fresh.meals, meal_note: fresh.meal_note,
     resets: [...(plan.resets || []), week],
   };
   const { error } = await supabase.from('plans').update({ data: next }).eq('user_id', userId).eq('active', true);

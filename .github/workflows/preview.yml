@@ -15,6 +15,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Nothing reaches phones unless the code typechecks and every test passes.
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
       - name: Set up Expo
         uses: expo/expo-github-action@v8
         with:

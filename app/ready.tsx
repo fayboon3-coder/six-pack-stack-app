@@ -36,7 +36,7 @@ export default function Ready() {
         <LoadingScreen
           title={slow ? 'Almost| there' : 'Building your| plan'}
           sub={slow ? 'This is taking longer than usual. Your plan will be on the Today tab.' : 'Made from your answers. Nothing generic.'}
-          steps={['Setting your calories and protein', 'Sizing your meals to your numbers', 'Writing your training split', 'Picking your starter stack', 'Mapping your 12 weeks']}
+          steps={['Setting your calories and protein', 'Building meals from the foods you picked', 'Writing your training split', 'Picking your starter stack', 'Mapping your 12 weeks']}
           stepMs={700}
           done={!!plan}
           onFinish={() => setRevealed(true)}

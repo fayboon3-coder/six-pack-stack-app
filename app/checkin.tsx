@@ -16,6 +16,7 @@ import { PHOTO_WEEKS, weekOf } from '../src/lib/program';
 import { isCoached } from '../src/lib/access';
 import { isPreviewing } from '../src/lib/preview';
 import { autoReset, RESET_WEEKS } from '../src/lib/reset';
+import { markCheckinDone } from '../src/lib/reminders';
 import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { twoTone } from '../src/components/TwoTone';
@@ -167,6 +168,7 @@ export default function CheckinScreen() {
       const r = await autoReset(uid, profile, plan, week, Number(weight)).catch(() => null);
       if (r) { setNewNums(r); await refresh(); }
     }
+    markCheckinDone(!isCoached(profile)).catch(() => {});
     setSaved(true);
   };
   const finish = () => {

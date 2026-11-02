@@ -20,7 +20,8 @@ type Ctx = {
 
 const SAMPLE_QUIZ: any = { goal: 'Lose fat and see my abs', sex: 'Male', age: '29', height_ft: '5', height_in: '11', weight: '212', goal_weight: '185',
   where_train: 'Gym', days: '4 days', experience: '1–3 years', tried: ['Fat burners', 'Pre-workout'], monthly_spend: '$100–$200',
-  eat_out: '1–3 times a week', struggle: 'Weekends', start_timing: 'This week', ready_to_invest: 'Yes, with a payment plan', first_name: 'Jake', email: 'preview@example.com' };
+  eat_out: '1–3 times a week', struggle: 'Weekends', start_timing: 'This week', ready_to_invest: 'Yes, with a payment plan', first_name: 'Jake', email: 'preview@example.com',
+  likes: ['Eggs', 'Greek yogurt', 'Chicken', 'Beef', 'Rice', 'Potatoes', 'Protein shakes', 'Fruit'], spots: ['Chipotle', 'Chick-fil-A'] };
 
 function previewProfilePlan(real: Profile, v: ViewAs): { profile: Profile; plan: Plan } {
   const fp = buildFreePlan(SAMPLE_QUIZ);
@@ -86,7 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (process.env.EXPO_PUBLIC_DEMO_TIER === 'free' || process.env.EXPO_PUBLIC_DEMO_TIER === 'self') {
         const q: any = { goal: 'Lose fat and see my abs', sex: 'Male', age: '29', height_ft: '5', height_in: '11', weight: '212', goal_weight: '185',
           where_train: 'Gym', days: '4 days', experience: '1–3 years', tried: ['Fat burners', 'Pre-workout'], monthly_spend: '$100–$200',
-          eat_out: '1–3 times a week', struggle: 'Weekends', start_timing: 'This week', ready_to_invest: 'Yes, with a payment plan', first_name: 'Jake', email: 'demo@example.com' };
+          eat_out: '1–3 times a week', struggle: 'Weekends', start_timing: 'This week', ready_to_invest: 'Yes, with a payment plan', first_name: 'Jake', email: 'demo@example.com',
+          likes: ['Eggs', 'Greek yogurt', 'Chicken', 'Beef', 'Rice', 'Potatoes', 'Protein shakes', 'Fruit'], spots: ['Chipotle', 'Chick-fil-A'] };
         const fp = buildFreePlan(q);
         setProfile({ id: 'demo', email: 'demo@example.com', first_name: 'Jake', role: 'client', tier: process.env.EXPO_PUBLIC_DEMO_TIER as any, start_date: null, quiz: q });
         setPlan({ ...fp, train: { ...fp.train, s: process.env.EXPO_PUBLIC_DEMO_START || fp.train.s } });
