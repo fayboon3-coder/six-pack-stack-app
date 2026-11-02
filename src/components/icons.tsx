@@ -100,3 +100,9 @@ export const TrendIcon = ({ color = '#fff', size = 18 }: P) => (
 export const CalendarIcon = ({ color = '#fff', size = 18 }: P) => (
   <Svg width={size} height={size} viewBox="0 0 24 24"><Rect x={3} y={5} width={18} height={16} rx={3} {...base(color)} /><Path d="M3 10h18M8 3v4M16 3v4" {...base(color)} /></Svg>
 );
+export const SparkIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" {...base(color)} /></Svg>
+);
+export const SearchIcon = ({ color = '#fff', size = 18 }: P) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24"><Circle cx={11} cy={11} r={6.5} {...base(color)} /><Path d="M16 16l5 5" {...base(color)} /></Svg>
+);
