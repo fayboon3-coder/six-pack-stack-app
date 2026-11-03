@@ -11,7 +11,7 @@ import PageHeader from '../../src/components/PageHeader';
 import HeroCard from '../../src/components/HeroCard';
 import { useRouter } from 'expo-router';
 import { COACHING_URL, isCoached, isFree, PRIVACY_URL, TERMS_URL } from '../../src/lib/access';
-import { BtlCard, CoachingCard, SubscriptionCard } from '../../src/components/Offers';
+import { CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
 
@@ -58,7 +58,6 @@ export default function Boon() {
         <>
           <Eyebrow>Your options</Eyebrow>
           <SubscriptionCard source="boon_tab" />
-          <BtlCard />
         </>
       ) : sub ? (
         <>

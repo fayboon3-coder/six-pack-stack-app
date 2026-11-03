@@ -6,7 +6,7 @@ import { useAuth } from '../src/lib/auth';
 import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import FullHero from '../src/components/FullHero';
-import { BtlCard, CoachingCard } from '../src/components/Offers';
+import { CoachingCard } from '../src/components/Offers';
 import { coachingFirst, isFree } from '../src/lib/access';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { purchasesEnabled, TRIAL_SEEN } from '../src/lib/purchases';
@@ -72,8 +72,7 @@ export default function Ready() {
           <Text style={st.body}>First workout: <Text style={{ fontFamily: F.black }}>{first.t}</Text>. Every exercise has a form video.</Text>
           <Button title="Start week 1" onPress={startWeek1} />
           <Text style={[st.k, { marginTop: 14 }]}>{hot ? 'You said you want to start now' : 'Want to go faster?'}</Text>
-          {hot ? <CoachingCard /> : <BtlCard />}
-          {hot ? <BtlCard /> : <CoachingCard />}
+          <CoachingCard />
         </View>
       </Animated.ScrollView>
     </SafeAreaView>

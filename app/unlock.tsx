@@ -5,12 +5,12 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../src/lib/auth';
 import { C, F } from '../src/lib/theme';
 import { BackIcon } from '../src/components/icons';
-import { BtlCard, CoachingCard, SubscriptionCard } from '../src/components/Offers';
+import { CoachingCard, SubscriptionCard } from '../src/components/Offers';
 import { coachingFirst } from '../src/lib/access';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
 
-/** The offers screen: The Full Stack (App Store subscription), coaching and Beyond the Label. */
+/** The offers screen: The Full Stack (App Store subscription) and coaching. */
 export default function Unlock() {
   const { profile, plan } = useAuth();
   const router = useRouter();
@@ -28,7 +28,6 @@ export default function Unlock() {
         {hot && <CoachingCard />}
         <SubscriptionCard source="unlock" />
         {!hot && <CoachingCard />}
-        <BtlCard />
       </ScrollView>
     </SafeAreaView>
   );
