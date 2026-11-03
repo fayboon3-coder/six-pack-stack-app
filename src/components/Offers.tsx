@@ -115,10 +115,13 @@ export function CoachingCard() {
       <Text style={st.kicker}>1:1 with Boon</Text>
       <Text style={st.title}>Six-Pack Stack Coaching</Text>
       <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. 12 weeks, with a results guarantee.</Text>
-      <Pressable accessibilityRole="button" onPress={() => Linking.openURL(COACHING_URL)} style={st.btn}>
+      <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/apply'); }} style={st.btn}>
+        <Text style={st.btnText}>Apply for coaching</Text>
+      </Pressable>
+      <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.white }]}>
         <Text style={st.btnText}>See how coaching works</Text>
       </Pressable>
-      <Text style={st.small}>The Abs or It's Free guarantee is on the page.</Text>
+      <Text style={st.small}>2-minute application. Follow the plan and miss your goal, and I coach you up to 12 more weeks free.</Text>
     </View>
   );
 }

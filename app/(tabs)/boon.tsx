@@ -45,12 +45,13 @@ export default function Boon() {
             subtitle={sub
               ? "You've got The Full Stack. If you want me reviewing your check-ins every Sunday and answering you on WhatsApp, you get $100 off coaching. Mention it in your application."
               : "I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp."}
-            cta="See how coaching works" onPress={() => Linking.openURL(COACHING_URL)} />
+            cta="Apply for coaching" onPress={() => router.push('/apply')} />
         ) : (
           <HeroCard image={FACE_IMG} imageRatio={16 / 9} badge="Replies within 24 hours" title="I've got you"
             subtitle="Stuck, hungry, sore, or staring at a supplement you saw online? Send it. I read and answer every message myself." cta="Text Boon on WhatsApp"
             onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
         )}
+        {(free || sub) && <Text accessibilityRole="link" onPress={() => Linking.openURL(COACHING_URL)} style={[st.legal, { textAlign: 'center', fontSize: 15, color: C.white, textDecorationLine: 'underline' }]}>See how coaching works first</Text>}
       </View>
     }>
 
