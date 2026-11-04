@@ -49,7 +49,7 @@ export default function Apply() {
   const submit = async () => {
     const need: [keyof typeof f, string][] = [['name', 'your first name'], ['email', 'your email'], ['age', 'your age'],
       ['height', 'your height'], ['current_weight', 'your weight'], ['goal_12_weeks', 'your 12-week goal'],
-      ['monthly_spend', 'your monthly supplement spend'], ['train_days', 'how often you train'], ['start_timing', 'when you want to start'],
+      ['monthly_spend', 'how much you spend on your body'], ['train_days', 'how often you train'], ['start_timing', 'when you want to start'],
       ['ready_to_invest', 'whether you are ready to invest'], ['medical', 'the medical question']];
     const miss = need.find(([k]) => !String(f[k]).trim());
     if (miss) return setErr(`Add ${miss[1]}.`);
@@ -96,7 +96,7 @@ export default function Apply() {
             <View style={{ flex: 1 }}><In label="Weight (lbs)" v={f.current_weight} on={(t) => set('current_weight', t)} kb="decimal-pad" /></View>
           </View>
           <In label="What do you want your body to look like in 12 weeks?" v={f.goal_12_weeks} on={(t) => set('goal_12_weeks', t)} multi ph="e.g. Lose my gut, see my top abs, fit into my old jeans" />
-          <Pick label="Monthly supplement spend" opts={SPEND} v={f.monthly_spend} on={(t) => set('monthly_spend', t)} />
+          <Pick sub="Supplements, gym, trainers, programs. All of it." label="How much do you spend on your body each month?" opts={SPEND} v={f.monthly_spend} on={(t) => set('monthly_spend', t)} />
           <Pick label="Days a week you train right now" opts={DAYS} v={f.train_days} on={(t) => set('train_days', t)} />
           <Pick label="How soon do you want to start?" opts={START} v={f.start_timing} on={(t) => set('start_timing', t)} />
           <Pick label="This is a premium 1:1 program. If we're a fit, are you ready to invest in yourself?" opts={INVEST} v={f.ready_to_invest} on={(t) => set('ready_to_invest', t)} />
@@ -126,10 +126,11 @@ function In({ label, v, on, kb = 'default', multi, ph }: { label: string; v: str
   );
 }
 
-function Pick({ label, opts, v, on }: { label: string; opts: string[]; v: string; on: (t: string) => void }) {
+function Pick({ label, sub, opts, v, on }: { label: string; sub?: string; opts: string[]; v: string; on: (t: string) => void }) {
   return (
     <View style={{ gap: 8 }}>
       <Text style={st.label}>{label}</Text>
+      {!!sub && <Text style={[st.hint, { marginTop: -4 }]}>{sub}</Text>}
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {opts.map((o) => (
           <Pressable key={o} accessibilityRole="radio" accessibilityState={{ selected: v === o }} onPress={() => on(o)} style={[st.chip, v === o && st.chipOn]}>
