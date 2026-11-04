@@ -53,11 +53,16 @@ const PLACE: Opt[] = [
   { v: 'Home with dumbbells', t: 'Home with dumbbells', s: 'A set of dumbbells and a bench', icon: ICON.home },
   { v: 'Home, no equipment', t: 'Home, no equipment', s: 'Bodyweight only', icon: ICON.body },
 ];
+const COACH_OPTS: Opt[] = [
+  { v: 'Yes', t: 'Yes', s: "I'm ready to go all in" },
+  { v: 'Yes, with a payment plan', t: 'Yes, with a payment plan', s: 'Spread it over a few months' },
+  { v: 'Not right now', t: 'Not right now', s: "I'll start with the app" },
+];
 const INJURIES = ['Lower back', 'Knees', 'Shoulders', 'Wrists / elbows', 'Hips', 'Other'];
 const STEPS_GOAL = ['6,000', '8,000', '10,000', '12,000'];
-const STEP_IDS = ['goal', 'sex', 'height', 'weight', 'activity', 'experience', 'place', 'days', 'foods', 'spots', 'injuries', 'loading', 'account', 'email'] as const;
+const STEP_IDS = ['goal', 'sex', 'height', 'weight', 'activity', 'experience', 'place', 'days', 'foods', 'spots', 'injuries', 'coaching', 'loading', 'account', 'email'] as const;
 type StepId = typeof STEP_IDS[number];
-const ASKED = 11;
+const ASKED = 12;
 
 type Q2 = Quiz & { activity?: string; injuries?: string[]; steps_goal?: string };
 const EMPTY: Q2 = {
@@ -92,7 +97,7 @@ export default function QuizScreen() {
 
   const set = (k: keyof Q2, v: any) => { setErr(''); setA((x) => ({ ...x, [k]: v })); };
   const next = () => { setErr(''); setI((x) => Math.min(STEP_IDS.length - 1, x + 1)); };
-  const back = () => { setErr(''); if (i === 0) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('injuries')); else setI(i - 1); };
+  const back = () => { setErr(''); if (i === 0) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(i - 1); };
   const go = (to: StepId) => { setErr(''); setI(STEP_IDS.indexOf(to)); };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
@@ -176,7 +181,11 @@ export default function QuizScreen() {
       <Or />
       <Pressable accessibilityRole="button" onPress={() => { set('injuries', []); next(); }} style={st.ghost}><Text style={st.ghostT}>Nothing to work around</Text></Pressable>
       <Text style={st.fine}>Have a medical condition or take prescription meds? Check with your doctor before starting.</Text></>;
-    cta = <Cta title="Build my plan" onPress={next} />;
+    cta = <Cta title="Continue" onPress={next} />;
+  } else if (step === 'coaching') {
+    body = <><Q q="If I coached you 1:1, would you invest in yourself?" sub="Your free plan doesn't depend on this. It helps me know who to help first." />
+      <Options opts={COACH_OPTS} value={a.ready_to_invest} onPick={(v) => set('ready_to_invest', v)} check /></>;
+    cta = <Cta title="Build my plan" onPress={() => (a.ready_to_invest ? next() : setErr('Pick one to continue.'))} />;
   } else if (step === 'account') {
     return <CreateAccount onEmail={() => go('email')} onBack={back} />;
   } else if (step === 'email') {
@@ -477,7 +486,7 @@ function EmailSignup({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v: 
       return setErr(res.error.message);
     }
     kitTag(email, q.first_name, ['app-quiz-done', 'app-free', 'src-app'], {
-      quiz_goal: q.goal, quiz_where_train: q.where_train, app_tier: 'free', current_weight: q.weight, lead_source: q.src ? `app:${q.src}` : 'app',
+      quiz_goal: q.goal, quiz_budget: q.ready_to_invest, quiz_where_train: q.where_train, app_tier: 'free', current_weight: q.weight, lead_source: q.src ? `app:${q.src}` : 'app',
     });
     setBusy(false);
     if (!res.data.session) return setNote('Check your email to confirm your account, then log in. Your plan will be waiting.');
