@@ -13,6 +13,10 @@ import { track } from '../src/lib/track';
 import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import { isCoached, isFree } from '../src/lib/access';
 import { showCoaching } from '../src/components/Coach';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PRIVACY_URL } from '../src/lib/access';
+
+const CONSENT = 'sps:aiConsent:v1';
 
 const FACE = require('../assets/logo-b.png');
 
@@ -36,6 +40,10 @@ export default function Ask() {
   const [left, setLeft] = useState<number | null>(null);
   const [blocked, setBlocked] = useState<null | 'limit' | 'not_live'>(null);
   const scroll = useRef<any>(null);
+  // Apple 5.1.2(i): say plainly what goes to the AI provider and get a yes before the first question.
+  const [consent, setConsent] = useState<boolean | null>(null);
+  useEffect(() => { AsyncStorage.getItem(CONSENT).then((v) => setConsent(v === 'yes' || process.env.EXPO_PUBLIC_DEMO_CHAT === '1')).catch(() => setConsent(false)); }, []);
+  const agree = async () => { setConsent(true); track('ai_consent'); try { await AsyncStorage.setItem(CONSENT, 'yes'); } catch {} };
   const free = isFree(profile);
   const name = plan?.name || profile?.first_name || '';
   const tier = profile?.tier || 'free';
@@ -52,6 +60,7 @@ export default function Ask() {
   const send = async (raw?: string) => {
     const question = (raw ?? text).trim();
     if (!question || thinking || blocked) return;
+    if (!consent) { setText(question); return; }
     setText('');
     setMsgs((m) => [...m, { id: 'u' + Date.now(), role: 'user', content: question }]);
     setThinking(true);
@@ -112,6 +121,16 @@ export default function Ask() {
           )}
         </ScrollView>
 
+        {consent === false && (
+          <View style={st.consent} accessibilityLiveRegion="polite">
+            <Text style={st.consentT}>Before you ask</Text>
+            <Text style={st.consentB}>Stack is an AI. To answer, it sends your question and the parts of your plan it needs (like your goal, calories and foods) to Anthropic, the company that makes the AI. It never gets your photos or payment details.</Text>
+            <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+              <Pressable accessibilityRole="button" onPress={agree} style={st.consentBtn}><Text style={st.consentBtnT}>OK, turn on Stack</Text></Pressable>
+              <Text accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} style={st.consentLink}>Privacy policy</Text>
+            </View>
+          </View>
+        )}
         <View style={st.bar}>
           {!blocked && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={st.starters}>
@@ -186,6 +205,12 @@ function Typing() {
 }
 
 const st = StyleSheet.create({
+  consent: { marginHorizontal: 16, marginBottom: 8, padding: 16, borderRadius: 18, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, gap: 10 },
+  consentT: { fontFamily: F.xbold, fontSize: 16, color: C.ink },
+  consentB: { fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: C.ink },
+  consentBtn: { height: 44, paddingHorizontal: 18, borderRadius: 22, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  consentBtnT: { fontFamily: F.bold, fontSize: 15, color: '#ffffff' },
+  consentLink: { fontFamily: F.semi, fontSize: 14, color: C.ink, textDecorationLine: 'underline' },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#e6e8ef' },
   back: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   avatar: { width: 42, height: 42, borderRadius: 11 },

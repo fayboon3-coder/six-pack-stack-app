@@ -429,6 +429,9 @@ function Loading({ onDone }: { onDone: () => void }) {
   );
 }
 
+/** Apple and Google sign-in show only once they're switched on in Supabase and wired for iPhone (EXPO_PUBLIC_OAUTH=1). */
+const OAUTH = process.env.EXPO_PUBLIC_OAUTH === '1';
+
 function CreateAccount({ onEmail, onBack }: { onEmail: () => void; onBack: () => void }) {
   const [note, setNote] = useState('');
   const oauth = async (provider: 'apple' | 'google') => {
@@ -447,9 +450,13 @@ function CreateAccount({ onEmail, onBack }: { onEmail: () => void; onBack: () =>
         <Text style={[st.sub, { textAlign: 'center', maxWidth: 300 }]}>Create your account and start your first workout today. No card needed.</Text>
       </View>
       <View style={{ gap: 12 }}>
-        <Cta title="Continue with Apple" onPress={() => oauth('apple')} />
-        <Pressable accessibilityRole="button" onPress={() => oauth('google')} style={st.ghostBig}><Text style={st.ghostT}>Continue with Google</Text></Pressable>
-        <Pressable accessibilityRole="button" onPress={onEmail} style={st.ghostBig}><Text style={st.ghostT}>Continue with email</Text></Pressable>
+        {OAUTH ? (
+          <>
+            <Cta title="Continue with Apple" onPress={() => oauth('apple')} />
+            <Pressable accessibilityRole="button" onPress={() => oauth('google')} style={st.ghostBig}><Text style={st.ghostT}>Continue with Google</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={onEmail} style={st.ghostBig}><Text style={st.ghostT}>Continue with email</Text></Pressable>
+          </>
+        ) : <Cta title="Continue with email" onPress={onEmail} />}
         {!!note && <Text style={[st.err, { textAlign: 'center' }]}>{note}</Text>}
       </View>
       <Text style={[st.fine, { textAlign: 'center', marginTop: 18, marginBottom: 20 }]}>By continuing you agree to the{' '}
