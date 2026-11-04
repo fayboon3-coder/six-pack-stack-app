@@ -65,12 +65,12 @@ export default function SignIn() {
             <Text style={st.label} nativeID="emailLabel">Email</Text>
             <TextInput accessibilityLabelledBy="emailLabel" value={email} onChangeText={setEmail} autoCapitalize="none"
               autoComplete="email" keyboardType="email-address" textContentType="emailAddress" placeholder="you@email.com"
-              placeholderTextColor="#ffffff99" style={st.input} returnKeyType="next" />
+              placeholderTextColor="#1b244099" style={st.input} returnKeyType="next" />
             <Text style={st.label} nativeID="pwLabel">Password</Text>
             <TextInput accessibilityLabelledBy="pwLabel" value={password} onChangeText={setPassword} secureTextEntry
               autoComplete={mode === 'up' ? 'new-password' : 'current-password'}
               textContentType={mode === 'up' ? 'newPassword' : 'password'} placeholder={mode === 'up' ? 'At least 8 characters' : 'Your password'}
-              placeholderTextColor="#ffffff99" style={st.input} returnKeyType="go" onSubmitEditing={submit} />
+              placeholderTextColor="#1b244099" style={st.input} returnKeyType="go" onSubmitEditing={submit} />
             <Button title={mode === 'in' ? 'Sign in' : 'Create account'} onPress={submit} loading={busy} />
             {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
             {!!note && <Text style={st.note} accessibilityLiveRegion="polite">{note}</Text>}

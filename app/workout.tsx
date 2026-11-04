@@ -230,10 +230,10 @@ export default function Workout() {
                   </View>
                   <Text style={st.last} numberOfLines={1}>{p ? `${p.weight ?? '–'} × ${p.reps ?? '–'}` : '—'}</Text>
                   <TextInput value={e.w} onChangeText={(t) => update(k, { w: t.replace(/[^\d.]/g, '') })} keyboardType="decimal-pad"
-                    placeholder={p?.weight != null ? String(p.weight) : '0'} placeholderTextColor="#ffffff55" returnKeyType="done"
+                    placeholder={p?.weight != null ? String(p.weight) : '0'} placeholderTextColor="#1b244055" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 72 }, active && { borderColor: C.red }]} />
                   <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
-                    placeholder={p?.reps != null ? String(p.reps) : '0'} placeholderTextColor="#ffffff55" returnKeyType="done"
+                    placeholder={p?.reps != null ? String(p.reps) : '0'} placeholderTextColor="#1b244055" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 58 }]} />
                   <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Set ${k + 1} done`} hitSlop={6}
                     onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.green, borderColor: C.green }]}>

@@ -126,7 +126,7 @@ function In({ label, v, on, kb = 'default', multi, ph }: { label: string; v: str
     <View style={{ gap: 8 }}>
       <Text style={st.label}>{label}</Text>
       <TextInput accessibilityLabel={label} value={v} onChangeText={on} keyboardType={kb} multiline={multi} placeholder={ph}
-        placeholderTextColor="#ffffff66" autoCapitalize={kb === 'email-address' ? 'none' : 'sentences'}
+        placeholderTextColor="#1b244066" autoCapitalize={kb === 'email-address' ? 'none' : 'sentences'}
         style={[st.input, multi && { height: 96, paddingTop: 14, textAlignVertical: 'top' }]} />
     </View>
   );
@@ -157,7 +157,7 @@ const st = StyleSheet.create({
   input: { minHeight: 52, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 16, paddingHorizontal: 14 },
   chip: { minHeight: 44, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, paddingHorizontal: 16, justifyContent: 'center' },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  chipText: { fontFamily: F.bold, fontSize: 14, color: C.onAccent },
+  chipText: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   err: { fontFamily: F.bold, fontSize: 14, color: C.red },
   doneIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' },
 });

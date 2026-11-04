@@ -61,7 +61,7 @@ function NumberRow({ icon, label, hint, unit, value, onChange, kb = 'decimal-pad
       </View>
       <View style={st.numBox}>
         <TextInput accessibilityLabel={`${label} in ${unit}`} value={value} onChangeText={onChange} keyboardType={kb}
-          placeholder={placeholder} placeholderTextColor="#ffffff66" style={st.numInput} />
+          placeholder={placeholder} placeholderTextColor="#1b244066" style={st.numInput} />
         <Text style={st.unit}>{unit}</Text>
       </View>
     </View>
@@ -101,7 +101,7 @@ function Note({ icon, label, value, onChange, placeholder }: {
         <Text style={st.rowLabel}>{label}</Text>
       </View>
       <TextInput accessibilityLabel={label} value={value} onChangeText={onChange} placeholder={placeholder}
-        placeholderTextColor="#ffffff66" multiline style={st.note} />
+        placeholderTextColor="#1b244066" multiline style={st.note} />
     </View>
   );
 }
@@ -317,7 +317,7 @@ const st = StyleSheet.create({
   chips: { flexDirection: 'row', gap: 5 },
   chip: { flex: 1, minWidth: 0, maxWidth: 52, height: 42, borderRadius: 11, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
   chipOn: { backgroundColor: C.red, borderColor: C.red },
-  chipText: { fontFamily: F.xbold, fontSize: 13, color: C.onAccent },
+  chipText: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
   picked: { fontFamily: F.black, fontSize: 15, color: C.green },
   ends: { flexDirection: 'row', justifyContent: 'space-between' },
   endText: { fontFamily: F.semi, fontSize: 11, color: C.ink },

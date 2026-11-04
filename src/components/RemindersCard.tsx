@@ -69,6 +69,6 @@ const st = StyleSheet.create({
   sub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.ink },
   chip: { minHeight: 40, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, paddingHorizontal: 14, justifyContent: 'center' },
   chipOn: { borderColor: C.green, backgroundColor: 'rgba(63,191,127,0.15)' },
-  chipText: { fontFamily: F.bold, fontSize: 13, color: C.onAccent },
+  chipText: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   note: { fontFamily: F.bold, fontSize: 13, color: C.red },
 });

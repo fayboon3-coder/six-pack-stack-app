@@ -88,7 +88,7 @@ const st = StyleSheet.create({
   statText: { fontFamily: F.xbold, fontSize: 12, color: C.ink },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  chipText: { fontFamily: F.bold, fontSize: 12, color: C.onAccent },
+  chipText: { fontFamily: F.bold, fontSize: 12, color: C.ink },
   dot: { width: 7, height: 7, borderRadius: 4 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   rowLine: { borderTopWidth: 1, borderTopColor: C.line },

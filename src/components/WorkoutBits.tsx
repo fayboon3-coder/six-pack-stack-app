@@ -24,5 +24,5 @@ const st = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderRadius: 999, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 5 },
   dot: { width: 7, height: 7, borderRadius: 4 },
-  chipText: { fontFamily: F.bold, fontSize: 12, color: C.onAccent },
+  chipText: { fontFamily: F.bold, fontSize: 12, color: C.ink },
 });

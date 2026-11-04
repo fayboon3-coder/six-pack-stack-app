@@ -48,7 +48,7 @@ export default function StackCheck() {
             <View style={st.search}>
               <SearchIcon color={C.ink} />
               <TextInput accessibilityLabel="Search supplements" value={q} onChangeText={setQ} placeholder="AG1, C4, fat burner, creatine…"
-                placeholderTextColor="#ffffff77" style={st.input} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
+                placeholderTextColor="#1b244077" style={st.input} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
               {!!q && <Pressable accessibilityRole="button" accessibilityLabel="Clear" onPress={() => setQ('')} hitSlop={10}><Text style={st.clear}>✕</Text></Pressable>}
             </View>
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
@@ -101,7 +101,7 @@ const st = StyleSheet.create({
   clear: { fontFamily: F.black, fontSize: 16, color: C.ink },
   chip: { minHeight: 40, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, paddingHorizontal: 14, justifyContent: 'center' },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  chipText: { fontFamily: F.bold, fontSize: 13, color: C.onAccent },
+  chipText: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 10 },
   name: { fontFamily: F.black, fontSize: 16, color: C.ink },
   sub: { fontFamily: F.semi, fontSize: 13, color: C.ink },

@@ -88,7 +88,7 @@ export default function ClientDetail() {
               <Text style={st.label}>Week</Text>
               <TextInput value={week} onChangeText={(t) => setWeek(t.replace(/\D/g, ''))} keyboardType="number-pad" style={[st.input, { width: 70, textAlign: 'center' }]} accessibilityLabel="Review week" />
             </View>
-            <TextInput value={body} onChangeText={setBody} multiline placeholder={`${name.split(' ')[0]}, big week…`} placeholderTextColor="#ffffff66"
+            <TextInput value={body} onChangeText={setBody} multiline placeholder={`${name.split(' ')[0]}, big week…`} placeholderTextColor="#1b244066"
               style={[st.input, { minHeight: 140, textAlignVertical: 'top', paddingTop: 12 }]} accessibilityLabel="Review text" />
             <Button title={busy ? 'Sending…' : 'Send review'} onPress={send} loading={busy} />
           </View>

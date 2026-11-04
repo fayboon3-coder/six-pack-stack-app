@@ -196,7 +196,7 @@ const st = StyleSheet.create({
   msg: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: 'rgba(27,36,64,0.92)' },
   starters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingLeft: 34 },
   chip: { borderWidth: 1.5, borderColor: C.red, borderRadius: 999, paddingHorizontal: 13, paddingVertical: 8, backgroundColor: 'rgba(226,67,59,0.08)' },
-  chipT: { fontFamily: F.bold, fontSize: 13, color: C.onAccent },
+  chipT: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.ink },
   wall: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 16, gap: 8, marginTop: 4 },
   wallT: { fontFamily: F.black, fontSize: 16, color: C.ink },

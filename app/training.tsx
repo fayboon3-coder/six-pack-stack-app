@@ -259,7 +259,7 @@ const st = StyleSheet.create({
   err: { fontFamily: F.bold, fontSize: 14, color: C.red },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, paddingVertical: 10, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.16)' },
-  chipT: { fontFamily: F.semi, fontSize: 14, color: C.onAccent },
+  chipT: { fontFamily: F.semi, fontSize: 14, color: C.ink },
   tick: { width: 16, height: 16, borderRadius: 8, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   weekTitle: { fontFamily: F.black, fontSize: 21, color: C.ink, marginTop: 6 },
   day: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 14, gap: 10 },
@@ -276,5 +276,5 @@ const st = StyleSheet.create({
   own: { gap: 10, borderRadius: 16, borderWidth: 1.5, borderColor: C.red, padding: 14, backgroundColor: C.bg },
   input: { height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, color: C.ink, paddingHorizontal: 14, fontFamily: F.semi, fontSize: 15 },
   btn2: { height: 46, borderRadius: 12, borderWidth: 1.5, borderColor: C.ink, alignItems: 'center', justifyContent: 'center' },
-  btn2T: { fontFamily: F.black, fontSize: 13, color: C.onAccent, letterSpacing: 0.4, textTransform: 'uppercase' },
+  btn2T: { fontFamily: F.black, fontSize: 13, color: C.ink, letterSpacing: 0.4, textTransform: 'uppercase' },
 });

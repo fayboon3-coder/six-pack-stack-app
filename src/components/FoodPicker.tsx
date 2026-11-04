@@ -66,8 +66,8 @@ export default function FoodPicker({ ids, custom, onChange }: {
           const on = sel.has(f.id);
           return (
             <Pressable key={f.id} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => toggle(f.id)} style={[st.chip, on && st.chipOn]}>
-              {on && <View style={st.tick}><CheckIcon size={10} /></View>}
-              <Text style={st.chipText}>{f.name}</Text>
+              {on && <View style={st.tick}><CheckIcon size={10} color={C.red} /></View>}
+              <Text style={[st.chipText, on && { color: C.onAccent }]}>{f.name}</Text>
             </Pressable>
           );
         })}
@@ -137,9 +137,9 @@ const st = StyleSheet.create({
   tabText: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, paddingVertical: 11, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
-  chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.16)' },
-  chipText: { fontFamily: F.semi, fontSize: 14, color: C.onAccent },
-  tick: { width: 18, height: 18, borderRadius: 9, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  chipOn: { borderColor: C.red, backgroundColor: C.red },
+  chipText: { fontFamily: F.semi, fontSize: 14, color: C.ink },
+  tick: { width: 18, height: 18, borderRadius: 9, backgroundColor: C.onAccent, alignItems: 'center', justifyContent: 'center' },
   addBtn: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.ink, alignItems: 'center', justifyContent: 'center' },
   addText: { fontFamily: F.black, fontSize: 14, color: C.ink, letterSpacing: 0.4, textTransform: 'uppercase' },
   summary: { borderRadius: 16, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 14, gap: 4 },

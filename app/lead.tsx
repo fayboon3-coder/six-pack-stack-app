@@ -46,7 +46,7 @@ export default function LeadScreen() {
     setBusy(true);
     await captureLead({ first_name: name.trim(), email: e, want, src });
     setBusy(false);
-    if (c.next === 'coaching') { Linking.openURL(COACHING_URL); return router.replace('/welcome'); }
+    if (c.next === 'coaching') return router.replace('/coaching');
     router.replace({ pathname: c.next as any, params: { name: name.trim(), email: e, ...(src ? { src } : {}) } });
   };
 
@@ -61,9 +61,9 @@ export default function LeadScreen() {
           <Text style={st.k}>{c.k}</Text>
           <Text style={st.h}>{c.h}</Text>
           <Text style={st.sub}>{c.sub}</Text>
-          <TextInput accessibilityLabel="First name" value={name} onChangeText={setName} placeholder="First name" placeholderTextColor="#ffffff77"
+          <TextInput accessibilityLabel="First name" value={name} onChangeText={setName} placeholder="First name" placeholderTextColor="#1b244077"
             style={st.input} autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
-          <TextInput accessibilityLabel="Email" value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#ffffff77"
+          <TextInput accessibilityLabel="Email" value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor="#1b244077"
             style={st.input} autoCapitalize="none" keyboardType="email-address" autoComplete="email" textContentType="emailAddress" returnKeyType="go" onSubmitEditing={go} />
           {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
           <Button title={c.cta} onPress={go} loading={busy} />
