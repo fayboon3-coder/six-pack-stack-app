@@ -6,9 +6,9 @@ import { readLead } from '../src/lib/lead';
 import { useAuth } from '../src/lib/auth';
 import { C, F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
-import { BackIcon, CheckIcon } from '../src/components/icons';
+import { CheckIcon } from '../src/components/icons';
 import { KIT_FORMS, kitForm } from '../src/lib/kit';
-import Backdrop from '../src/components/Backdrop';
+import { RoundBtn } from '../src/components/PageTitle';
 
 const START = ['This week', 'Within 2 weeks', 'Within a month', 'Just looking'];
 const INVEST = ['Yes', 'Yes, with a payment plan', 'Not right now'];
@@ -70,7 +70,7 @@ export default function Apply() {
   if (done) {
     return (
       <SafeAreaView style={[st.wrap, { justifyContent: 'center', gap: 16 }]}>
-        <View style={st.doneIcon}><CheckIcon size={30} /></View>
+        <View style={st.doneIcon}><CheckIcon size={28} color="#ffffff" /></View>
         <Text style={st.h}>Got it, {f.name.trim()}. Your application is in.</Text>
         <Text style={st.body}>I read every application myself, within 24 hours. Watch your inbox at {f.email.trim()}. If we're a fit, you'll get a short video I recorded for you and a link to claim your spot.</Text>
         <Text style={st.body}>Check your spam or promotions folder and move my email to your main inbox so you don't miss it.</Text>
@@ -82,15 +82,12 @@ export default function Apply() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
-      <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
-          <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
-            <BackIcon />
-          </Pressable>
+          <RoundBtn kind="back" label="Close" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} />
           <Text style={st.k}>1:1 coaching application</Text>
           <Text style={st.h}>Let's see if we're a fit.</Text>
-          <Text style={st.body}>About 2 minutes. I've filled in what you already told me.</Text>
+          <Text style={st.body}>About 2 minutes. I read every application myself, within 24 hours. I've filled in what you already told me.</Text>
 
           <In label="First name" v={f.name} on={(t) => set('name', t)} />
           <In label="Email" v={f.email} on={(t) => set('email', t)} kb="email-address" />
@@ -139,7 +136,7 @@ function Pick({ label, opts, v, on }: { label: string; opts: string[]; v: string
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
         {opts.map((o) => (
           <Pressable key={o} accessibilityRole="radio" accessibilityState={{ selected: v === o }} onPress={() => on(o)} style={[st.chip, v === o && st.chipOn]}>
-            <Text style={st.chipText}>{o}</Text>
+            <Text style={[st.chipText, v === o && { color: '#ffffff' }]}>{o}</Text>
           </Pressable>
         ))}
       </View>
@@ -149,15 +146,15 @@ function Pick({ label, opts, v, on }: { label: string; opts: string[]; v: string
 
 const st = StyleSheet.create({
   wrap: { flex: 1, backgroundColor: C.bg, padding: 24 },
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.4 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
-  label: { fontFamily: F.xbold, fontSize: 13, lineHeight: 18, color: C.ink },
-  hint: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.ink },
-  input: { minHeight: 52, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 16, paddingHorizontal: 14 },
-  chip: { minHeight: 44, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, paddingHorizontal: 16, justifyContent: 'center' },
-  chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  chipText: { fontFamily: F.bold, fontSize: 14, color: C.ink },
+  k: { fontFamily: F.bold, fontSize: 13, letterSpacing: 1, textTransform: 'uppercase', color: C.red, marginTop: 6 },
+  h: { fontFamily: F.xbold, fontSize: 31, lineHeight: 37, color: C.ink, letterSpacing: -0.5, marginTop: -8 },
+  body: { fontFamily: F.medium, fontSize: 16, lineHeight: 23, color: C.ink, marginTop: -6 },
+  label: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: C.ink },
+  hint: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink },
+  input: { minHeight: 56, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16, outlineWidth: 0 } as any,
+  chip: { minHeight: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.bg, paddingHorizontal: 18, justifyContent: 'center' },
+  chipOn: { borderColor: C.red, backgroundColor: C.red },
+  chipText: { fontFamily: F.semi, fontSize: 16, color: C.ink },
   err: { fontFamily: F.bold, fontSize: 14, color: C.red },
-  doneIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' },
+  doneIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', borderWidth: 8, borderColor: '#e7f6ee' },
 });
