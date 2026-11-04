@@ -30,9 +30,8 @@ export default function Apply() {
   const [f, setF] = useState({
     name: profile?.first_name || q.first_name || params.name || '',
     email: profile?.email || session?.user.email || params.email || '',
-    phone: '',
     age: q.age || '', height: q.height_ft ? `${q.height_ft}'${q.height_in || 0}"` : '', current_weight: q.weight || '',
-    goal_12_weeks: '', cost_of_staying: '',
+    goal_12_weeks: '',
     monthly_spend: q.monthly_spend || '', train_days: quizDays,
     start_timing: START.includes(quizStart) ? quizStart : '', ready_to_invest: INVEST.includes(q.ready_to_invest) ? q.ready_to_invest : '',
     medical: '' as '' | 'No' | 'Yes', medicalText: '',
@@ -48,8 +47,8 @@ export default function Apply() {
   const set = (k: keyof typeof f, v: string) => { setErr(''); setF((x) => ({ ...x, [k]: v })); };
 
   const submit = async () => {
-    const need: [keyof typeof f, string][] = [['name', 'your first name'], ['email', 'your email'], ['phone', 'your phone number'], ['age', 'your age'],
-      ['height', 'your height'], ['current_weight', 'your weight'], ['goal_12_weeks', 'your 12-week goal'], ['cost_of_staying', "what it's costing you"],
+    const need: [keyof typeof f, string][] = [['name', 'your first name'], ['email', 'your email'], ['age', 'your age'],
+      ['height', 'your height'], ['current_weight', 'your weight'], ['goal_12_weeks', 'your 12-week goal'],
       ['monthly_spend', 'your monthly supplement spend'], ['train_days', 'how often you train'], ['start_timing', 'when you want to start'],
       ['ready_to_invest', 'whether you are ready to invest'], ['medical', 'the medical question']];
     const miss = need.find(([k]) => !String(f[k]).trim());
@@ -57,8 +56,8 @@ export default function Apply() {
     if (f.medical === 'Yes' && f.medicalText.trim().length < 2) return setErr('Add a quick note about your condition, injury or medication.');
     setBusy(true);
     const ok = await kitForm(KIT_FORMS.application, f.email.trim().toLowerCase(), f.name.trim(), {
-      phone: f.phone, age: f.age, height: f.height, current_weight: f.current_weight, goal_12_weeks: f.goal_12_weeks,
-      cost_of_staying: f.cost_of_staying, tried_before: (q.tried || []).join(', '), monthly_spend: f.monthly_spend,
+      age: f.age, height: f.height, current_weight: f.current_weight, goal_12_weeks: f.goal_12_weeks,
+      monthly_spend: f.monthly_spend,
       train_days: f.train_days, start_timing: f.start_timing, ready_to_invest: f.ready_to_invest,
       medical: f.medical === 'Yes' ? `Yes: ${f.medicalText.trim()}` : 'No', lead_source: q.src ? `app:${q.src}` : 'app',
     });
@@ -91,14 +90,12 @@ export default function Apply() {
 
           <In label="First name" v={f.name} on={(t) => set('name', t)} />
           <In label="Email" v={f.email} on={(t) => set('email', t)} kb="email-address" />
-          <In label="Phone (for WhatsApp if we work together)" v={f.phone} on={(t) => set('phone', t)} kb="phone-pad" />
           <View style={{ flexDirection: 'row', gap: 10 }}>
             <View style={{ flex: 1 }}><In label="Age" v={f.age} on={(t) => set('age', t)} kb="number-pad" /></View>
             <View style={{ flex: 1 }}><In label="Height" v={f.height} on={(t) => set('height', t)} ph={`5'10"`} /></View>
             <View style={{ flex: 1 }}><In label="Weight (lbs)" v={f.current_weight} on={(t) => set('current_weight', t)} kb="decimal-pad" /></View>
           </View>
           <In label="What do you want your body to look like in 12 weeks?" v={f.goal_12_weeks} on={(t) => set('goal_12_weeks', t)} multi ph="e.g. Lose my gut, see my top abs, fit into my old jeans" />
-          <In label="What's it costing you to stay where you are?" v={f.cost_of_staying} on={(t) => set('cost_of_staying', t)} multi ph="Confidence, dating, energy, money… only I read this" />
           <Pick label="Monthly supplement spend" opts={SPEND} v={f.monthly_spend} on={(t) => set('monthly_spend', t)} />
           <Pick label="Days a week you train right now" opts={DAYS} v={f.train_days} on={(t) => set('train_days', t)} />
           <Pick label="How soon do you want to start?" opts={START} v={f.start_timing} on={(t) => set('start_timing', t)} />
