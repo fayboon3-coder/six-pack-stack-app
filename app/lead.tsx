@@ -21,7 +21,7 @@ const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next:
 /** One screen between "what are you here for" and the path: name + email, straight into Boon's emails. */
 export default function LeadScreen() {
   const { want: w } = useLocalSearchParams<{ want?: string }>();
-  const want: Want = w === 'btl' || w === 'coaching' || w === 'sub' ? w : 'plan';
+  const want: Want = w === 'coaching' || w === 'sub' ? w : 'plan';
   const c = COPY[want];
   const router = useRouter();
   const [name, setName] = useState('');

@@ -49,11 +49,11 @@ export default function VerdictScreen() {
         {!!v.claim && <Block label="What they claim" text={v.claim} />}
 
         {locked ? (
-          <Pressable accessibilityRole="button" onPress={() => router.push(profile ? '/unlock' : '/btl')} style={st.lock}>
+          <Pressable accessibilityRole="button" onPress={() => router.push(profile ? '/unlock' : '/quiz')} style={st.lock}>
             <View style={st.lockIcon}><LockIcon size={20} /></View>
             <Text style={st.lockT}>What the research says, the cheaper swap and the marketing tricks</Text>
-            <Text style={st.body}>{profile ? 'Full breakdowns for every product come with the full plan.' : 'Every full breakdown is in Beyond the Label.'}</Text>
-            <View style={st.btn}><Text style={st.btnText}>{profile ? 'Unlock Stack Check' : 'See Beyond the Label'}</Text></View>
+            <Text style={st.body}>{profile ? 'Full breakdowns for every product come with the full plan.' : 'Every full breakdown comes with the Six-Pack Stack app. Build your free plan to start.'}</Text>
+            <View style={st.btn}><Text style={st.btnText}>{profile ? 'Unlock Stack Check' : 'Build my free plan'}</Text></View>
           </Pressable>
         ) : (
           <>

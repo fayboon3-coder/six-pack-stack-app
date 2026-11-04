@@ -2,13 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { C, F } from '../lib/theme';
-import { BTL_URL, COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
+import { COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
 import { useAuth } from '../lib/auth';
 import { track } from '../lib/track';
 import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, type Offer } from '../lib/purchases';
 import { CheckIcon, LockIcon } from './icons';
 
-const BTL_IMG = require('../../assets/img/btl_cover.jpg');
 const PROGRAM_IMG = require('../../assets/img/cover_program.jpg');
 const COACH_IMG = require('../../assets/img/cover_coaching.jpg');
 const Cover = ({ src }: { src: any }) => (
@@ -80,7 +79,7 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
         <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>
         <Tick>Calories re-set at weeks 4 and 8 so your progress keeps moving</Tick>
         <Tick>Your meal plan, swaps, eating-out orders and grocery list</Tick>
-        <Tick>Stack Check: all 47 Beyond the Label verdicts ($39.99 on its own)</Tick>
+        <Tick>Stack Check: all 47 product verdicts (Beyond the Label, built in)</Tick>
         <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
@@ -122,22 +121,6 @@ export function CoachingCard() {
         <Text style={st.btnText}>See how coaching works</Text>
       </Pressable>
       <Text style={st.small}>2-minute application. Follow the plan and miss your goal, and I coach you up to 12 more weeks free.</Text>
-    </View>
-  );
-}
-
-export function BtlCard() {
-  return (
-    <View style={st.card}>
-      <Cover src={BTL_IMG} />
-      <View style={{ gap: 10 }}>
-        <Text style={st.kicker}>Beyond the Label · $39.99</Text>
-        <Text style={st.title}>What actually works, and what's marketing</Text>
-        <Text style={st.body}>My full investigation of 47 supplements and gadgets. Check anything before you buy it.</Text>
-        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: C.navy }]}>
-          <Text style={st.btnText}>Get Beyond the Label</Text>
-        </Pressable>
-      </View>
     </View>
   );
 }
