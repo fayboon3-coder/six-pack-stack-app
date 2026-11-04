@@ -42,8 +42,8 @@ const st = StyleSheet.create({
   badge: { position: 'absolute', top: 16, left: 16, backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
   badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.onAccent },
   body: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 4, gap: 6 },
-  title: { fontFamily: F.black, fontSize: 34, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 36, color: C.ink, letterSpacing: -0.5 },
   subtitle: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.ink },
   cta: { marginTop: 12, height: 58, borderRadius: 16, backgroundColor: C.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
+  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: -0.5, color: C.onAccent },
 });

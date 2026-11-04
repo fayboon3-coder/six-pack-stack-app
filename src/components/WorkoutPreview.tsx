@@ -81,7 +81,7 @@ const st = StyleSheet.create({
   play: { position: 'absolute', top: 14, right: 14, width: 46, height: 46, borderRadius: 23, backgroundColor: 'rgba(226,67,59,0.92)', alignItems: 'center', justifyContent: 'center', paddingLeft: 3 },
   titleWrap: { position: 'absolute', left: 20, right: 20, bottom: 10 },
   day: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  title: { fontFamily: F.black, fontSize: 36, lineHeight: 40, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  title: { fontFamily: F.black, fontSize: 36, lineHeight: 40, color: C.ink, letterSpacing: -0.5 },
   body: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 8, gap: 14 },
   stats: { flexDirection: 'row', gap: 8 },
   stat: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: C.bg, borderRadius: 12, paddingVertical: 10 },
@@ -101,5 +101,5 @@ const st = StyleSheet.create({
   muscle: { fontFamily: F.semi, fontSize: 12, color: C.ink, flexShrink: 1 },
   more: { fontFamily: F.bold, fontSize: 13, color: C.ink, paddingTop: 6, borderTopWidth: 1, borderTopColor: C.line },
   cta: { height: 58, borderRadius: 16, backgroundColor: C.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
+  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: -0.5, color: C.onAccent },
 });

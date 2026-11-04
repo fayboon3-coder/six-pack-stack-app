@@ -177,7 +177,7 @@ const st = StyleSheet.create({
   scoreT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ink },
   scoreChev: { fontFamily: F.bold, fontSize: 28, color: C.ink, marginTop: -4 },
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
   search: { height: 56, borderRadius: 16, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16 },
   input: { flex: 1, fontFamily: F.bold, fontSize: 17, color: C.ink, minWidth: 0 },

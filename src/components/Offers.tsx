@@ -177,7 +177,7 @@ const st = StyleSheet.create({
   legal: { fontFamily: F.semi, fontSize: 11, lineHeight: 16, color: 'rgba(27,36,64,0.6)', textAlign: 'center' },
   links: { flexDirection: 'row', justifyContent: 'center', gap: 22 },
   link: { fontFamily: F.bold, fontSize: 12, color: C.ink, textDecorationLine: 'underline' },
-  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent, textAlign: 'center' },
+  btnText: { fontFamily: F.bold, fontSize: 16, color: C.onAccent, textAlign: 'center' },
   locked: { marginHorizontal: 20, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, borderRadius: 24, padding: 20, gap: 10 },
   lockIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
 });

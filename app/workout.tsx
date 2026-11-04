@@ -293,7 +293,7 @@ const st = StyleSheet.create({
   prV: { fontFamily: F.black, fontSize: 17, color: C.onAccent },
   doneBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
   doneK: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.green },
-  doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, letterSpacing: -0.5 },
   doneTile: { flex: 1, backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
   doneV: { fontFamily: F.black, fontSize: 22, color: C.ink },
   doneL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },

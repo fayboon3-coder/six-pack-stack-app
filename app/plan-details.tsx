@@ -222,7 +222,7 @@ const st = StyleSheet.create({
   numL: { fontFamily: F.semi, fontSize: 12, color: C.ink },
   big: { fontFamily: F.black, fontSize: 28 },
   item: { fontFamily: F.black, fontSize: 17, color: C.ink },
-  slot: { fontFamily: F.black, fontSize: 22, color: C.ink, textTransform: 'uppercase' },
+  slot: { fontFamily: F.black, fontSize: 22, color: C.ink },
   buy: { alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 10, backgroundColor: C.red, justifyContent: 'center' },
   buyText: { fontFamily: F.black, fontSize: 13, color: C.onAccent, textTransform: 'uppercase' },
   pill: { fontFamily: F.black, fontSize: 11, letterSpacing: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden', alignSelf: 'flex-start' },

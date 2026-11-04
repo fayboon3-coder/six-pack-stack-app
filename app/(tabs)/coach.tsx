@@ -152,7 +152,7 @@ const st = StyleSheet.create({
   preview: { borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 14, gap: 8 },
   vrow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, backgroundColor: C.bg, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
   pbtn: { minHeight: 44, borderRadius: 999, backgroundColor: C.red, paddingHorizontal: 16, justifyContent: 'center' },
-  pbtnText: { fontFamily: F.black, fontSize: 13, color: C.onAccent, textTransform: 'uppercase', letterSpacing: 0.5 },
+  pbtnText: { fontFamily: F.bold, fontSize: 16, color: C.onAccent },
   kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red, marginTop: 10 },
   title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink },
   sub: { fontFamily: F.semi, fontSize: 14, color: C.ink },

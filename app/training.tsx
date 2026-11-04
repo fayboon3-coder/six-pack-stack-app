@@ -237,7 +237,7 @@ function AddMove({ onAdd, onCancel }: { onAdd: (name: string, target: string) =>
 
 const st = StyleSheet.create({
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
   small: { fontFamily: F.semi, fontSize: 13, lineHeight: 19, color: 'rgba(27,36,64,0.75)' },
   secT: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase', color: C.ink },
@@ -276,5 +276,5 @@ const st = StyleSheet.create({
   own: { gap: 10, borderRadius: 16, borderWidth: 1.5, borderColor: C.red, padding: 14, backgroundColor: C.bg },
   input: { height: 48, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, color: C.ink, paddingHorizontal: 14, fontFamily: F.semi, fontSize: 15 },
   btn2: { height: 46, borderRadius: 12, borderWidth: 1.5, borderColor: C.ink, alignItems: 'center', justifyContent: 'center' },
-  btn2T: { fontFamily: F.black, fontSize: 13, color: C.ink, letterSpacing: 0.4, textTransform: 'uppercase' },
+  btn2T: { fontFamily: F.bold, fontSize: 16, color: C.ink },
 });

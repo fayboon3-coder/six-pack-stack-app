@@ -51,7 +51,7 @@ export default function TrialOffer() {
 
 const st = StyleSheet.create({
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
   points: { gap: 8, borderRadius: 18, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 16 },
   dot: { fontFamily: F.black, fontSize: 15, color: C.green },

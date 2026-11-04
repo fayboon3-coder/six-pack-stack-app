@@ -38,6 +38,6 @@ const st = StyleSheet.create({
   pills: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   pill: { backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   pillText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.onAccent },
-  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.ink, letterSpacing: -0.6, textTransform: 'uppercase' },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.ink, letterSpacing: -0.6 },
   lede: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.ink },
 });

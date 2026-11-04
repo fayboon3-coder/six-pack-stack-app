@@ -56,7 +56,7 @@ export default function SignIn() {
           <View style={st.wrap}>
           <View style={{ gap: 10 }}>
             <Eyebrow>{mode === 'in' ? 'Welcome back' : 'Welcome'}</Eyebrow>
-            <H1 style={{ fontSize: 34, textTransform: 'uppercase', lineHeight: 36 }}>
+            <H1 style={{ fontSize: 34, lineHeight: 36 }}>
               {mode === 'in' ? 'Sign in to your plan.' : 'Create your account.'}
             </H1>
             <Text style={st.sub}>{mode === 'up' ? 'Use the email you bought coaching with. Your plan attaches to it automatically.' : 'Welcome back. Your plan is right where you left it.'}</Text>

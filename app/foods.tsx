@@ -66,6 +66,6 @@ export default function Foods() {
 
 const st = StyleSheet.create({
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
 });

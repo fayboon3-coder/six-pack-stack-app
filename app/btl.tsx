@@ -75,7 +75,7 @@ const Score = ({ n, l, c }: { n: number; l: string; c: string }) => (
 
 const st = StyleSheet.create({
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.5 },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
   label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
   score: { flexDirection: 'row', gap: 10 },

@@ -87,11 +87,11 @@ const Block = ({ label, text, tone }: { label: string; text: string; tone?: 'gre
 
 const st = StyleSheet.create({
   k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
-  h: { fontFamily: F.black, fontSize: 28, lineHeight: 32, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.4 },
+  h: { fontFamily: F.black, fontSize: 28, lineHeight: 32, color: C.ink, letterSpacing: -0.4 },
   verdict: { flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 2, borderRadius: 18, padding: 14, backgroundColor: C.card },
   mark: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   markText: { fontFamily: F.black, fontSize: 22, color: C.bg },
-  vLabel: { fontFamily: F.black, fontSize: 22, textTransform: 'uppercase' },
+  vLabel: { fontFamily: F.black, fontSize: 22 },
   vSub: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   headline: { fontFamily: F.black, fontSize: 22, lineHeight: 27, color: C.ink },
   body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
@@ -103,6 +103,6 @@ const st = StyleSheet.create({
   lockIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   lockT: { fontFamily: F.black, fontSize: 18, lineHeight: 23, color: C.ink },
   btn: { height: 54, borderRadius: 14, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
+  btnText: { fontFamily: F.bold, fontSize: 16, color: C.onAccent },
   fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.ink },
 });

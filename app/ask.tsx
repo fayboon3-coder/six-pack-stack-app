@@ -206,7 +206,7 @@ const st = StyleSheet.create({
   wallT: { fontFamily: F.black, fontSize: 16, color: C.ink },
   wallB: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(27,36,64,0.8)' },
   wallBtn: { backgroundColor: C.red, borderRadius: 14, paddingVertical: 13, alignItems: 'center', marginTop: 6 },
-  wallBtnT: { fontFamily: F.black, fontSize: 14, color: C.onAccent, letterSpacing: 0.5, textTransform: 'uppercase' },
+  wallBtnT: { fontFamily: F.bold, fontSize: 16, color: C.onAccent },
   bar: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6, backgroundColor: C.bg },
   inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, borderRadius: 26, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, paddingLeft: 6, paddingRight: 5, paddingVertical: 5 },
   input: { flex: 1, minHeight: 42, maxHeight: 120, color: C.ink, fontFamily: F.medium, fontSize: 15, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, outlineWidth: 0 } as any,
