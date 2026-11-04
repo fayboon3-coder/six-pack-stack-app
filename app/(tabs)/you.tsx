@@ -13,6 +13,11 @@ import { isoDate, loggedDays } from '../../src/lib/logs';
 import { getStreak } from '../../src/lib/streak';
 import { applyReminders, hasPermission, readPrefs } from '../../src/lib/reminders';
 import { isFree } from '../../src/lib/access';
+import Leaderboard from '../../src/components/Leaderboard';
+import { addProtein, num, proteinGoal, readDay, undoProtein } from '../../src/lib/daily';
+import { kcalEaten, readMeals } from '../../src/lib/mealsToday';
+
+const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
 const LOGO = require('../../assets/logo-b.png');
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -23,6 +28,18 @@ export default function You() {
   const router = useRouter();
   const [weekDays, setWeekDays] = useState<string[]>([]);
   const [total, setTotal] = useState(0);
+  const [adding, setAdding] = useState(false);
+  const [protein, setProtein] = useState(0);
+  const [kcal, setKcal] = useState(0);
+  const [canUndo, setCanUndo] = useState(false);
+  const [bump, setBump] = useState(0);
+  const loadFood = useCallback(async () => {
+    const d = await readDay(); setProtein(d.protein); setCanUndo(d.adds.length > 0);
+    if (plan) setKcal(kcalEaten(plan, await readMeals()));
+  }, [plan]);
+  useFocusEffect(useCallback(() => { loadFood(); }, [loadFood]));
+  const addG = async (g: number) => { await addProtein(g); await loadFood(); setBump((b) => b + 1); };
+  const undoG = async () => { await undoProtein(); await loadFood(); setBump((b) => b + 1); };
 
   const load = useCallback(async () => {
     if (!session || !plan) return;
@@ -54,6 +71,7 @@ export default function You() {
     </View>
   );
   const week = weekOf(plan.train.s);
+  const kcalGoal = num(plan.kcal) || 2000, pg = proteinGoal(plan);
   const toSun = daysToSunday();
   const sunday = new Date(); sunday.setDate(sunday.getDate() + toSun);
   const start = new Date(); start.setDate(start.getDate() - start.getDay() + 1);
@@ -67,7 +85,13 @@ export default function You() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <SafeAreaView edges={['top']} style={st.head}>
         <Text style={st.title} accessibilityRole="header">You</Text>
-        <Pressable accessibilityRole="button" accessibilityLabel="Reminders and settings" onPress={() => router.push('/boon')} style={st.round}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Reminders" onPress={() => router.push('/boon')} style={st.round}>
+          <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0" stroke={C.ink} strokeWidth={1.9} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel={profile?.role === 'coach' ? 'Coach dashboard' : '1:1 coaching'} onPress={() => router.push(profile?.role === 'coach' ? '/coach' : '/coaching')} style={st.round}>
+          <Svg width={20} height={20} viewBox="0 0 24 24"><Circle cx={9} cy={8} r={3.5} stroke={C.ink} strokeWidth={1.9} fill="none" /><Path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M17.5 15c2 .6 3.2 2.2 3.5 5" stroke={C.ink} strokeWidth={1.9} fill="none" strokeLinecap="round" /></Svg>
+        </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/boon')} style={st.round}>
           <Svg width={20} height={20} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={3} stroke={C.ink} strokeWidth={1.9} fill="none" /><Path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1" stroke={C.ink} strokeWidth={1.9} strokeLinecap="round" /></Svg>
         </Pressable>
       </SafeAreaView>
@@ -78,12 +102,14 @@ export default function You() {
           </Pressable>
         )}
 
-        {!!session && <DaysStacked plan={plan} userId={session.user.id} />}
+        {!!session && <DaysStacked key={'ds' + bump} plan={plan} userId={session.user.id} onProtein={() => setAdding(true)} />}
         <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
           <Image source={LOGO} style={{ width: 44, height: 44 }} />
           <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
           <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
         </Pressable>
+
+        {!!session && !viewAs && <Leaderboard userId={session.user.id} />}
 
         <Section title="Upcoming check-ins">
           <View style={st.weekRow}>{days.map((d, k) => <Text key={k} style={st.dow}>{DOW[d.getDay()]}</Text>)}</View>
@@ -103,9 +129,18 @@ export default function You() {
 
         <Section title="Nutrition" onPress={() => router.push('/plan')}>
           <View style={{ flexDirection: 'row', gap: 18 }}>
-            <View style={{ flex: 1 }}><Text style={st.small}>Calories target</Text><Text style={st.num}>{String(plan.kcal)}</Text></View>
-            <View style={{ flex: 1 }}><Text style={st.small}>Protein target</Text><Text style={st.num}>{plan.protein} g</Text></View>
+            <Target label="Calories target" value={fmt(kcalGoal)} left={`${fmt(Math.max(0, kcalGoal - kcal))} left`} pct={kcal / kcalGoal} color="#ffb347" onAdd={() => router.push('/plan')} addLabel="Log a meal" />
+            <Target label="Protein target" value={`${fmt(pg)} g`} left={`${fmt(Math.max(0, pg - protein))} g left`} pct={protein / pg} color="#d22f26" onAdd={() => setAdding(!adding)} addLabel="Add protein" />
           </View>
+          {adding && (
+            <View style={st.addRow}>
+              <Text style={[st.small, { flex: 1, marginTop: 0 }]}>Add protein</Text>
+              {[10, 25, 40].map((g) => (
+                <Pressable key={g} accessibilityRole="button" accessibilityLabel={`Add ${g} grams protein`} onPress={() => addG(g)} style={st.add}><Text style={st.addT}>+{g}g</Text></Pressable>
+              ))}
+              {canUndo && <Pressable accessibilityRole="button" accessibilityLabel="Undo last protein" onPress={undoG} style={st.undo}><Text style={st.undoT}>Undo</Text></Pressable>}
+            </View>
+          )}
         </Section>
 
         <Pressable accessibilityRole="button" onPress={() => router.push('/stack-check')} style={st.redCard}>
@@ -121,6 +156,22 @@ export default function You() {
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
         {profile?.role !== 'coach' && <Text accessibilityRole="link" onPress={() => router.push('/delete-account')} style={st.legal}>Delete my account</Text>}
       </ScrollView>
+    </View>
+  );
+}
+
+function Target({ label, value, left, pct, color, onAdd, addLabel }: { label: string; value: string; left: string; pct: number; color: string; onAdd: () => void; addLabel: string }) {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text style={st.small}>{label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+        <Text style={st.num}>{value}</Text>
+        <Pressable accessibilityRole="button" accessibilityLabel={addLabel} onPress={onAdd} hitSlop={6} style={st.plus}>
+          <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth={2.8} strokeLinecap="round" /></Svg>
+        </Pressable>
+      </View>
+      <View style={st.track}><View style={[st.fill, { width: `${Math.min(100, Math.max(0, pct * 100))}%`, backgroundColor: color }]} /></View>
+      <Text style={st.small}>{left}</Text>
     </View>
   );
 }
@@ -142,7 +193,7 @@ function Section({ title, children, onPress }: { title: string; children: React.
 const st = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingBottom: 14, paddingTop: 8, borderBottomWidth: 1, borderBottomColor: C.line, backgroundColor: C.bg },
   title: { flex: 1, fontFamily: F.black, fontSize: 34, letterSpacing: -0.6, color: C.ink },
-  round: { width: 44, height: 44, borderRadius: 22, borderWidth: 1.5, borderColor: '#d9dde7', alignItems: 'center', justifyContent: 'center' },
+  round: { width: 46, height: 46, borderRadius: 22, borderWidth: 1.5, borderColor: '#d9dde7', alignItems: 'center', justifyContent: 'center' },
   card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 22, overflow: 'hidden' },
   secHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line },
   secT: { fontFamily: F.bold, fontSize: 13, letterSpacing: 0.8, color: C.ink },
@@ -162,7 +213,15 @@ const st = StyleSheet.create({
   checkRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   camera: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.redTint, alignItems: 'center', justifyContent: 'center' },
   rowTitle: { fontFamily: F.bold, fontSize: 17, color: C.ink },
-  num: { fontFamily: F.xbold, fontSize: 26, color: C.ink, marginTop: 6 },
+  num: { fontFamily: F.xbold, fontSize: 26, color: C.ink },
+  plus: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  track: { height: 6, borderRadius: 3, backgroundColor: '#e8eaf0', marginTop: 10, marginBottom: 6, overflow: 'hidden' },
+  fill: { height: 6, borderRadius: 3 },
+  addRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  add: { height: 38, paddingHorizontal: 12, borderRadius: 19, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  addT: { fontFamily: F.bold, fontSize: 14, color: C.onAccent },
+  undo: { height: 38, paddingHorizontal: 12, borderRadius: 19, borderWidth: 1.5, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center' },
+  undoT: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   redCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.redTint, borderWidth: 1, borderColor: '#f3c9c6' },
   coachBanner: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.red },
   card2: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.line },

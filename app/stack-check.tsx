@@ -1,7 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Linking, FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import Svg, { Path } from 'react-native-svg';
+import { useAuth } from '../src/lib/auth';
+import { plain } from '../src/lib/program';
+import Page from '../src/components/Page';
+import PageTitle from '../src/components/PageTitle';
 import { C, F } from '../src/lib/theme';
 import { BackIcon, SearchIcon } from '../src/components/icons';
 import AskBoonCard from '../src/components/AskBoonCard';
@@ -13,8 +18,83 @@ import { twoTone } from '../src/components/TwoTone';
 
 const FILTERS = ['All', 'Worth it', 'Depends', 'Skip it'] as const;
 
-/** Stack Check: type any supplement or gadget, get Boon's verdict. */
+const TAG: Record<string, { label: string; fg: string; bg: string }> = {
+  KEEP: { label: 'WORTH IT', fg: '#12804f', bg: '#e7f6ee' },
+  SWAP: { label: 'SWAP', fg: '#a86400', bg: '#fdf3dc' },
+  CUT: { label: 'WASTE', fg: '#c62f27', bg: '#fdeceb' },
+};
+
+/** Stack Check: their own audit (what's worth it and what's a waste), with the full library one tap away. */
 export default function StackCheck() {
+  const { plan } = useAuth();
+  const { lib } = useLocalSearchParams<{ lib?: string }>();
+  const router = useRouter();
+  const audit = plan?.audit || [];
+  if (!audit.length || lib === '1') return <Library />;
+  const save = Math.max(0, (plan?.before ?? 0) - (plan?.after ?? 0)) || audit.filter((a) => a.verdict === 'CUT').reduce((n, a) => n + (Number(a.cost) || 0), 0);
+  const items = audit.filter((a) => a.verdict !== 'ADD');
+  const adds = audit.filter((a) => a.verdict === 'ADD');
+  const n = (v: string) => audit.filter((a) => a.verdict === v).length;
+  return (
+    <Page tabs={false} header={<PageTitle back title="Stack Check" size={28} />}>
+      <View style={[st2.card, st2.sum]}>
+        <View style={{ flex: 1 }}>
+          <Text style={st2.small}>You could save</Text>
+          <Text><Text style={st2.save}>${save}</Text><Text style={st2.per}> / month</Text></Text>
+        </View>
+        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+          <Text style={st2.small}><Text style={{ color: '#12804f', fontFamily: F.xbold }}>{n('KEEP')}</Text> worth it</Text>
+          {!!n('SWAP') && <Text style={st2.small}><Text style={{ color: '#a86400', fontFamily: F.xbold }}>{n('SWAP')}</Text> swap</Text>}
+          <Text style={st2.small}><Text style={{ color: '#c62f27', fontFamily: F.xbold }}>{n('CUT')}</Text> waste</Text>
+        </View>
+      </View>
+      {items.map((a, k) => {
+        const t = TAG[a.verdict] || TAG.SWAP;
+        return (
+          <View key={k} style={[st2.card, { padding: 16, gap: 8 }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Text style={st2.name}>{a.product}</Text>
+              <Text style={[st2.tag, { color: t.fg, backgroundColor: t.bg }]}>{t.label}</Text>
+            </View>
+            <Text style={st2.why}>{plain(a.why)}{a.instead ? ` ${plain(a.instead)}` : ''}{a.verdict === 'CUT' && a.cost ? <Text style={{ fontFamily: F.bold }}> Save ${a.cost}/mo.</Text> : null}</Text>
+          </View>
+        );
+      })}
+      {adds.map((a, k) => (
+        <View key={'a' + k} style={[st2.card, st2.add]}>
+          <View style={{ flex: 1 }}>
+            <Text style={[st2.name, { fontSize: 16 }]}>Missing: {a.product}</Text>
+            <Text style={st2.why}>{plain(a.why)}</Text>
+          </View>
+        </View>
+      ))}
+      <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/stack-check', params: { lib: '1' } })} style={[st2.card, st2.add, { borderStyle: 'solid' }]}>
+        <View style={{ flex: 1 }}>
+          <Text style={[st2.name, { fontSize: 16 }]}>Check anything else</Text>
+          <Text style={st2.why}>Search every product I've investigated.</Text>
+        </View>
+        <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke={C.ink} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+      </Pressable>
+      <Text style={st2.fine}>No sponsors, no affiliate links. Take anything prescribed? Keep taking it and check with your doctor.</Text>
+    </Page>
+  );
+}
+
+const st2 = StyleSheet.create({
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18 },
+  sum: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18, paddingVertical: 16 },
+  small: { fontFamily: F.medium, fontSize: 14, color: C.ink },
+  save: { fontFamily: F.black, fontSize: 36, color: C.ink, letterSpacing: -0.5 },
+  per: { fontFamily: F.semi, fontSize: 17, color: C.ink },
+  name: { flex: 1, fontFamily: F.bold, fontSize: 17, color: C.ink },
+  tag: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 0.8, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, overflow: 'hidden' },
+  why: { fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: C.ink },
+  add: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 16, borderStyle: 'dashed', borderColor: '#cfd4de', backgroundColor: '#f1f3f7' },
+  fine: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink, paddingHorizontal: 4, marginTop: 4 },
+});
+
+/** Library: type any supplement or gadget, get Boon's verdict. */
+function Library() {
   const router = useRouter();
   const [q, setQ] = useState('');
   const [f, setF] = useState<(typeof FILTERS)[number]>('All');

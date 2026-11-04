@@ -3,6 +3,8 @@ import { Platform } from 'react-native';
 import { Pedometer } from 'expo-sensors';
 import type { Plan } from './types';
 import { isoDate } from './logs';
+import { supabase } from './supabase';
+import { isPreviewing } from './preview';
 
 /** One day's numbers. Steps can come from the phone; protein is logged with quick adds. */
 export type Day = { steps: number; stepsManual?: boolean; protein: number; adds: number[] };
@@ -16,7 +18,34 @@ export const proteinGoal = (plan: Plan) => num(plan.protein) || 150;
 export async function readDay(d = isoDate()): Promise<Day> {
   try { const s = await AsyncStorage.getItem(key(d)); return s ? { ...EMPTY, ...JSON.parse(s) } : { ...EMPTY }; } catch { return { ...EMPTY }; }
 }
-export async function writeDay(d: string, v: Day) { try { await AsyncStorage.setItem(key(d), JSON.stringify(v)); } catch {} }
+export async function writeDay(d: string, v: Day) { try { await AsyncStorage.setItem(key(d), JSON.stringify(v)); } catch {} pushDay(d, v); }
+
+/** Back the day up to the account (and the leaderboard). Silent if offline or not set up yet. */
+async function pushDay(d: string, v: Day) {
+  try {
+    if (isPreviewing()) return;
+    const { data } = await supabase.auth.getSession();
+    const uid = data.session?.user.id; if (!uid) return;
+    await supabase.from('daily_stats').upsert({ user_id: uid, day: d, steps: Math.round(v.steps), protein: Math.round(v.protein), updated_at: new Date().toISOString() });
+  } catch {}
+}
+
+export type Leader = { rank: number; first_name: string; steps: number; is_me: boolean };
+/** This week's steps leaderboard (Monday start). Null when it isn't available. */
+export async function stepsLeaderboard(): Promise<Leader[] | null> {
+  try {
+    const m = new Date(); m.setHours(12, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+    const r: any = await Promise.race([supabase.rpc('steps_leaderboard', { p_week_start: isoDate(m) }), new Promise((res) => setTimeout(() => res({ error: 'timeout' }), 5000))]);
+    if (r.error || !Array.isArray(r.data)) return null;
+    return r.data.map((x: any) => ({ rank: Number(x.rank), first_name: String(x.first_name), steps: Number(x.steps), is_me: !!x.is_me }));
+  } catch { return null; }
+}
+export async function setOnLeaderboard(on: boolean) {
+  try {
+    const { data } = await supabase.auth.getSession(); const uid = data.session?.user.id; if (!uid) return false;
+    const { error } = await supabase.from('profiles').update({ on_leaderboard: on }).eq('id', uid); return !error;
+  } catch { return false; }
+}
 
 export async function addProtein(g: number, d = isoDate()) {
   const v = await readDay(d);

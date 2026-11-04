@@ -83,20 +83,13 @@ export default function Ask() {
         <Image source={FACE} style={st.avatar} />
         <View style={{ flex: 1 }}>
           <Text style={st.topT}>Stack</Text>
-          <Text style={st.topS}>Your AI coach, trained on Boon's plans</Text>
+          <Text style={st.topS}>Your AI coach, trained on Boon's plans. No sponsors.</Text>
         </View>
       </View>
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scroll} contentContainerStyle={st.list} keyboardShouldPersistTaps="handled">
           <Bubble role="assistant" content={`Hey${name ? ' ' + name : ''}. Ask me anything about your plan, food, training or a supplement you saw online. I know your numbers, so I'll answer for you, not for everyone.`} />
-          {empty && (
-            <View style={st.starters}>
-              {STARTERS.map((s) => (
-                <Pressable key={s} accessibilityRole="button" onPress={() => send(s)} style={st.chip}><Text style={st.chipT}>{s}</Text></Pressable>
-              ))}
-            </View>
-          )}
           {msgs.map((m) => <Bubble key={m.id} role={m.role} content={m.content} />)}
           {thinking && <Typing />}
 
@@ -119,13 +112,20 @@ export default function Ask() {
         </ScrollView>
 
         <View style={st.bar}>
+          {!blocked && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={st.starters}>
+              {STARTERS.map((s) => (
+                <Pressable key={s} accessibilityRole="button" onPress={() => send(s)} disabled={thinking} style={st.chip}><Text style={st.chipT}>{s}</Text></Pressable>
+              ))}
+            </ScrollView>
+          )}
           <View style={st.inputRow}>
-            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask Stack anything…'} placeholderTextColor="rgba(27,36,64,0.45)"
+            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask about food, training, supplements'} placeholderTextColor={C.muted}
               style={st.input} multiline maxLength={1500} editable={!blocked} onSubmitEditing={() => send()} blurOnSubmit={false}
               accessibilityLabel="Your question" />
             <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => send()} disabled={!text.trim() || thinking || !!blocked}
               style={[st.send, (!text.trim() || thinking || !!blocked) && { opacity: 0.4 }]}>
-              <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M5 12h13M13 6l6 6-6 6" stroke={C.ink} strokeWidth={2.6} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+              <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M12 19V5M6 11l6-6 6 6" stroke="#fff" strokeWidth={2.6} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
             </Pressable>
           </View>
           <Text style={st.fine}>
@@ -151,9 +151,8 @@ function Bubble({ role, content }: { role: 'user' | 'assistant'; content: string
   const me = role === 'user';
   return (
     <View style={[st.row, me && { justifyContent: 'flex-end' }]}>
-      {!me && <Image source={FACE} style={st.mini} />}
       <View style={[st.bubble, me ? st.me : st.ai]}>
-        <Rich text={content} style={[st.msg, me && { color: C.ink }]} />
+        <Rich text={content} style={[st.msg, me && { color: '#ffffff' }]} />
       </View>
     </View>
   );
@@ -173,7 +172,6 @@ function Typing() {
   }, []);
   return (
     <View style={st.row} accessibilityLabel="Stack is typing">
-      <Image source={FACE} style={st.mini} />
       <View style={[st.bubble, st.ai, { flexDirection: 'row', gap: 6, paddingVertical: 16 }]}>
         {dots.map((d, i) => <Animated.View key={i} style={[st.dot, { opacity: d, transform: [{ scale: d }] }]} />)}
       </View>
@@ -182,30 +180,30 @@ function Typing() {
 }
 
 const st = StyleSheet.create({
-  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(27,36,64,0.08)' },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#e6e8ef' },
   back: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
-  avatar: { width: 40, height: 40, borderRadius: 11 },
-  topT: { fontFamily: F.black, fontSize: 20, color: C.ink },
-  topS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(27,36,64,0.6)', marginTop: 1 },
-  list: { padding: 16, gap: 12, paddingBottom: 24 },
-  row: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  avatar: { width: 42, height: 42, borderRadius: 11 },
+  topT: { fontFamily: F.black, fontSize: 26, letterSpacing: -0.5, color: C.ink },
+  topS: { fontFamily: F.medium, fontSize: 13, color: C.ink, marginTop: 1 },
+  list: { paddingHorizontal: 16, paddingTop: 16, gap: 12, paddingBottom: 16 },
+  row: { flexDirection: 'row', alignItems: 'flex-end' },
   mini: { width: 26, height: 26, borderRadius: 7 },
-  bubble: { maxWidth: '82%', borderRadius: 18, paddingHorizontal: 14, paddingVertical: 11 },
-  ai: { backgroundColor: C.navy, borderBottomLeftRadius: 6 },
-  me: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderBottomRightRadius: 6 },
-  msg: { fontFamily: F.medium, fontSize: 15, lineHeight: 22, color: C.onAccent },
-  starters: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingLeft: 34 },
-  chip: { borderWidth: 1.5, borderColor: C.red, borderRadius: 999, paddingHorizontal: 13, paddingVertical: 8, backgroundColor: 'rgba(226,67,59,0.08)' },
-  chipT: { fontFamily: F.bold, fontSize: 13, color: C.ink },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.onAccent },
+  bubble: { maxWidth: '92%', borderRadius: 18, paddingHorizontal: 16, paddingVertical: 13 },
+  ai: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
+  me: { backgroundColor: C.navy, maxWidth: '84%' },
+  msg: { fontFamily: F.medium, fontSize: 15, lineHeight: 23, color: C.ink },
+  starters: { gap: 8, paddingBottom: 10 },
+  chip: { borderWidth: 1, borderColor: '#d5d9e3', borderRadius: 999, paddingHorizontal: 14, height: 38, justifyContent: 'center', backgroundColor: C.bg },
+  chipT: { fontFamily: F.semi, fontSize: 14, color: C.ink },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.ink },
   wall: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 16, gap: 8, marginTop: 4 },
   wallT: { fontFamily: F.black, fontSize: 16, color: C.ink },
   wallB: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(27,36,64,0.8)' },
   wallBtn: { backgroundColor: C.red, borderRadius: 14, paddingVertical: 13, alignItems: 'center', marginTop: 6 },
   wallBtnT: { fontFamily: F.black, fontSize: 14, color: C.onAccent, letterSpacing: 0.5, textTransform: 'uppercase' },
-  bar: { paddingHorizontal: 12, paddingTop: 8, paddingBottom: 6, borderTopWidth: 1, borderTopColor: 'rgba(27,36,64,0.08)', backgroundColor: C.bg },
-  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  input: { flex: 1, minHeight: 46, maxHeight: 120, borderRadius: 23, borderWidth: 1, borderColor: C.line, backgroundColor: C.card, color: C.ink, fontFamily: F.semi, fontSize: 15, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 },
-  send: { width: 46, height: 46, borderRadius: 23, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  fine: { fontFamily: F.medium, fontSize: 11, color: 'rgba(27,36,64,0.45)', textAlign: 'center', marginTop: 6 },
+  bar: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 6, backgroundColor: C.bg },
+  inputRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, borderRadius: 26, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, paddingLeft: 6, paddingRight: 5, paddingVertical: 5 },
+  input: { flex: 1, minHeight: 42, maxHeight: 120, color: C.ink, fontFamily: F.medium, fontSize: 15, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, outlineWidth: 0 } as any,
+  send: { width: 42, height: 42, borderRadius: 21, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  fine: { fontFamily: F.medium, fontSize: 11, color: C.muted, textAlign: 'center', marginTop: 6 },
 });

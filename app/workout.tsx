@@ -14,7 +14,8 @@ import { isoDate, lastSession, saveSet } from '../src/lib/logs';
 import { isLocked } from '../src/lib/access';
 import { getStreak } from '../src/lib/streak';
 import RemindersCard from '../src/components/RemindersCard';
-import { FlameIcon, TrophyIcon } from '../src/components/icons';
+import { ClockIcon, FlameIcon, TrophyIcon } from '../src/components/icons';
+import { RoundBtn } from '../src/components/PageTitle';
 import Backdrop from '../src/components/Backdrop';
 import SwapSheet from '../src/components/SwapSheet';
 import { SwapIcon } from '../src/components/icons';
@@ -27,14 +28,14 @@ const REST = 90;
 const ACC = 'setInputs';
 
 export default function Workout() {
-  const { d } = useLocalSearchParams<{ d: string }>();
+  const { d, i: i0 } = useLocalSearchParams<{ d: string; i?: string }>();
   const { plan, session, profile, refresh } = useAuth();
   const [swapOpen, setSwapOpen] = useState(false);
   const router = useRouter();
   const dayIdx = Number(d || 0);
   const day = plan?.train.d[dayIdx];
   const week = weekOf(plan?.train.s);
-  const [i, setI] = useState(0);
+  const [i, setI] = useState(Math.max(0, Number(i0 || 0)));
   const [entries, setEntries] = useState<Record<string, Entry[]>>({});
   const [prev, setPrev] = useState<Record<string, { weight: number | null; reps: number | null }[]>>({});
   const [rest, setRest] = useState(0);
@@ -163,96 +164,86 @@ export default function Workout() {
     );
   }
 
+  const nextName = !last ? exName(day.x[i + 1][0], plan) : '';
+  const go = (n: number) => { Keyboard.dismiss(); setI(n); };
+  const exit = () => (router.canGoBack() ? router.back() : router.replace('/'));
+
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
-      <Backdrop />
+    <SafeAreaView edges={['top', 'bottom']} style={{ flex: 1, backgroundColor: C.bg }}>
       {!!pr && (
         <View style={st.prBanner} accessibilityLiveRegion="polite">
-          <TrophyIcon color={C.bg} size={22} />
+          <TrophyIcon color={C.onAccent} size={22} />
           <View style={{ flex: 1 }}><Text style={st.prK}>New personal record</Text><Text style={st.prV}>{pr}</Text></View>
         </View>
       )}
       <View style={{ flex: 1 }}>
         <View style={st.top}>
-          <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={st.icon}><BackIcon /></Pressable>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={st.title}>{(day.t.split('·')[1] || day.t).trim()}</Text>
-            <Text style={st.time}>{mmss(elapsed)}</Text>
+          <RoundBtn kind="close" label="Close workout" onPress={exit} />
+          <View style={st.progress}>
+            {day.x.map((_, k) => (
+              <Pressable key={k} onPress={() => go(k)} accessibilityLabel={`Exercise ${k + 1}`} hitSlop={{ top: 12, bottom: 12 }} style={{ flex: 1 }}>
+                <View style={[st.seg, { backgroundColor: k === i ? '#e2433b' : k < i ? C.navy : '#e8eaf0' }]} />
+              </Pressable>
+            ))}
           </View>
-          <Text style={[st.time, { width: 44, textAlign: 'right' }]}>{i + 1}/{day.x.length}</Text>
-        </View>
-        <View style={st.progress}>
-          {day.x.map((_, k) => (
-            <View key={k} style={[st.seg, { backgroundColor: k < i ? C.green : k === i ? C.red : C.line }]} />
-          ))}
+          <Text style={st.count}>{i + 1} / {day.x.length}</Text>
         </View>
 
-        <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 24 }} keyboardShouldPersistTaps="handled"
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }} keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
-          {!!info?.video && (
-            <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${info.name}`} style={st.video}
-              onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
-              <Image source={thumb(info.video, 'hq')} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />
-              <View style={st.shade} />
-              <View style={st.play}><PlayIcon size={22} /></View>
-              <Text style={[ui.label, st.videoLabel]}>Watch form video</Text>
-            </Pressable>
-          )}
-          <View style={{ gap: 6 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-              <Text style={[st.exName, { flex: 1 }]}>{exName(ex[0], plan)}</Text>
-              {canSwap && (
-                <Pressable accessibilityRole="button" accessibilityLabel={`Swap ${exName(ex[0], plan)}`} onPress={() => setSwapOpen(true)} hitSlop={6} style={st.swapBtn}>
-                  <SwapIcon size={14} /><Text style={st.swapT}>Swap</Text>
-                </Pressable>
-              )}
-            </View>
-            <Text style={st.target}>{nSets} sets · {repsOf(ex[1])} reps</Text>
-            {!!ex[2] && <Text style={st.note}>{ex[2]}</Text>}
-            {(info?.cues || []).map((c, k) => <Text key={k} style={st.cue}>{k + 1}. {c}</Text>)}
+          <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${exName(ex[0], plan)}`} style={st.video} disabled={!info?.video}
+            onPress={() => info?.video && Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
+            {!!info?.video && <Image source={thumb(info.video, 'hq')} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />}
+            <View style={st.play}><PlayIcon color="#fff" size={24} /></View>
+            <Text style={[st.vTag, { left: 12 }]}>HD form demo</Text>
+            <Text style={[st.vTag, { right: 12, fontFamily: F.medium, fontSize: 12 }]}>Curated YouTube video</Text>
+          </Pressable>
+
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 }}>
+            <Text style={st.exName} accessibilityRole="header">{exName(ex[0], plan)}</Text>
+            {canSwap && (
+              <Pressable accessibilityRole="button" accessibilityLabel={`Swap ${exName(ex[0], plan)}`} onPress={() => setSwapOpen(true)} hitSlop={6} style={st.swapBtn}>
+                <SwapIcon size={15} /><Text style={st.swapT}>Swap</Text>
+              </Pressable>
+            )}
+          </View>
+          <Text style={st.target}>{nSets} sets · {repsOf(ex[1])} reps</Text>
+          {!!ex[2] && <Text style={st.note}>{ex[2]}</Text>}
+          <View style={{ gap: 6, marginTop: 10 }}>
+            {(info?.cues || []).slice(0, 3).map((c, k) => (
+              <View key={k} style={{ flexDirection: 'row', gap: 10 }}><Text style={st.cueN}>{k + 1}</Text><Text style={st.cue}>{c}</Text></View>
+            ))}
           </View>
 
           <View style={st.table}>
-            <View style={st.head}>
-              <Text style={[st.h, { width: 34 }]}>Set</Text>
-              <Text style={[st.h, { flex: 1 }]}>Last time</Text>
-              <Text style={[st.h, { width: 72, textAlign: 'center' }]}>lbs</Text>
-              <Text style={[st.h, { width: 58, textAlign: 'center' }]}>Reps</Text>
-              <View style={{ width: 40 }} />
+            <View style={[st.grid, st.head]}>
+              <Text style={[st.h, { width: 34 }]}>SET</Text>
+              <Text style={[st.h, { flex: 1 }]}>LAST WEEK</Text>
+              <Text style={[st.h, { width: 74 }]}>LBS</Text>
+              <Text style={[st.h, { width: 64 }]}>REPS</Text>
+              <View style={{ width: 44 }} />
             </View>
             {list.map((e, k) => {
               const p = p0[k];
-              const active = k === nextUndone;
               return (
-                <View key={k} style={[st.setRow, active && st.setRowActive, e.done && st.setRowDone]}>
-                  <View style={[st.setNo, active && { backgroundColor: C.red, borderColor: C.red }, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
-                    <Text style={st.setNoText}>{k + 1}</Text>
-                  </View>
+                <View key={k} style={[st.grid, st.setRow, e.done && { backgroundColor: '#e7f6ee' }]}>
+                  <Text style={[st.setNo, { width: 34 }]}>{k + 1}</Text>
                   <Text style={st.last} numberOfLines={1}>{p ? `${p.weight ?? '–'} × ${p.reps ?? '–'}` : '—'}</Text>
                   <TextInput value={e.w} onChangeText={(t) => update(k, { w: t.replace(/[^\d.]/g, '') })} keyboardType="decimal-pad"
-                    placeholder={p?.weight != null ? String(p.weight) : '0'} placeholderTextColor="#1b244055" returnKeyType="done"
-                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 72 }, active && { borderColor: C.red }]} />
+                    placeholder={p?.weight != null ? String(p.weight) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
+                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 74 }, k === nextUndone && { borderColor: '#e2433b' }]} />
                   <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
-                    placeholder={p?.reps != null ? String(p.reps) : '0'} placeholderTextColor="#1b244055" returnKeyType="done"
-                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 58 }]} />
-                  <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Set ${k + 1} done`} hitSlop={6}
-                    onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
-                    <CheckIcon color={e.done ? C.bg : '#1b244055'} size={16} />
+                    placeholder={p?.reps != null ? String(p.reps) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
+                    inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 64 }]} />
+                  <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Complete set ${k + 1}`} hitSlop={6}
+                    onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.red, borderWidth: 0 }]}>
+                    <CheckIcon color={e.done ? '#fff' : C.muted} size={16} />
                   </Pressable>
                 </View>
               );
             })}
           </View>
-
-          {(rest > 0 || beat) && (
-            <View style={st.rest}>
-              <View>
-                <Text style={[ui.label, { color: C.green }]}>{rest > 0 ? 'Rest' : 'Nice'}</Text>
-                <Text style={st.restTime}>{rest > 0 ? mmss(rest) : 'Done'}</Text>
-              </View>
-              {beat && <Text style={st.cell}>More weight than last time</Text>}
-            </View>
-          )}
+          {beat && <Text style={st.beat}>More weight than last week. That's progress.</Text>}
         </ScrollView>
 
         {Platform.OS === 'ios' && (
@@ -271,8 +262,13 @@ export default function Workout() {
         )}
 
         {!kb && <View style={st.footer}>
-          {i > 0 && <Button title="Back" variant="ghost" onPress={() => setI(i - 1)} style={{ flex: 1 }} />}
-          <Button title={last ? 'Finish workout' : 'Next exercise'} onPress={() => (last ? finish() : setI(i + 1))} style={{ flex: 2 }} />
+          <View style={[st.timer, rest > 0 ? { backgroundColor: '#e8eaf0' } : { backgroundColor: '#e7f6ee' }]} accessibilityLabel={rest > 0 ? `Rest ${mmss(rest)}` : 'Go'}>
+            <ClockIcon color={rest > 0 ? C.ink : C.green} size={18} />
+            <Text style={[st.timerT, { color: rest > 0 ? C.ink : C.green }]}>{rest > 0 ? `Rest ${mmss(rest)}` : 'Go'}</Text>
+          </View>
+          <Pressable accessibilityRole="button" onPress={() => (last ? finish() : go(i + 1))} style={({ pressed }) => [st.next, pressed && { opacity: 0.88 }]}>
+            <Text style={st.nextT} numberOfLines={1}>{last ? 'Finish workout' : `Next: ${nextName}`}</Text>
+          </Pressable>
         </View>}
       </View>
     </SafeAreaView>
@@ -280,9 +276,18 @@ export default function Workout() {
 }
 
 const st = StyleSheet.create({
+  count: { fontFamily: F.bold, fontSize: 14, color: C.ink },
+  vTag: { position: 'absolute', bottom: 10, fontFamily: F.semi, fontSize: 13, color: C.ink, backgroundColor: 'rgba(255,255,255,0.92)', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, overflow: 'hidden' },
+  cueN: { fontFamily: F.xbold, fontSize: 14, color: C.ink, width: 10 },
+  grid: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 },
+  beat: { fontFamily: F.bold, fontSize: 14, color: C.green, marginTop: 12 },
+  timer: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 54, paddingHorizontal: 16, borderRadius: 27 },
+  timerT: { fontFamily: F.xbold, fontSize: 17, fontVariant: ['tabular-nums'] },
+  next: { flex: 1, height: 54, borderRadius: 27, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 14 },
+  nextT: { fontFamily: F.bold, fontSize: 17, color: C.onAccent },
   prBanner: { position: 'absolute', zIndex: 10, top: 60, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.green, borderRadius: 18, padding: 14 },
-  prK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.bg },
-  prV: { fontFamily: F.black, fontSize: 17, color: C.bg },
+  prK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.onAccent },
+  prV: { fontFamily: F.black, fontSize: 17, color: C.onAccent },
   doneBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
   doneK: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.green },
   doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
@@ -294,41 +299,41 @@ const st = StyleSheet.create({
   prRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   prT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   doneSub: { fontFamily: F.bold, fontSize: 15, color: C.ink, marginTop: 8 },
-  top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 4 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 },
   icon: { width: 44, height: 44, justifyContent: 'center' },
   title: { fontFamily: F.black, fontSize: 15, color: C.ink, textTransform: 'uppercase', letterSpacing: 0.6 },
   time: { fontFamily: F.bold, fontSize: 13, color: C.ink },
-  progress: { flexDirection: 'row', gap: 4, paddingHorizontal: 20, paddingTop: 8 },
-  seg: { flex: 1, height: 4, borderRadius: 2 },
-  video: { height: 200, borderRadius: 20, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  progress: { flex: 1, flexDirection: 'row', gap: 4 },
+  seg: { height: 5, borderRadius: 3 },
+  video: { height: 190, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   shade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(13,27,51,0.35)' },
   videoLabel: { position: 'absolute', left: 14, bottom: 12, backgroundColor: 'rgba(13,27,51,0.85)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden' },
-  play: { width: 58, height: 58, borderRadius: 29, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  exName: { fontFamily: F.black, fontSize: 24, color: C.ink },
-  target: { fontFamily: F.xbold, fontSize: 13, color: C.red },
-  note: { fontFamily: F.bold, fontSize: 13, color: C.ink },
-  cue: { fontFamily: F.semi, fontSize: 14, color: C.ink, lineHeight: 20 },
-  table: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 10, gap: 8 },
-  head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 6, paddingTop: 4 },
-  h: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
-  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.bg, borderRadius: 14, borderWidth: 1, borderColor: C.line, padding: 6 },
+  play: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(217,58,49,0.95)', alignItems: 'center', justifyContent: 'center' },
+  exName: { flex: 1, fontFamily: F.black, fontSize: 24, letterSpacing: -0.4, color: C.ink },
+  target: { fontFamily: F.semi, fontSize: 13, color: C.red, marginTop: 4 },
+  note: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink, marginTop: 2 },
+  cue: { flex: 1, fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: C.ink },
+  table: { marginTop: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18, overflow: 'hidden' },
+  head: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.line },
+  h: { fontFamily: F.bold, fontSize: 12, letterSpacing: 0.5, color: C.ink },
+  setRow: { paddingVertical: 8 },
   setRowActive: { borderColor: C.red },
   setRowDone: { borderColor: 'rgba(63,191,127,0.6)', backgroundColor: 'rgba(63,191,127,0.08)' },
-  setNo: { width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  setNo: { fontFamily: F.xbold, fontSize: 16, color: C.ink },
   setNoText: { fontFamily: F.black, fontSize: 14, color: C.ink },
-  last: { flex: 1, minWidth: 0, fontFamily: F.bold, fontSize: 13, color: C.ink },
+  last: { flex: 1, minWidth: 0, fontFamily: F.medium, fontSize: 14, color: C.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
   rowLine: { borderTopWidth: 1, borderTopColor: C.line, paddingVertical: 10 },
   cell: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
-  input: { height: 44, borderRadius: 10, borderWidth: 1, borderColor: C.line, backgroundColor: C.card, color: C.ink, fontFamily: F.black, fontSize: 17, textAlign: 'center', paddingHorizontal: 4 },
-  tick: { width: 40, height: 40, borderRadius: 12, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
+  input: { height: 40, borderRadius: 10, borderWidth: 1.5, borderColor: '#d5d9e3', backgroundColor: C.bg, color: C.ink, fontFamily: F.bold, fontSize: 16, textAlign: 'center', paddingHorizontal: 4 },
+  tick: { width: 44, height: 40, borderRadius: 10, borderWidth: 1.5, borderColor: '#c3c8d4', alignItems: 'center', justifyContent: 'center' },
   rest: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(63,191,127,0.12)', borderWidth: 1, borderColor: 'rgba(63,191,127,0.4)', borderRadius: 14, padding: 14 },
-  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8, flexDirection: 'row', gap: 10, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.bg },
+  footer: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 8, flexDirection: 'row', gap: 10, alignItems: 'center', borderTopWidth: 1, borderTopColor: '#e6e8ef', backgroundColor: C.bg },
   acc: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: C.card, borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 16, paddingVertical: 8 },
   accText: { fontFamily: F.xbold, fontSize: 13, color: C.ink, flex: 1 },
   accBtn: { backgroundColor: C.red, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8 },
   accBtnText: { fontFamily: F.black, fontSize: 14, color: C.onAccent },
-  swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, marginTop: 2 },
-  swapT: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
+  swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, borderColor: '#d9dde7', backgroundColor: C.bg },
+  swapT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   restTime: { fontFamily: F.black, fontSize: 22, color: C.ink },
 });
