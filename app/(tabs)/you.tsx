@@ -7,6 +7,7 @@ import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import RemindersCard from '../../src/components/RemindersCard';
+import DaysStacked from '../../src/components/DaysStacked';
 import { daysToSunday, PHOTO_WEEKS, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';
 import { getStreak } from '../../src/lib/streak';
@@ -53,13 +54,7 @@ export default function You() {
         </Pressable>
       </SafeAreaView>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 130, gap: 12 }}>
-        <Section title="Days Stacked">
-          <View style={st.rowEnd}>
-            <View><Text style={st.big2}>Current week</Text><Text style={st.small}>{range} · {total} stacked all-time</Text></View>
-            <Text><Text style={st.score}>{stacked}</Text><Text style={st.of}>/{plan.train.d.length}</Text></Text>
-          </View>
-          <View style={st.tip}><Text style={st.tipI}>i</Text><Text style={st.tipT}>Hit {plan.steps || '8,000'} steps, today's workout and {plan.protein} g protein to stack today.</Text></View>
-        </Section>
+        {!!session && <DaysStacked plan={plan} userId={session.user.id} />}
 
         <Section title="Upcoming check-ins">
           <View style={st.weekRow}>{days.map((d, k) => <Text key={k} style={st.dow}>{DOW[d.getDay()]}</Text>)}</View>

@@ -12,7 +12,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Take your progress photos for your Sunday check-in.",
         "NSPhotoLibraryUsageDescription": "Choose progress photos for your Sunday check-in.",
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMotionUsageDescription": "Six-Pack Stack counts your daily steps so your Days Stacked score fills in on its own."
       }
     },
     "android": {
@@ -36,6 +37,12 @@
         {
           "cameraPermission": "Take your progress photos for your Sunday check-in.",
           "photosPermission": "Choose progress photos for your Sunday check-in."
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Six-Pack Stack counts your daily steps so your Days Stacked score fills in on its own."
         }
       ]
     ],
