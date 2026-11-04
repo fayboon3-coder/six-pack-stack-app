@@ -81,7 +81,7 @@ export default function Apply() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 60 }} keyboardShouldPersistTaps="handled">
@@ -148,16 +148,16 @@ function Pick({ label, opts, v, on }: { label: string; opts: string[]; v: string
 }
 
 const st = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: C.navy, padding: 24 },
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, letterSpacing: -0.4 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  label: { fontFamily: F.xbold, fontSize: 13, lineHeight: 18, color: C.white },
-  hint: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.white },
-  input: { minHeight: 52, borderRadius: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, color: C.white, fontFamily: F.semi, fontSize: 16, paddingHorizontal: 14 },
-  chip: { minHeight: 44, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2, paddingHorizontal: 16, justifyContent: 'center' },
+  wrap: { flex: 1, backgroundColor: C.bg, padding: 24 },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.4 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  label: { fontFamily: F.xbold, fontSize: 13, lineHeight: 18, color: C.ink },
+  hint: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.ink },
+  input: { minHeight: 52, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 16, paddingHorizontal: 14 },
+  chip: { minHeight: 44, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, paddingHorizontal: 16, justifyContent: 'center' },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  chipText: { fontFamily: F.bold, fontSize: 14, color: C.white },
-  err: { fontFamily: F.bold, fontSize: 14, color: C.red2 },
+  chipText: { fontFamily: F.bold, fontSize: 14, color: C.onAccent },
+  err: { fontFamily: F.bold, fontSize: 14, color: C.red },
   doneIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' },
 });

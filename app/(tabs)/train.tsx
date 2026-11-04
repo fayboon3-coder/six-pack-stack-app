@@ -6,7 +6,7 @@ import { C, F } from '../../src/lib/theme';
 import { Body, Card, s as ui } from '../../src/components/ui';
 import Screen from '../../src/components/Screen';
 import NoPlan from '../../src/components/NoPlan';
-import PageHeader from '../../src/components/PageHeader';
+import ProgramsHeader from '../../src/components/ProgramsHeader';
 import WorkoutPreview from '../../src/components/WorkoutPreview';
 import { MuscleChips, Stat } from '../../src/components/WorkoutBits';
 import { CheckIcon, ChevronIcon, ClockIcon, DumbbellIcon, LayersIcon, PlayIcon } from '../../src/components/icons';
@@ -45,8 +45,7 @@ export default function Train() {
   return (
     <Screen header={
       <View style={{ gap: 18 }}>
-        <PageHeader kicker={`Week ${week} · ${phase.name}`} title="This| week"
-          subtitle={`${doneCount} of ${plan.train.d.length} workouts done`} week={week} />
+        <ProgramsHeader active="train" sub={`Week ${week} of 12 · ${phase.name} · ${doneCount} of ${plan.train.d.length} done`} />
 
         {/* Week strip: every day at a glance */}
         <View style={st.weekRow}>
@@ -57,7 +56,7 @@ export default function Train() {
             return (
               <Pressable key={d} disabled={k < 0} onPress={() => go(k)} accessibilityRole={k >= 0 ? 'button' : undefined}
                 accessibilityLabel={k >= 0 ? `${d}: ${metas[k].type}${isDone ? ', done' : ''}` : `${d}: rest day`} style={st.weekDay}>
-                <Text style={[st.weekLabel, i === todayDow && { color: C.red2 }]}>{d}</Text>
+                <Text style={[st.weekLabel, i === todayDow && { color: C.red }]}>{d}</Text>
                 <View style={[st.weekDot, k < 0 && st.rest, isNext && { backgroundColor: C.red, borderColor: C.red }, isDone && { backgroundColor: C.green, borderColor: C.green }]}>
                   {isDone ? <CheckIcon size={13} /> : k >= 0 ? <Text style={st.weekType}>{metas[k].type.split(/\s|\+/)[0].slice(0, 5).toUpperCase()}</Text> : <Text style={st.restText}>–</Text>}
                 </View>
@@ -93,16 +92,16 @@ export default function Train() {
                 {isDone ? <CheckIcon size={18} /> : <Text style={st.dayText}>{m.day.slice(0, 3).toUpperCase()}</Text>}
               </View>
               <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={[ui.label, { color: isDone ? C.green : isNext ? C.red2 : C.white }]}>{isDone ? 'Done this week' : isNext ? 'Up next' : `Workout ${k + 1}`}</Text>
+                <Text style={[ui.label, { color: isDone ? C.green : isNext ? C.red : C.ink }]}>{isDone ? 'Done this week' : isNext ? 'Up next' : `Workout ${k + 1}`}</Text>
                 <Text style={st.type}>{m.type}</Text>
               </View>
               <ChevronIcon />
             </Pressable>
 
             <View style={st.stats}>
-              <Stat icon={<ClockIcon color={C.red2} size={14} />} value={`${m.minutes} min`} />
-              <Stat icon={<DumbbellIcon color={C.red2} size={14} />} value={`${m.items.length}`} />
-              <Stat icon={<LayersIcon color={C.red2} size={14} />} value={`${m.sets} sets`} />
+              <Stat icon={<ClockIcon color={C.red} size={14} />} value={`${m.minutes} min`} />
+              <Stat icon={<DumbbellIcon color={C.red} size={14} />} value={`${m.items.length}`} />
+              <Stat icon={<LayersIcon color={C.red} size={14} />} value={`${m.sets} sets`} />
             </View>
             <MuscleChips muscles={m.muscles} />
 
@@ -136,28 +135,28 @@ export default function Train() {
 const st = StyleSheet.create({
   weekRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20 },
   weekDay: { alignItems: 'center', gap: 6, minWidth: 40 },
-  weekLabel: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: C.white },
-  weekDot: { width: 42, height: 42, borderRadius: 21, borderWidth: 2, borderColor: C.line, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center' },
+  weekLabel: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: C.ink },
+  weekDot: { width: 42, height: 42, borderRadius: 21, borderWidth: 2, borderColor: C.line, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
   rest: { backgroundColor: 'transparent', borderStyle: 'dashed' },
-  restText: { fontFamily: F.bold, fontSize: 14, color: C.white },
-  weekType: { fontFamily: F.black, fontSize: 9, color: C.white, letterSpacing: 0.3 },
-  edit: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.navy2, padding: 16 },
+  restText: { fontFamily: F.bold, fontSize: 14, color: C.ink },
+  weekType: { fontFamily: F.black, fontSize: 9, color: C.ink, letterSpacing: 0.3 },
+  edit: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.card, padding: 16 },
   editIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  editT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.white },
-  editS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(255,255,255,0.75)' },
-  listTitle: { fontFamily: F.black, fontSize: 21, color: C.white, marginTop: 8 },
-  card: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 12 },
+  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
+  editT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ink },
+  editS: { fontFamily: F.semi, fontSize: 12, color: 'rgba(27,36,64,0.75)' },
+  listTitle: { fontFamily: F.black, fontSize: 21, color: C.ink, marginTop: 8 },
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 12 },
   cardNext: { borderColor: C.red, borderWidth: 2 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   day: { width: 52, height: 52, borderRadius: 26, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
-  dayText: { fontFamily: F.black, fontSize: 13, color: C.white, letterSpacing: 0.5 },
-  type: { fontFamily: F.black, fontSize: 22, color: C.white },
+  dayText: { fontFamily: F.black, fontSize: 13, color: C.ink, letterSpacing: 0.5 },
+  type: { fontFamily: F.black, fontSize: 22, color: C.ink },
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  thumb: { width: 128, height: 76, borderRadius: 12, backgroundColor: C.navy },
+  thumb: { width: 128, height: 76, borderRadius: 12, backgroundColor: C.bg },
   thumbNum: { position: 'absolute', left: 6, top: 6, minWidth: 22, height: 22, borderRadius: 11, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  thumbNumText: { fontFamily: F.black, fontSize: 11, color: C.white },
+  thumbNumText: { fontFamily: F.black, fontSize: 11, color: C.ink },
   thumbPlay: { position: 'absolute', right: 6, bottom: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: 'rgba(13,27,51,0.8)', alignItems: 'center', justifyContent: 'center' },
-  thumbName: { fontFamily: F.xbold, fontSize: 13, lineHeight: 17, color: C.white },
-  thumbTarget: { fontFamily: F.semi, fontSize: 12, color: C.white },
+  thumbName: { fontFamily: F.xbold, fontSize: 13, lineHeight: 17, color: C.ink },
+  thumbTarget: { fontFamily: F.semi, fontSize: 12, color: C.ink },
 });

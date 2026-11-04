@@ -5,9 +5,9 @@ import { View } from 'react-native';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
-  useFonts, Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold,
-  Montserrat_800ExtraBold, Montserrat_900Black,
-} from '@expo-google-fonts/montserrat';
+  useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold,
+  Inter_800ExtraBold, Inter_900Black,
+} from '@expo-google-fonts/inter';
 import { AuthProvider, useAuth } from '../src/lib/auth';
 import { C } from '../src/lib/theme';
 import Splash from '../src/components/Splash';
@@ -23,20 +23,20 @@ function Gate() {
   useEffect(() => {
     if (loading) return;
     const seg = segments[0] as string | undefined;
-    const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'apply', 'stack-check', 'verdict'].includes(seg || '');
+    const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'apply', 'coaching', 'stack-check', 'verdict'].includes(seg || '');
     if (!session && !open) router.replace('/welcome');
     if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) router.replace('/');
   }, [session, loading, segments, router, profile]);
 
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: C.navy }}>
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
         <LoadingScreen title="Loading your| plan" />
       </View>
     );
   }
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.navy } }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="welcome" />
       <Stack.Screen name="lead" />
@@ -44,6 +44,7 @@ function Gate() {
       <Stack.Screen name="quiz" options={{ gestureEnabled: false }} />
       <Stack.Screen name="ready" options={{ gestureEnabled: false }} />
       <Stack.Screen name="apply" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="coaching" />
       <Stack.Screen name="unlock" options={{ presentation: 'modal' }} />
       <Stack.Screen name="stack-check" />
       <Stack.Screen name="verdict/[id]" />
@@ -63,13 +64,13 @@ function Gate() {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Montserrat_500Medium, Montserrat_600SemiBold, Montserrat_700Bold, Montserrat_800ExtraBold, Montserrat_900Black,
+    Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold, Inter_900Black,
   });
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <StatusBar style="light" />
-        <View style={{ flex: 1, backgroundColor: C.navy }}>
+        <View style={{ flex: 1, backgroundColor: C.bg }}>
           {fontsLoaded && <Gate />}
           {fontsLoaded && <PreviewBar />}
           <Intro fontsLoaded={fontsLoaded} />

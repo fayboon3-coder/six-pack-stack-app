@@ -41,7 +41,7 @@ export default function DeleteAccount() {
 
   if (busy) {
     return (
-      <View style={{ flex: 1, backgroundColor: C.navy }}>
+      <View style={{ flex: 1, backgroundColor: C.bg }}>
         <LoadingScreen title="Deleting your| account" steps={['Removing your progress photos', 'Deleting your plan, logs and check-ins', 'Closing your account']}
           stepMs={500} done={done} onFinish={async () => { await signOut(); router.replace('/welcome'); }} />
       </View>
@@ -49,7 +49,7 @@ export default function DeleteAccount() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView contentContainerStyle={st.wrap} keyboardShouldPersistTaps="handled">
@@ -65,7 +65,7 @@ export default function DeleteAccount() {
           <Text style={st.body}>You'll still get my emails until you unsubscribe. The link is at the bottom of every email.</Text>
           <Text style={[st.k, { marginTop: 10 }]}>Type DELETE to confirm</Text>
           <TextInput value={typed} onChangeText={setTyped} autoCapitalize="characters" autoCorrect={false} placeholder="DELETE"
-            placeholderTextColor="rgba(255,255,255,0.35)" style={st.input} accessibilityLabel="Type DELETE to confirm" />
+            placeholderTextColor="rgba(27,36,64,0.35)" style={st.input} accessibilityLabel="Type DELETE to confirm" />
           {!!err && <Text style={st.err}>{err}</Text>}
           <Button title="Delete my account" onPress={run} disabled={!ok} />
           <Button title="Keep my account" variant="ghost" onPress={() => router.back()} />
@@ -77,10 +77,10 @@ export default function DeleteAccount() {
 
 const st = StyleSheet.create({
   wrap: { padding: 24, gap: 14, paddingBottom: 48 },
-  k: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 35, color: C.white, marginBottom: 4 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  li: { fontFamily: F.bold, fontSize: 15, lineHeight: 22, color: C.white },
-  input: { borderWidth: 1.5, borderColor: C.line, borderRadius: 14, backgroundColor: C.navy2, color: C.white, fontFamily: F.black, fontSize: 18, letterSpacing: 2, paddingHorizontal: 16, paddingVertical: 14 },
-  err: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.red2 },
+  k: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 35, color: C.ink, marginBottom: 4 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  li: { fontFamily: F.bold, fontSize: 15, lineHeight: 22, color: C.ink },
+  input: { borderWidth: 1.5, borderColor: C.line, borderRadius: 14, backgroundColor: C.card, color: C.ink, fontFamily: F.black, fontSize: 18, letterSpacing: 2, paddingHorizontal: 16, paddingVertical: 14 },
+  err: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.red },
 });

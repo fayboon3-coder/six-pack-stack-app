@@ -63,12 +63,12 @@ export default function RemindersCard({ compact }: { compact?: boolean }) {
 }
 
 const st = StyleSheet.create({
-  card: { backgroundColor: C.navy2, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 16, gap: 12 },
+  card: { backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 16, gap: 12 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  t: { fontFamily: F.black, fontSize: 16, color: C.white },
-  sub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.white },
+  t: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  sub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.ink },
   chip: { minHeight: 40, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, paddingHorizontal: 14, justifyContent: 'center' },
   chipOn: { borderColor: C.green, backgroundColor: 'rgba(63,191,127,0.15)' },
-  chipText: { fontFamily: F.bold, fontSize: 13, color: C.white },
-  note: { fontFamily: F.bold, fontSize: 13, color: C.red2 },
+  chipText: { fontFamily: F.bold, fontSize: 13, color: C.onAccent },
+  note: { fontFamily: F.bold, fontSize: 13, color: C.red },
 });

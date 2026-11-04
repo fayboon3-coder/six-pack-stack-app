@@ -1,29 +1,21 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { C, F } from '../../src/lib/theme';
-import { HomeIcon, TrainIcon, PlanIcon, ProgressIcon, ChatIcon, TargetIcon } from '../../src/components/icons';
-import { useAuth } from '../../src/lib/auth';
+import { C } from '../../src/lib/theme';
+import TabBar from '../../src/components/TabBar';
 
+/** Programs · Progress · Stack · You, on a floating pill tab bar. Other routes stay reachable but hidden. */
 export default function TabsLayout() {
-  const { profile } = useAuth();
-  const coach = profile?.role === 'coach';
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: C.red2,
-        tabBarInactiveTintColor: C.white,
-        tabBarStyle: { backgroundColor: C.tabBar, borderTopColor: C.line, height: 84, paddingTop: 8 },
-        tabBarLabelStyle: { fontFamily: F.xbold, fontSize: 10 },
-        sceneStyle: { backgroundColor: C.navy },
-      }}
-    >
-      <Tabs.Screen name="index" options={{ title: 'Today', tabBarIcon: ({ color }) => <HomeIcon color={String(color)} /> }} />
-      <Tabs.Screen name="train" options={{ title: 'Train', tabBarIcon: ({ color }) => <TrainIcon color={String(color)} /> }} />
-      <Tabs.Screen name="plan" options={{ title: 'Plan', tabBarIcon: ({ color }) => <PlanIcon color={String(color)} /> }} />
-      <Tabs.Screen name="progress" options={{ title: 'Progress', tabBarIcon: ({ color }) => <ProgressIcon color={String(color)} /> }} />
-      <Tabs.Screen name="boon" options={{ title: 'Boon', tabBarIcon: ({ color }) => <ChatIcon color={String(color)} /> }} />
-      <Tabs.Screen name="coach" options={{ title: 'Coach', href: coach ? undefined : null, tabBarIcon: ({ color }) => <TargetIcon color={String(color)} size={22} /> }} />
+    <Tabs tabBar={(p) => <TabBar {...p} />} screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: C.bg } }}>
+      <Tabs.Screen name="index" options={{ title: 'Programs' }} />
+      <Tabs.Screen name="progress" options={{ title: 'Progress' }} />
+      <Tabs.Screen name="stack" options={{ title: 'Stack' }} />
+      <Tabs.Screen name="you" options={{ title: 'You' }} />
+      <Tabs.Screen name="train" options={{ href: null }} />
+      <Tabs.Screen name="plan" options={{ href: null }} />
+      <Tabs.Screen name="today" options={{ href: null }} />
+      <Tabs.Screen name="boon" options={{ href: null }} />
+      <Tabs.Screen name="coach" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -46,12 +46,12 @@ export default function PageHeader({ kicker, title, subtitle, week, right }: {
 const st = StyleSheet.create({
   wrap: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6, gap: 6 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 44 },
-  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
+  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
   logo: { width: 44, height: 44 },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.navy2, borderWidth: 2, borderColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontFamily: F.black, fontSize: 16, color: C.white },
-  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.white, letterSpacing: -0.6 },
-  subtitle: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.white },
+  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.card, borderWidth: 2, borderColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.ink, letterSpacing: -0.6 },
+  subtitle: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.ink },
   weeks: { flexDirection: 'row', gap: 3, marginTop: 8 },
   seg: { flex: 1, height: 5, borderRadius: 3 },
 });

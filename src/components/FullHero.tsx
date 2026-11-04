@@ -14,14 +14,14 @@ export default function FullHero({ image, pills, title, lede, ratio = 0.92 }: {
   return (
     <View style={{ width: w, height: h, alignSelf: 'center' }}>
       <Image source={image} style={{ width: w, height: h }} resizeMode="cover" accessibilityIgnoresInvertColors />
-      <LinearGradient colors={['rgba(13,27,51,0.45)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.6)', C.navy]} locations={[0, 0.25, 0.62, 1]}
+      <LinearGradient colors={['rgba(13,27,51,0.45)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.6)', C.bg]} locations={[0, 0.25, 0.62, 1]}
         style={{ position: 'absolute', left: 0, top: 0, width: w, height: h }} />
       <View style={st.text}>
         {!!pills?.length && (
           <View style={st.pills}>
             {pills.map((p) => (
               <View key={p.text} style={[st.pill, p.tone === 'green' && { backgroundColor: C.green }]}>
-                <Text style={[st.pillText, p.tone === 'green' && { color: C.navy }]}>{p.text}</Text>
+                <Text style={[st.pillText, p.tone === 'green' && { color: C.bg }]}>{p.text}</Text>
               </View>
             ))}
           </View>
@@ -37,7 +37,7 @@ const st = StyleSheet.create({
   text: { position: 'absolute', left: 20, right: 20, bottom: 4, gap: 8 },
   pills: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   pill: { backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  pillText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.white, letterSpacing: -0.6, textTransform: 'uppercase' },
-  lede: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.white },
+  pillText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.onAccent },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 38, color: C.ink, letterSpacing: -0.6, textTransform: 'uppercase' },
+  lede: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.ink },
 });

@@ -85,7 +85,7 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
       <Pressable accessibilityRole="button" onPress={start} disabled={!live || !offers || !!busy} style={[st.btn, (!live || !offers || !!busy) && { opacity: 0.55 }]}>
-        {busy === 'buy' ? <ActivityIndicator color={C.white} /> : <Text style={st.btnText}>{label}</Text>}
+        {busy === 'buy' ? <ActivityIndicator color={C.ink} /> : <Text style={st.btnText}>{label}</Text>}
       </Pressable>
       {!!msg && <Text style={[st.small, { fontFamily: F.bold }]}>{msg}</Text>}
       {live && (
@@ -118,7 +118,7 @@ export function CoachingCard() {
       <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/apply'); }} style={st.btn}>
         <Text style={st.btnText}>Apply for coaching</Text>
       </Pressable>
-      <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.white }]}>
+      <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.ink }]}>
         <Text style={st.btnText}>See how coaching works</Text>
       </Pressable>
       <Text style={st.small}>2-minute application. Follow the plan and miss your goal, and I coach you up to 12 more weeks free.</Text>
@@ -134,7 +134,7 @@ export function BtlCard() {
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>
         <Text style={st.body}>My full investigation of 47 supplements and gadgets. Check anything before you buy it.</Text>
-        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.white }]}>
+        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.ink }]}>
           <Text style={st.btnText}>Get Beyond the Label</Text>
         </Pressable>
       </View>
@@ -155,29 +155,29 @@ export function LockedWeek({ week, onUnlock }: { week: number; onUnlock: () => v
 }
 
 const st = StyleSheet.create({
-  opt: { flex: 1, borderWidth: 1.5, borderColor: C.line, borderRadius: 16, padding: 12, gap: 2, backgroundColor: C.navy },
+  opt: { flex: 1, borderWidth: 1.5, borderColor: C.line, borderRadius: 16, padding: 12, gap: 2, backgroundColor: C.bg },
   optOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.12)' },
-  optTitle: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  optPrice: { fontFamily: F.black, fontSize: 26, color: C.white },
+  optTitle: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
+  optPrice: { fontFamily: F.black, fontSize: 26, color: C.ink },
   best: { position: 'absolute', top: -10, right: 8, backgroundColor: C.green, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  bestText: { fontFamily: F.black, fontSize: 9, letterSpacing: 0.8, textTransform: 'uppercase', color: C.navy },
-  card: { backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.line, borderRadius: 22, padding: 18, gap: 10 },
+  bestText: { fontFamily: F.black, fontSize: 9, letterSpacing: 0.8, textTransform: 'uppercase', color: C.bg },
+  card: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, borderRadius: 22, padding: 18, gap: 10 },
   badge: { alignSelf: 'flex-start', backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  badgeText: { fontFamily: F.black, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  kicker: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  title: { fontFamily: F.black, fontSize: 22, lineHeight: 26, color: C.white },
-  price: { fontFamily: F.black, fontSize: 34, color: C.white },
-  per: { fontFamily: F.xbold, fontSize: 16, color: C.white },
-  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.white },
-  small: { fontFamily: F.semi, fontSize: 12, color: C.white, textAlign: 'center' },
+  badgeText: { fontFamily: F.black, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.onAccent },
+  kicker: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
+  title: { fontFamily: F.black, fontSize: 22, lineHeight: 26, color: C.ink },
+  price: { fontFamily: F.black, fontSize: 34, color: C.ink },
+  per: { fontFamily: F.xbold, fontSize: 16, color: C.ink },
+  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.ink },
+  small: { fontFamily: F.semi, fontSize: 12, color: C.ink, textAlign: 'center' },
   tick: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   tickDot: { width: 20, height: 20, borderRadius: 10, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-  tickText: { flex: 1, fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.white },
+  tickText: { flex: 1, fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.ink },
   btn: { height: 54, borderRadius: 14, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
-  legal: { fontFamily: F.semi, fontSize: 11, lineHeight: 16, color: 'rgba(255,255,255,0.6)', textAlign: 'center' },
+  legal: { fontFamily: F.semi, fontSize: 11, lineHeight: 16, color: 'rgba(27,36,64,0.6)', textAlign: 'center' },
   links: { flexDirection: 'row', justifyContent: 'center', gap: 22 },
-  link: { fontFamily: F.bold, fontSize: 12, color: C.white, textDecorationLine: 'underline' },
-  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white, textAlign: 'center' },
-  locked: { marginHorizontal: 20, backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.red, borderRadius: 24, padding: 20, gap: 10 },
+  link: { fontFamily: F.bold, fontSize: 12, color: C.ink, textDecorationLine: 'underline' },
+  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent, textAlign: 'center' },
+  locked: { marginHorizontal: 20, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, borderRadius: 24, padding: 20, gap: 10 },
   lockIcon: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
 });

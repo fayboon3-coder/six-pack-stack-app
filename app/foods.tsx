@@ -47,7 +47,7 @@ export default function Foods() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
@@ -57,7 +57,7 @@ export default function Foods() {
         <Text style={st.h}>{twoTone('Your| foods')}</Text>
         <Text style={st.body}>Add or remove anything. Every meal gets rebuilt from this list, sized to {plan?.kcal || 'your'} calories and {plan?.protein || 'your'} g of protein.</Text>
         <FoodPicker ids={ids} custom={custom} onChange={(a, b) => { setMsg(''); setIds(a); setCustom(b); }} />
-        {!!msg && <Text style={[st.body, { color: C.red2 }]}>{msg}</Text>}
+        {!!msg && <Text style={[st.body, { color: C.red }]}>{msg}</Text>}
         <Button title={busy ? 'Building your meals…' : 'Rebuild my meals'} onPress={save} />
       </ScrollView>
     </SafeAreaView>
@@ -65,7 +65,7 @@ export default function Foods() {
 }
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
 });

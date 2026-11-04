@@ -51,7 +51,7 @@ export default function LeadScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 22, gap: 16, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
@@ -75,13 +75,13 @@ export default function LeadScreen() {
 }
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, letterSpacing: -0.4 },
-  sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  input: { height: 58, borderRadius: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, color: C.white, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.4 },
+  sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  input: { height: 58, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
   bonus: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   tick: { width: 22, height: 22, borderRadius: 11, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' },
-  bonusText: { flex: 1, fontFamily: F.bold, fontSize: 14, color: C.white },
-  err: { fontFamily: F.bold, fontSize: 14, color: C.red2 },
-  fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.white, textAlign: 'center' },
+  bonusText: { flex: 1, fontFamily: F.bold, fontSize: 14, color: C.ink },
+  err: { fontFamily: F.bold, fontSize: 14, color: C.red },
+  fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.ink, textAlign: 'center' },
 });

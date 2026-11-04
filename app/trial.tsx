@@ -27,7 +27,7 @@ export default function TrialOffer() {
   useEffect(() => { if (profile && !isFree(profile)) router.replace('/'); }, [profile?.tier]);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
         <Text style={st.k}>{plan?.name ? `${plan.name}, your plan is ready` : 'Your plan is ready'}</Text>
@@ -50,11 +50,11 @@ export default function TrialOffer() {
 }
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
   points: { gap: 8, borderRadius: 18, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 16 },
   dot: { fontFamily: F.black, fontSize: 15, color: C.green },
   skip: { minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  skipText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
+  skipText: { fontFamily: F.bold, fontSize: 14, color: C.ink, textDecorationLine: 'underline' },
 });

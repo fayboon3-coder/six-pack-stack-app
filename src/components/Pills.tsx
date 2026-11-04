@@ -10,8 +10,8 @@ export default function Pills<T extends string>({ items, value, onChange }: { it
         const on = t === value;
         return (
           <Pressable key={t} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={() => onChange(t)}
-            style={[st.pill, on ? { backgroundColor: C.white, borderColor: C.white } : null]}>
-            <Text style={[st.text, on && { color: C.navy }]}>{t}</Text>
+            style={[st.pill, on ? { backgroundColor: C.ink, borderColor: C.ink } : null]}>
+            <Text style={[st.text, on && { color: C.bg }]}>{t}</Text>
           </Pressable>
         );
       })}
@@ -21,5 +21,5 @@ export default function Pills<T extends string>({ items, value, onChange }: { it
 
 const st = StyleSheet.create({
   pill: { height: 40, paddingHorizontal: 18, borderRadius: 999, borderWidth: 1, borderColor: C.line, justifyContent: 'center' },
-  text: { fontFamily: F.xbold, fontSize: 14, color: C.white },
+  text: { fontFamily: F.xbold, fontSize: 14, color: C.ink },
 });

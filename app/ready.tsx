@@ -36,7 +36,7 @@ export default function Ready() {
   if (!plan || !revealed) {
     const slow = !plan && tries > 8;
     return (
-      <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
+      <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.bg }}>
         <LoadingScreen
           title={slow ? 'Almost| there' : 'Building your| plan'}
           sub={slow ? 'This is taking longer than usual. Your plan will be on the Today tab.' : 'Made from your answers. Nothing generic.'}
@@ -59,7 +59,7 @@ export default function Ready() {
   };
   const hot = coachingFirst(profile);
   return (
-    <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <Animated.ScrollView style={{ opacity: reveal, transform: [{ translateY: reveal.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }} contentContainerStyle={{ paddingBottom: 48 }}>
         <FullHero image={HERO} pills={[{ text: 'Plan ready', tone: 'green' }, { text: 'Weeks 1–2 free' }]}
@@ -84,14 +84,14 @@ const Tile = ({ v, l }: { v: string; l: string }) => (
 );
 
 const st = StyleSheet.create({
-  center: { flex: 1, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
-  loading: { fontFamily: F.xbold, fontSize: 16, color: C.white, textAlign: 'center' },
+  center: { flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24 },
+  loading: { fontFamily: F.xbold, fontSize: 16, color: C.ink, textAlign: 'center' },
   goal: { backgroundColor: C.red, borderRadius: 18, padding: 16, gap: 4 },
-  goalK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
-  goalT: { fontFamily: F.black, fontSize: 20, lineHeight: 24, color: C.white },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  tile: { flex: 1, backgroundColor: C.navy2, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
-  tileV: { fontFamily: F.black, fontSize: 20, color: C.white },
-  tileL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  goalK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.ink },
+  goalT: { fontFamily: F.black, fontSize: 20, lineHeight: 24, color: C.ink },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  tile: { flex: 1, backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
+  tileV: { fontFamily: F.black, fontSize: 20, color: C.ink },
+  tileL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
 });

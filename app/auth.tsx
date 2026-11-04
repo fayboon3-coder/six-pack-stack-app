@@ -21,13 +21,13 @@ export default function AuthCallback() {
     });
   }, [code, router]);
 
-  if (!err) return <View style={{ flex: 1, backgroundColor: C.navy }}><LoadingScreen title="Signing you| in" sub="One second. Your plan is on its way." /></View>;
+  if (!err) return <View style={{ flex: 1, backgroundColor: C.bg }}><LoadingScreen title="Signing you| in" sub="One second. Your plan is on its way." /></View>;
   return (
-    <View style={{ flex: 1, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 }}>
+    <View style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16 }}>
       <Backdrop />
       {err ? (
         <>
-          <Text style={{ fontFamily: F.bold, fontSize: 16, color: C.white, textAlign: 'center' }}>{err}</Text>
+          <Text style={{ fontFamily: F.bold, fontSize: 16, color: C.ink, textAlign: 'center' }}>{err}</Text>
           <Button title="Back to sign in" onPress={() => router.replace('/sign-in')} style={{ alignSelf: 'stretch' }} />
         </>
       ) : null}

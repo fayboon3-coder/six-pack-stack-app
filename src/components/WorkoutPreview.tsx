@@ -24,7 +24,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
       onPress={onPress} style={({ pressed }) => [st.card, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       <View style={{ width: cw, height: ih }}>
         {!!coverItem?.video && <Image source={thumb(coverItem.video, 'hq')} style={{ width: cw, height: ih }} resizeMode="cover" accessibilityIgnoresInvertColors />}
-        <LinearGradient colors={['rgba(13,27,51,0.15)', 'rgba(13,27,51,0.35)', C.navy2]} locations={[0, 0.5, 1]}
+        <LinearGradient colors={['rgba(13,27,51,0.15)', 'rgba(13,27,51,0.35)', C.card]} locations={[0, 0.5, 1]}
           style={{ position: 'absolute', left: 0, top: 0, width: cw, height: ih }} />
         <View style={[st.badge, done && { backgroundColor: C.green }]}><Text style={st.badgeText}>{badge}</Text></View>
         <View style={st.play}><PlayIcon size={22} /></View>
@@ -36,9 +36,9 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
 
       <View style={st.body}>
         <View style={st.stats}>
-          <View style={{ flex: 1 }}><Stat icon={<ClockIcon color={C.red2} size={15} />} value={`${w.minutes} min`} /></View>
-          <View style={{ flex: 1.3 }}><Stat icon={<DumbbellIcon color={C.red2} size={15} />} value={`${w.items.length} moves`} /></View>
-          <View style={{ flex: 1 }}><Stat icon={<LayersIcon color={C.red2} size={15} />} value={`${w.sets} sets`} /></View>
+          <View style={{ flex: 1 }}><Stat icon={<ClockIcon color={C.red} size={15} />} value={`${w.minutes} min`} /></View>
+          <View style={{ flex: 1.3 }}><Stat icon={<DumbbellIcon color={C.red} size={15} />} value={`${w.items.length} moves`} /></View>
+          <View style={{ flex: 1 }}><Stat icon={<LayersIcon color={C.red} size={15} />} value={`${w.sets} sets`} /></View>
         </View>
         <MuscleChips muscles={w.muscles} />
 
@@ -75,31 +75,31 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
 
 
 const st = StyleSheet.create({
-  card: { marginHorizontal: 20, borderRadius: 28, overflow: 'hidden', backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line },
+  card: { marginHorizontal: 20, borderRadius: 28, overflow: 'hidden', backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
   badge: { position: 'absolute', top: 16, left: 16, backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
+  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.onAccent },
   play: { position: 'absolute', top: 14, right: 14, width: 46, height: 46, borderRadius: 23, backgroundColor: 'rgba(226,67,59,0.92)', alignItems: 'center', justifyContent: 'center', paddingLeft: 3 },
   titleWrap: { position: 'absolute', left: 20, right: 20, bottom: 10 },
-  day: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  title: { fontFamily: F.black, fontSize: 36, lineHeight: 40, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
+  day: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  title: { fontFamily: F.black, fontSize: 36, lineHeight: 40, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
   body: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 8, gap: 14 },
   stats: { flexDirection: 'row', gap: 8 },
-  stat: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: C.navy, borderRadius: 12, paddingVertical: 10 },
-  statText: { fontFamily: F.xbold, fontSize: 12, color: C.white },
+  stat: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: C.bg, borderRadius: 12, paddingVertical: 10 },
+  statText: { fontFamily: F.xbold, fontSize: 12, color: C.ink },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  chipText: { fontFamily: F.bold, fontSize: 12, color: C.white },
+  chipText: { fontFamily: F.bold, fontSize: 12, color: C.onAccent },
   dot: { width: 7, height: 7, borderRadius: 4 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 8 },
   rowLine: { borderTopWidth: 1, borderTopColor: C.line },
-  thumbWrap: { width: 76, height: 48, borderRadius: 10, overflow: 'hidden', backgroundColor: C.navy },
+  thumbWrap: { width: 76, height: 48, borderRadius: 10, overflow: 'hidden', backgroundColor: C.bg },
   thumb: { width: 76, height: 48 },
   num: { position: 'absolute', left: 4, top: 4, minWidth: 18, height: 18, borderRadius: 9, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 4 },
-  numText: { fontFamily: F.black, fontSize: 10, color: C.white },
-  exName: { fontFamily: F.xbold, fontSize: 15, color: C.white },
-  target: { fontFamily: F.black, fontSize: 13, color: C.white },
-  muscle: { fontFamily: F.semi, fontSize: 12, color: C.white, flexShrink: 1 },
-  more: { fontFamily: F.bold, fontSize: 13, color: C.white, paddingTop: 6, borderTopWidth: 1, borderTopColor: C.line },
+  numText: { fontFamily: F.black, fontSize: 10, color: C.ink },
+  exName: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
+  target: { fontFamily: F.black, fontSize: 13, color: C.ink },
+  muscle: { fontFamily: F.semi, fontSize: 12, color: C.ink, flexShrink: 1 },
+  more: { fontFamily: F.bold, fontSize: 13, color: C.ink, paddingTop: 6, borderTopWidth: 1, borderTopColor: C.line },
   cta: { height: 58, borderRadius: 16, backgroundColor: C.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
+  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
 });

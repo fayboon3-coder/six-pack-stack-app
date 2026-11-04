@@ -28,7 +28,7 @@ export default function PreviewBar() {
 const st = StyleSheet.create({
   wrap: { position: 'absolute', right: 10, alignItems: 'flex-end', zIndex: 50 },
   bar: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: C.red, borderRadius: 999, paddingLeft: 14, paddingRight: 4, paddingVertical: 4, maxWidth: 260, opacity: 0.96 },
-  text: { flexShrink: 1, fontFamily: F.xbold, fontSize: 11, color: C.white },
-  exit: { backgroundColor: C.navy, borderRadius: 999, paddingHorizontal: 14, minHeight: 32, justifyContent: 'center' },
-  exitText: { fontFamily: F.black, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', color: C.white },
+  text: { flexShrink: 1, fontFamily: F.xbold, fontSize: 11, color: C.ink },
+  exit: { backgroundColor: C.bg, borderRadius: 999, paddingHorizontal: 14, minHeight: 32, justifyContent: 'center' },
+  exitText: { fontFamily: F.black, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', color: C.ink },
 });

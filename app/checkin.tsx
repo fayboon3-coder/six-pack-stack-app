@@ -187,14 +187,14 @@ export default function CheckinScreen() {
   const hh = Math.round(hw * 0.92);
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.navy }}>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
           {/* Hero photo */}
           <View style={{ width: hw, height: hh, alignSelf: 'center' }}>
             <Image source={HERO} style={{ width: hw, height: hh }} resizeMode="cover" accessibilityIgnoresInvertColors />
-            <LinearGradient colors={['rgba(13,27,51,0.5)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.55)', C.navy]} locations={[0, 0.25, 0.62, 1]}
+            <LinearGradient colors={['rgba(13,27,51,0.5)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.55)', C.bg]} locations={[0, 0.25, 0.62, 1]}
               style={{ position: 'absolute', left: 0, top: 0, width: hw, height: hh }} />
             <SafeAreaView edges={['top']} style={{ position: 'absolute', left: 12, top: 4 }}>
               <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} style={st.close}><BackIcon /></Pressable>
@@ -202,7 +202,7 @@ export default function CheckinScreen() {
             <View style={st.heroText}>
               <View style={st.pills}>
                 <View style={st.pill}><Text style={st.pillText}>Week {week} of 12</Text></View>
-                {photoWeek && <View style={[st.pill, { backgroundColor: C.green }]}><CameraIcon size={12} color={C.navy} /><Text style={[st.pillText, { color: C.navy }]}>Photo week</Text></View>}
+                {photoWeek && <View style={[st.pill, { backgroundColor: C.green }]}><CameraIcon size={12} color={C.bg} /><Text style={[st.pillText, { color: C.bg }]}>Photo week</Text></View>}
               </View>
               <Text style={st.title} accessibilityRole="header">{twoTone('Sunday| Check-in')}</Text>
               <Text style={st.lede}>{name ? `${name}, this` : 'This'} takes 2 minutes. {!isCoached(profile) ? 'Your numbers build your trend on the Progress tab, so you can see exactly what is working.' : 'I read every answer myself and send your adjustments within 24 hours.'}</Text>
@@ -217,11 +217,11 @@ export default function CheckinScreen() {
 
           <View style={{ paddingHorizontal: 20, gap: 16 }}>
             <Section n={1} title="Your numbers" sub="Weigh in each morning after the bathroom. Send the average." done={done.numbers}>
-              <NumberRow icon={<ScaleIcon color={C.red2} />} label="Weight" hint="7-day average" unit="lbs" placeholder="196.4"
+              <NumberRow icon={<ScaleIcon color={C.red} />} label="Weight" hint="7-day average" unit="lbs" placeholder="196.4"
                 value={weight} onChange={(t) => setWeight(t.replace(/[^\d.]/g, ''))} />
-              <NumberRow icon={<RulerIcon color={C.red2} />} label="Waist" hint="At the belly button" unit="in" placeholder="34.5"
+              <NumberRow icon={<RulerIcon color={C.red} />} label="Waist" hint="At the belly button" unit="in" placeholder="34.5"
                 value={waist} onChange={(t) => setWaist(t.replace(/[^\d.]/g, ''))} />
-              <NumberRow icon={<StepsIcon color={C.red2} />} label="Steps" hint="Daily average" unit="/day" placeholder="8,000" kb="number-pad"
+              <NumberRow icon={<StepsIcon color={C.red} />} label="Steps" hint="Daily average" unit="/day" placeholder="8,000" kb="number-pad"
                 value={steps} onChange={(t) => setSteps(t.replace(/\D/g, ''))} />
             </Section>
 
@@ -232,7 +232,7 @@ export default function CheckinScreen() {
                     <Pressable key={a} accessibilityRole="button" accessibilityLabel={`${photos[a] ? 'Retake' : 'Add'} ${a} photo`} onPress={() => pick(a)} style={st.photo}>
                       {photos[a]
                         ? <><Image source={{ uri: photos[a] }} style={{ position: 'absolute', left: 0, top: 0, right: 0, bottom: 0 }} /><View style={st.photoOk}><CheckIcon size={12} /></View></>
-                        : <><View style={st.camera}><CameraIcon color={C.white} size={20} /></View><Text style={st.photoLabel}>{a[0].toUpperCase() + a.slice(1)}</Text></>}
+                        : <><View style={st.camera}><CameraIcon color={C.ink} size={20} /></View><Text style={st.photoLabel}>{a[0].toUpperCase() + a.slice(1)}</Text></>}
                     </Pressable>
                   ))}
                 </View>
@@ -240,28 +240,28 @@ export default function CheckinScreen() {
               </Section>
             ) : (
               <View style={st.nextPhoto}>
-                <Badge><CameraIcon color={C.red2} /></Badge>
+                <Badge><CameraIcon color={C.red} /></Badge>
                 <Text style={[st.rowHint, { flex: 1 }]}>No photos this week. Next photo week: <Text style={{ fontFamily: F.black }}>week {nextPhoto ?? 12}</Text>.</Text>
               </View>
             )}
 
             <Section n={photoWeek ? 3 : 2} title="Your week" sub={isCoached(profile) ? 'Be honest. A rough week tells me exactly what to fix.' : 'Be honest. A rough week shows you exactly what to fix.'} done={done.week}>
-              <Scale icon={<DumbbellIcon color={C.red2} size={18} />} label="Workouts done" n={nDays} value={workouts} onChange={setWorkouts} />
-              <Scale icon={<ForkIcon color={C.red2} />} label="Days you hit your food" n={7} value={nutrition} onChange={setNutrition} />
-              <Scale icon={<BoltIcon color={C.red2} />} label="Energy" n={10} from={1} value={energy} onChange={setEnergy} low="Drained" high="Fired up" />
-              <Scale icon={<HungerIcon color={C.red2} />} label="Hunger" n={10} from={1} value={hunger} onChange={setHunger} low="Full all week" high="Starving" />
+              <Scale icon={<DumbbellIcon color={C.red} size={18} />} label="Workouts done" n={nDays} value={workouts} onChange={setWorkouts} />
+              <Scale icon={<ForkIcon color={C.red} />} label="Days you hit your food" n={7} value={nutrition} onChange={setNutrition} />
+              <Scale icon={<BoltIcon color={C.red} />} label="Energy" n={10} from={1} value={energy} onChange={setEnergy} low="Drained" high="Fired up" />
+              <Scale icon={<HungerIcon color={C.red} />} label="Hunger" n={10} from={1} value={hunger} onChange={setHunger} low="Full all week" high="Starving" />
             </Section>
 
             <Section n={photoWeek ? 4 : 3} title={!isCoached(profile) ? "Your notes" : "Talk to me"} sub={!isCoached(profile) ? "Writing it down is how you spot what works." : "This is where I learn what to change for you."} done={done.talk}>
-              <Note icon={<TrophyIcon color={C.red2} />} label="Your win this week" value={win} onChange={setWin}
+              <Note icon={<TrophyIcon color={C.red} />} label="Your win this week" value={win} onChange={setWin}
                 placeholder="Big or small. Hit every workout, skipped the drive-thru, slept 8 hours…" />
               <View style={st.shareRow}>
                 <Text style={[st.rowHint, { flex: 1 }]}>OK to share this win with your first name only?</Text>
                 <Switch value={shareWin} onValueChange={setShareWin} trackColor={{ true: C.green, false: C.line }} accessibilityLabel="OK to share this win" />
               </View>
-              <Note icon={<MountainIcon color={C.red2} />} label="What was hardest?" value={hardest} onChange={setHardest}
+              <Note icon={<MountainIcon color={C.red} />} label="What was hardest?" value={hardest} onChange={setHardest}
                 placeholder="Weekends, late-night snacking, getting to the gym…" />
-              {!!isCoached(profile) && <Note icon={<QuestionIcon color={C.red2} />} label="Anything you want me to answer?" value={questions} onChange={setQuestions}
+              {!!isCoached(profile) && <Note icon={<QuestionIcon color={C.red} />} label="Anything you want me to answer?" value={questions} onChange={setQuestions}
                 placeholder="Food swaps, a sore joint, a supplement you saw online…" />}
             </Section>
 
@@ -294,41 +294,41 @@ const st = StyleSheet.create({
   heroText: { position: 'absolute', left: 20, right: 20, bottom: 6, gap: 8 },
   pills: { flexDirection: 'row', gap: 8 },
   pill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
-  pillText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, letterSpacing: -0.8, textTransform: 'uppercase' },
-  lede: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.white },
+  pillText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.onAccent },
+  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, letterSpacing: -0.8, textTransform: 'uppercase' },
+  lede: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.ink },
   progress: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingVertical: 16 },
-  track: { flex: 1, height: 8, borderRadius: 4, backgroundColor: C.navy2, overflow: 'hidden' },
+  track: { flex: 1, height: 8, borderRadius: 4, backgroundColor: C.card, overflow: 'hidden' },
   fill: { height: 8, borderRadius: 4, backgroundColor: C.green },
-  progressText: { fontFamily: F.xbold, fontSize: 12, color: C.white },
-  section: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 18 },
+  progressText: { fontFamily: F.xbold, fontSize: 12, color: C.ink },
+  section: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 22, padding: 16, gap: 18 },
   sectionHead: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
   step: { width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: C.red, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
-  stepText: { fontFamily: F.black, fontSize: 13, color: C.white },
-  sectionTitle: { fontFamily: F.black, fontSize: 20, color: C.white },
-  sectionSub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.white, marginTop: 2 },
+  stepText: { fontFamily: F.black, fontSize: 13, color: C.ink },
+  sectionTitle: { fontFamily: F.black, fontSize: 20, color: C.ink },
+  sectionSub: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: C.ink, marginTop: 2 },
   badge: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(226,67,59,0.14)', borderWidth: 1, borderColor: 'rgba(226,67,59,0.45)', alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  rowLabel: { fontFamily: F.xbold, fontSize: 15, color: C.white },
-  rowHint: { fontFamily: F.semi, fontSize: 12, lineHeight: 17, color: C.white },
-  numBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.navy, borderWidth: 1, borderColor: C.line, borderRadius: 12, paddingHorizontal: 12, height: 50, width: 132 },
-  numInput: { flex: 1, minWidth: 0, color: C.white, fontFamily: F.black, fontSize: 18, textAlign: 'right' },
-  unit: { fontFamily: F.bold, fontSize: 12, color: C.white },
+  rowLabel: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
+  rowHint: { fontFamily: F.semi, fontSize: 12, lineHeight: 17, color: C.ink },
+  numBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, borderRadius: 12, paddingHorizontal: 12, height: 50, width: 132 },
+  numInput: { flex: 1, minWidth: 0, color: C.ink, fontFamily: F.black, fontSize: 18, textAlign: 'right' },
+  unit: { fontFamily: F.bold, fontSize: 12, color: C.ink },
   chips: { flexDirection: 'row', gap: 5 },
-  chip: { flex: 1, minWidth: 0, maxWidth: 52, height: 42, borderRadius: 11, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  chip: { flex: 1, minWidth: 0, maxWidth: 52, height: 42, borderRadius: 11, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
   chipOn: { backgroundColor: C.red, borderColor: C.red },
-  chipText: { fontFamily: F.xbold, fontSize: 13, color: C.white },
+  chipText: { fontFamily: F.xbold, fontSize: 13, color: C.onAccent },
   picked: { fontFamily: F.black, fontSize: 15, color: C.green },
   ends: { flexDirection: 'row', justifyContent: 'space-between' },
-  endText: { fontFamily: F.semi, fontSize: 11, color: C.white },
-  note: { minHeight: 76, borderRadius: 12, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy, color: C.white, fontFamily: F.semi, fontSize: 15, padding: 12, textAlignVertical: 'top' },
+  endText: { fontFamily: F.semi, fontSize: 11, color: C.ink },
+  note: { minHeight: 76, borderRadius: 12, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, color: C.ink, fontFamily: F.semi, fontSize: 15, padding: 12, textAlignVertical: 'top' },
   shareRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: -6 },
-  photo: { flex: 1, aspectRatio: 3 / 4, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.line, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center', gap: 8, overflow: 'hidden' },
+  photo: { flex: 1, aspectRatio: 3 / 4, borderRadius: 14, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.line, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center', gap: 8, overflow: 'hidden' },
   camera: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  photoLabel: { fontFamily: F.xbold, fontSize: 13, color: C.white },
+  photoLabel: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
   photoOk: { position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: 11, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center' },
   private: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  privateText: { fontFamily: F.semi, fontSize: 12, color: C.white },
-  nextPhoto: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 14 },
-  footer: { fontFamily: F.semi, fontSize: 12, color: C.white, textAlign: 'center', marginTop: 4 },
+  privateText: { fontFamily: F.semi, fontSize: 12, color: C.ink },
+  nextPhoto: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 14 },
+  footer: { fontFamily: F.semi, fontSize: 12, color: C.ink, textAlign: 'center', marginTop: 4 },
 });

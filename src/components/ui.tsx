@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
 import { C, F, R } from '../lib/theme';
 
-export const Eyebrow = ({ children, color = C.red2, style }: { children: React.ReactNode; color?: string; style?: TextStyle }) => (
+export const Eyebrow = ({ children, color = C.red, style }: { children: React.ReactNode; color?: string; style?: TextStyle }) => (
   <Text style={[s.eyebrow, { color }, style]}>{children}</Text>
 );
 
@@ -22,7 +22,7 @@ export function Button({ title, onPress, disabled, loading, variant = 'red', sty
   title: string; onPress?: () => void; disabled?: boolean; loading?: boolean;
   variant?: 'red' | 'navy' | 'ghost'; style?: ViewStyle;
 }) {
-  const bg = variant === 'red' ? C.red : variant === 'navy' ? C.navy : 'transparent';
+  const bg = variant === 'red' ? C.red : variant === 'navy' ? C.navy : C.bg;
   return (
     <Pressable
       accessibilityRole="button"
@@ -32,7 +32,7 @@ export function Button({ title, onPress, disabled, loading, variant = 'red', sty
       style={({ pressed }) => [s.btn, { backgroundColor: bg, opacity: disabled ? 0.5 : pressed ? 0.85 : 1 },
         variant === 'ghost' && { borderWidth: 1, borderColor: C.line }, style]}
     >
-      {loading ? <ActivityIndicator color={C.white} /> : <Text style={s.btnText}>{title}</Text>}
+      {loading ? <ActivityIndicator color={variant === 'ghost' ? C.ink : C.onAccent} /> : <Text style={[s.btnText, variant === 'ghost' && { color: C.ink }]}>{title}</Text>}
     </Pressable>
   );
 }
@@ -46,12 +46,12 @@ export function Bar({ value, max, color }: { value: number; max: number; color: 
 
 export const s = StyleSheet.create({
   eyebrow: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.8, textTransform: 'uppercase' },
-  h1: { fontFamily: F.black, fontSize: 28, color: C.white, letterSpacing: -0.3 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  card: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: R.card, padding: 16, gap: 10 },
-  btn: { height: 56, borderRadius: R.btn, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
-  btnText: { fontFamily: F.black, fontSize: 16, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
-  barBg: { height: 8, borderRadius: 4, backgroundColor: C.navy, overflow: 'hidden' },
+  h1: { fontFamily: F.black, fontSize: 28, color: C.ink, letterSpacing: -0.3 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: R.card, padding: 16, gap: 10 },
+  btn: { height: 54, borderRadius: R.btn, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20 },
+  btnText: { fontFamily: F.bold, fontSize: 18, color: C.onAccent },
+  barBg: { height: 8, borderRadius: 4, backgroundColor: '#e8eaf0', overflow: 'hidden' },
   barFg: { height: 8, borderRadius: 4 },
-  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
+  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.ink },
 });

@@ -9,7 +9,7 @@ export default function Poster({ source, label, size = 120, style, children }: {
 }) {
   return (
     <View style={[st.tile, { width: size, height: size * 1.25 }, style]}>
-      <LinearGradient colors={['#23406e', C.navy2, '#0f1f3b']} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#23406e', C.card, '#0f1f3b']} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
       {source ? (
         <Image source={source} resizeMode="contain" style={{ width: '78%', height: '72%' }} accessibilityIgnoresInvertColors />
       ) : (
@@ -22,5 +22,5 @@ export default function Poster({ source, label, size = 120, style, children }: {
 
 const st = StyleSheet.create({
   tile: { borderRadius: 16, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: C.line },
-  initial: { fontFamily: F.black, fontSize: 40, color: C.white },
+  initial: { fontFamily: F.black, fontSize: 40, color: C.ink },
 });

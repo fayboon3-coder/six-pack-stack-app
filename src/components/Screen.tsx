@@ -12,12 +12,12 @@ export default function Screen({ children, onRefresh, refreshing = false, style,
   edgeToEdge?: boolean;
 }) {
   return (
-    <SafeAreaView edges={edgeToEdge ? [] : ['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={edgeToEdge ? [] : ['top']} style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       {scroll ? (
         <ScrollView
-          contentContainerStyle={{ paddingBottom: 40 }}
-          refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.white} /> : undefined}
+          contentContainerStyle={{ paddingBottom: 120 }}
+          refreshControl={onRefresh ? <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.ink} /> : undefined}
         >
           {header}
           <View style={[{ padding: 20, paddingTop: header ? 12 : 20, gap: 16 }, style]}>{children}</View>

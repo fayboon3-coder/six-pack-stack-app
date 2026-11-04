@@ -37,12 +37,12 @@ export default function ReminderPrompt({ style }: { style?: object }) {
 }
 
 const st = StyleSheet.create({
-  card: { backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.green, borderRadius: 18, padding: 16, gap: 10 },
+  card: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.green, borderRadius: 18, padding: 16, gap: 10 },
   k: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.green },
-  t: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.white },
-  note: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  t: { fontFamily: F.black, fontSize: 16, lineHeight: 21, color: C.ink },
+  note: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   on: { flex: 1, backgroundColor: C.green, borderRadius: 12, paddingVertical: 12, alignItems: 'center' },
-  onT: { fontFamily: F.black, fontSize: 13, color: C.navy, textTransform: 'uppercase', letterSpacing: 0.5 },
+  onT: { fontFamily: F.black, fontSize: 13, color: C.bg, textTransform: 'uppercase', letterSpacing: 0.5 },
   off: { paddingHorizontal: 14, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, justifyContent: 'center' },
-  offT: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  offT: { fontFamily: F.bold, fontSize: 13, color: C.ink },
 });

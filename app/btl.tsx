@@ -28,7 +28,7 @@ export default function Btl() {
   const { width } = useWindowDimensions();
   const cw = Math.min(width - 120, 300);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 22, gap: 18, paddingBottom: 56 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/welcome'))} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
@@ -74,20 +74,20 @@ const Score = ({ n, l, c }: { n: number; l: string; c: string }) => (
 );
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
   score: { flexDirection: 'row', gap: 10 },
-  sTile: { flex: 1, borderWidth: 1.5, borderRadius: 16, padding: 12, alignItems: 'center', backgroundColor: C.navy2 },
+  sTile: { flex: 1, borderWidth: 1.5, borderRadius: 16, padding: 12, alignItems: 'center', backgroundColor: C.card },
   sN: { fontFamily: F.black, fontSize: 28 },
-  sL: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: C.white },
+  sL: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1, textTransform: 'uppercase', color: C.ink },
   row: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   tick: { width: 22, height: 22, borderRadius: 11, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
-  rowText: { flex: 1, fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.white },
-  buy: { backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.red, borderRadius: 22, padding: 18, gap: 12 },
-  price: { fontFamily: F.black, fontSize: 34, color: C.white },
-  once: { fontFamily: F.xbold, fontSize: 15, color: C.white },
+  rowText: { flex: 1, fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.ink },
+  buy: { backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, borderRadius: 22, padding: 18, gap: 12 },
+  price: { fontFamily: F.black, fontSize: 34, color: C.ink },
+  once: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
   link: { minHeight: 44, justifyContent: 'center', alignItems: 'center' },
-  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline', textAlign: 'center' },
+  linkText: { fontFamily: F.bold, fontSize: 14, color: C.ink, textDecorationLine: 'underline', textAlign: 'center' },
 });

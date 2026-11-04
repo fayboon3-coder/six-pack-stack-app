@@ -66,7 +66,7 @@ export default function ClientDetail() {
   const name = profile?.first_name || profile?.email || 'Client';
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
@@ -101,13 +101,13 @@ export default function ClientDetail() {
               <View key={c.id} style={[st.card, !reviewed && { borderColor: C.red }]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                   <Text style={st.cardTitle}>Week {c.week}</Text>
-                  <Text style={[st.meta, { color: reviewed ? C.green : C.red2 }]}>{reviewed ? 'Reviewed' : 'Needs review'} · {c.checkin_date}</Text>
+                  <Text style={[st.meta, { color: reviewed ? C.green : C.red }]}>{reviewed ? 'Reviewed' : 'Needs review'} · {c.checkin_date}</Text>
                 </View>
                 <View style={st.iconRow}>
-                  <Item icon={<ScaleIcon color={C.red2} size={15} />} text={`${c.weight ?? '–'} lbs`} />
-                  <Item icon={<DumbbellIcon color={C.red2} size={15} />} text={`${c.workouts ?? '–'} workouts`} />
-                  <Item icon={<ForkIcon color={C.red2} size={15} />} text={`${c.nutrition_days ?? '–'}/7 food`} />
-                  <Item icon={<BoltIcon color={C.red2} size={15} />} text={`${c.energy ?? '–'}/10`} />
+                  <Item icon={<ScaleIcon color={C.red} size={15} />} text={`${c.weight ?? '–'} lbs`} />
+                  <Item icon={<DumbbellIcon color={C.red} size={15} />} text={`${c.workouts ?? '–'} workouts`} />
+                  <Item icon={<ForkIcon color={C.red} size={15} />} text={`${c.nutrition_days ?? '–'}/7 food`} />
+                  <Item icon={<BoltIcon color={C.red} size={15} />} text={`${c.energy ?? '–'}/10`} />
                 </View>
                 <Text style={st.meta}>Waist {c.waist ?? '–'} in · Steps {c.steps ?? '–'} · Hunger {c.hunger ?? '–'}/10</Text>
                 {!!c.win && <View style={st.win}><TrophyIcon color={C.green} size={15} /><Text style={st.body}>{c.win}{c.share_win ? '  (OK to share)' : ''}</Text></View>}
@@ -143,23 +143,23 @@ const Item = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
 );
 
 const st = StyleSheet.create({
-  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.navy2, alignItems: 'center', justifyContent: 'center' },
-  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white },
+  back: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.card, alignItems: 'center', justifyContent: 'center' },
+  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink },
   goal: { fontFamily: F.black, fontSize: 15, color: C.green, textTransform: 'uppercase' },
   stats: { flexDirection: 'row', gap: 10 },
-  stat: { flex: 1, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 16, padding: 12, gap: 4 },
-  statValue: { fontFamily: F.black, fontSize: 22, color: C.white },
-  card: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 20, padding: 16, gap: 10 },
-  cardTitle: { fontFamily: F.black, fontSize: 18, color: C.white },
-  section: { fontFamily: F.black, fontSize: 20, color: C.white, marginTop: 6 },
-  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  meta: { fontFamily: F.semi, fontSize: 12, lineHeight: 17, color: C.white },
-  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.white, flex: 1 },
+  stat: { flex: 1, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 16, padding: 12, gap: 4 },
+  statValue: { fontFamily: F.black, fontSize: 22, color: C.ink },
+  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 20, padding: 16, gap: 10 },
+  cardTitle: { fontFamily: F.black, fontSize: 18, color: C.ink },
+  section: { fontFamily: F.black, fontSize: 20, color: C.ink, marginTop: 6 },
+  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
+  meta: { fontFamily: F.semi, fontSize: 12, lineHeight: 17, color: C.ink },
+  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: C.ink, flex: 1 },
   bold: { fontFamily: F.black },
-  input: { borderRadius: 12, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy, color: C.white, fontFamily: F.semi, fontSize: 15, paddingHorizontal: 12, height: 46 },
+  input: { borderRadius: 12, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, color: C.ink, fontFamily: F.semi, fontSize: 15, paddingHorizontal: 12, height: 46 },
   iconRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
-  itemText: { fontFamily: F.xbold, fontSize: 13, color: C.white },
+  itemText: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
   win: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
-  photo: { flex: 1, aspectRatio: 3 / 4, borderRadius: 10, backgroundColor: C.navy },
+  photo: { flex: 1, aspectRatio: 3 / 4, borderRadius: 10, backgroundColor: C.bg },
 });

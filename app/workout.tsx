@@ -138,10 +138,10 @@ export default function Workout() {
 
   if (finished) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
         <ScrollView contentContainerStyle={{ padding: 24, gap: 16, paddingBottom: 48 }}>
-          <View style={st.doneBadge}><CheckIcon color={C.navy} size={30} /></View>
+          <View style={st.doneBadge}><CheckIcon color={C.bg} size={30} /></View>
           <Text style={st.doneK}>{(day.t.split('·')[1] || day.t).trim()} done</Text>
           <Text style={st.doneH}>{prs.length ? `${prs.length} new personal record${prs.length > 1 ? 's' : ''}.` : 'Another one in the bank.'}</Text>
           <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -164,11 +164,11 @@ export default function Workout() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       {!!pr && (
         <View style={st.prBanner} accessibilityLiveRegion="polite">
-          <TrophyIcon color={C.navy} size={22} />
+          <TrophyIcon color={C.bg} size={22} />
           <View style={{ flex: 1 }}><Text style={st.prK}>New personal record</Text><Text style={st.prV}>{pr}</Text></View>
         </View>
       )}
@@ -237,7 +237,7 @@ export default function Workout() {
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 58 }]} />
                   <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Set ${k + 1} done`} hitSlop={6}
                     onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.green, borderColor: C.green }]}>
-                    <CheckIcon color={e.done ? C.navy : '#ffffff55'} size={16} />
+                    <CheckIcon color={e.done ? C.bg : '#1b244055'} size={16} />
                   </Pressable>
                 </View>
               );
@@ -281,54 +281,54 @@ export default function Workout() {
 
 const st = StyleSheet.create({
   prBanner: { position: 'absolute', zIndex: 10, top: 60, left: 16, right: 16, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.green, borderRadius: 18, padding: 14 },
-  prK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.navy },
-  prV: { fontFamily: F.black, fontSize: 17, color: C.navy },
+  prK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.bg },
+  prV: { fontFamily: F.black, fontSize: 17, color: C.bg },
   doneBadge: { width: 64, height: 64, borderRadius: 32, backgroundColor: C.green, alignItems: 'center', justifyContent: 'center', marginTop: 20 },
   doneK: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.green },
-  doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  doneTile: { flex: 1, backgroundColor: C.navy2, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
-  doneV: { fontFamily: F.black, fontSize: 22, color: C.white },
-  doneL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
+  doneH: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  doneTile: { flex: 1, backgroundColor: C.card, borderRadius: 16, borderWidth: 1, borderColor: C.line, padding: 12, gap: 2 },
+  doneV: { fontFamily: F.black, fontSize: 22, color: C.ink },
+  doneL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
   streak: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: C.red, borderRadius: 16, padding: 14 },
-  streakT: { fontFamily: F.black, fontSize: 16, color: C.white, flex: 1 },
+  streakT: { fontFamily: F.black, fontSize: 16, color: C.ink, flex: 1 },
   prRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  prT: { fontFamily: F.bold, fontSize: 15, color: C.white },
-  doneSub: { fontFamily: F.bold, fontSize: 15, color: C.white, marginTop: 8 },
+  prT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  doneSub: { fontFamily: F.bold, fontSize: 15, color: C.ink, marginTop: 8 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 4 },
   icon: { width: 44, height: 44, justifyContent: 'center' },
-  title: { fontFamily: F.black, fontSize: 15, color: C.white, textTransform: 'uppercase', letterSpacing: 0.6 },
-  time: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  title: { fontFamily: F.black, fontSize: 15, color: C.ink, textTransform: 'uppercase', letterSpacing: 0.6 },
+  time: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   progress: { flexDirection: 'row', gap: 4, paddingHorizontal: 20, paddingTop: 8 },
   seg: { flex: 1, height: 4, borderRadius: 2 },
-  video: { height: 200, borderRadius: 20, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  video: { height: 200, borderRadius: 20, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
   shade: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(13,27,51,0.35)' },
   videoLabel: { position: 'absolute', left: 14, bottom: 12, backgroundColor: 'rgba(13,27,51,0.85)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden' },
   play: { width: 58, height: 58, borderRadius: 29, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  exName: { fontFamily: F.black, fontSize: 24, color: C.white },
-  target: { fontFamily: F.xbold, fontSize: 13, color: C.red2 },
-  note: { fontFamily: F.bold, fontSize: 13, color: C.white },
-  cue: { fontFamily: F.semi, fontSize: 14, color: C.white, lineHeight: 20 },
-  table: { backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 10, gap: 8 },
+  exName: { fontFamily: F.black, fontSize: 24, color: C.ink },
+  target: { fontFamily: F.xbold, fontSize: 13, color: C.red },
+  note: { fontFamily: F.bold, fontSize: 13, color: C.ink },
+  cue: { fontFamily: F.semi, fontSize: 14, color: C.ink, lineHeight: 20 },
+  table: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 10, gap: 8 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 6, paddingTop: 4 },
-  h: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.white },
-  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.navy, borderRadius: 14, borderWidth: 1, borderColor: C.line, padding: 6 },
+  h: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.2, textTransform: 'uppercase', color: C.ink },
+  setRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.bg, borderRadius: 14, borderWidth: 1, borderColor: C.line, padding: 6 },
   setRowActive: { borderColor: C.red },
   setRowDone: { borderColor: 'rgba(63,191,127,0.6)', backgroundColor: 'rgba(63,191,127,0.08)' },
   setNo: { width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
-  setNoText: { fontFamily: F.black, fontSize: 14, color: C.white },
-  last: { flex: 1, minWidth: 0, fontFamily: F.bold, fontSize: 13, color: C.white },
+  setNoText: { fontFamily: F.black, fontSize: 14, color: C.ink },
+  last: { flex: 1, minWidth: 0, fontFamily: F.bold, fontSize: 13, color: C.ink },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
   rowLine: { borderTopWidth: 1, borderTopColor: C.line, paddingVertical: 10 },
-  cell: { fontFamily: F.xbold, fontSize: 15, color: C.white },
-  input: { height: 44, borderRadius: 10, borderWidth: 1, borderColor: C.line, backgroundColor: C.navy2, color: C.white, fontFamily: F.black, fontSize: 17, textAlign: 'center', paddingHorizontal: 4 },
+  cell: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
+  input: { height: 44, borderRadius: 10, borderWidth: 1, borderColor: C.line, backgroundColor: C.card, color: C.ink, fontFamily: F.black, fontSize: 17, textAlign: 'center', paddingHorizontal: 4 },
   tick: { width: 40, height: 40, borderRadius: 12, borderWidth: 2, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   rest: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(63,191,127,0.12)', borderWidth: 1, borderColor: 'rgba(63,191,127,0.4)', borderRadius: 14, padding: 14 },
-  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8, flexDirection: 'row', gap: 10, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.navy },
-  acc: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: C.navy2, borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 16, paddingVertical: 8 },
-  accText: { fontFamily: F.xbold, fontSize: 13, color: C.white, flex: 1 },
+  footer: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8, flexDirection: 'row', gap: 10, borderTopWidth: 1, borderTopColor: C.line, backgroundColor: C.bg },
+  acc: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: C.card, borderTopWidth: 1, borderTopColor: C.line, paddingHorizontal: 16, paddingVertical: 8 },
+  accText: { fontFamily: F.xbold, fontSize: 13, color: C.ink, flex: 1 },
   accBtn: { backgroundColor: C.red, borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8 },
-  accBtnText: { fontFamily: F.black, fontSize: 14, color: C.white },
-  swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2, marginTop: 2 },
-  swapT: { fontFamily: F.xbold, fontSize: 13, color: C.white },
-  restTime: { fontFamily: F.black, fontSize: 22, color: C.white },
+  accBtnText: { fontFamily: F.black, fontSize: 14, color: C.onAccent },
+  swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 36, paddingHorizontal: 12, borderRadius: 12, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, marginTop: 2 },
+  swapT: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
+  restTime: { fontFamily: F.black, fontSize: 22, color: C.ink },
 });

@@ -49,7 +49,7 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: out, zIndex: 100 }]} pointerEvents="none">
-      <LinearGradient colors={['#13284d', C.navy, '#070f1f']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={['#13284d', C.bg, '#070f1f']} style={StyleSheet.absoluteFill} />
       <View style={st.center}>
         <View style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
           <Animated.View style={[st.ring, { opacity: ringOpacity, transform: [{ scale: ringScale }] }]} />
@@ -68,8 +68,8 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
 const st = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   ring: { position: 'absolute', width: 120, height: 120, borderRadius: 30, borderWidth: 3, borderColor: C.red },
-  word: { fontFamily: 'Montserrat_900Black', fontSize: 26, letterSpacing: 3, color: C.white },
-  tag: { fontFamily: 'Montserrat_800ExtraBold', fontSize: 11, letterSpacing: 4, color: C.red2 },
-  track: { width: 140, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.12)', marginTop: 28, overflow: 'hidden' },
+  word: { fontFamily: 'Inter_900Black', fontSize: 26, letterSpacing: 3, color: C.ink },
+  tag: { fontFamily: 'Inter_800ExtraBold', fontSize: 11, letterSpacing: 4, color: C.red },
+  track: { width: 140, height: 4, borderRadius: 2, backgroundColor: 'rgba(27,36,64,0.12)', marginTop: 28, overflow: 'hidden' },
   bar: { height: 4, borderRadius: 2, backgroundColor: C.red },
 });

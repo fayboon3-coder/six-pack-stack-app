@@ -16,7 +16,7 @@ export default function Unlock() {
   const router = useRouter();
   const hot = coachingFirst(profile);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
@@ -34,7 +34,7 @@ export default function Unlock() {
 }
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 32, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
 });

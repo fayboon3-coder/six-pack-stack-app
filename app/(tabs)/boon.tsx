@@ -51,7 +51,7 @@ export default function Boon() {
             subtitle="Stuck, hungry, sore, or staring at a supplement you saw online? Send it. I read and answer every message myself." cta="Text Boon on WhatsApp"
             onPress={() => Linking.openURL(`https://wa.me/${WHATSAPP}`)} />
         )}
-        {(free || sub) && <Text accessibilityRole="link" onPress={() => Linking.openURL(COACHING_URL)} style={[st.legal, { textAlign: 'center', fontSize: 15, color: C.white, textDecorationLine: 'underline' }]}>See how coaching works first</Text>}
+        {(free || sub) && <Text accessibilityRole="link" onPress={() => Linking.openURL(COACHING_URL)} style={[st.legal, { textAlign: 'center', fontSize: 15, color: C.ink, textDecorationLine: 'underline' }]}>See how coaching works first</Text>}
       </View>
     }>
 
@@ -83,7 +83,7 @@ export default function Boon() {
       <Eyebrow style={{ marginTop: 12 }}>Settings</Eyebrow>
       <RemindersCard />
 
-      <Text style={[st.sub, { fontFamily: 'Montserrat_500Medium', lineHeight: 16, marginTop: 16 }]}>
+      <Text style={[st.sub, { fontFamily: 'Inter_500Medium', lineHeight: 16, marginTop: 16 }]}>
         Product names, logos and photos belong to their owners and are shown to identify the products Boon reviews. No sponsorships, no affiliate links. Not medical advice: check with your doctor before changing anything if you have a condition or take medication.
       </Text>
       <View style={{ marginTop: 8, gap: 8 }}>
@@ -100,9 +100,9 @@ export default function Boon() {
 }
 
 const st = StyleSheet.create({
-  legal: { fontFamily: F.bold, fontSize: 13, color: C.white, textDecorationLine: 'underline', paddingVertical: 6 },
+  legal: { fontFamily: F.bold, fontSize: 13, color: C.ink, textDecorationLine: 'underline', paddingVertical: 6 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 8 },
   avatar: { width: 48, height: 48, borderRadius: 24, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontFamily: F.black, fontSize: 20, color: C.white },
-  sub: { fontFamily: F.bold, fontSize: 12, color: C.white },
+  avatarText: { fontFamily: F.black, fontSize: 20, color: C.ink },
+  sub: { fontFamily: F.bold, fontSize: 12, color: C.ink },
 });

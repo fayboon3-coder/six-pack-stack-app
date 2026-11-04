@@ -72,7 +72,7 @@ export default function SwapSheet({ cfg, day, ex, onPick, onReset, onClose }: {
 
           {swapped && (
             <Pressable accessibilityRole="button" onPress={onReset} style={st.reset}>
-              <CheckIcon color={C.white} size={12} /><Text style={st.resetT}>Back to the original move</Text>
+              <CheckIcon color={C.ink} size={12} /><Text style={st.resetT}>Back to the original move</Text>
             </Pressable>
           )}
           <Pressable accessibilityRole="button" onPress={onClose} style={st.cancel}><Text style={st.cancelT}>Keep {cur?.name || 'it'}</Text></Pressable>
@@ -84,28 +84,28 @@ export default function SwapSheet({ cfg, day, ex, onPick, onReset, onClose }: {
 
 const st = StyleSheet.create({
   dim: { flex: 1, backgroundColor: 'rgba(5,10,22,0.65)' },
-  sheet: { maxHeight: '86%', backgroundColor: C.navy, borderTopLeftRadius: 26, borderTopRightRadius: 26, borderWidth: 1, borderColor: C.line },
+  sheet: { maxHeight: '86%', backgroundColor: C.bg, borderTopLeftRadius: 26, borderTopRightRadius: 26, borderWidth: 1, borderColor: C.line },
   grab: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: C.line, marginTop: 10 },
-  k: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 24, color: C.white },
-  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(255,255,255,0.85)' },
+  k: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 24, color: C.ink },
+  body: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(27,36,64,0.85)' },
   reasons: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  reason: { paddingHorizontal: 13, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2 },
-  reasonOn: { borderColor: C.white },
+  reason: { paddingHorizontal: 13, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
+  reasonOn: { borderColor: C.ink },
   reasonHurt: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  reasonT: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  reasonT: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   warn: { borderRadius: 14, borderWidth: 1.5, borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.1)', padding: 12, gap: 6 },
-  warnT: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.white },
-  warnS: { fontFamily: F.semi, fontSize: 12, lineHeight: 18, color: 'rgba(255,255,255,0.8)' },
-  opt: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 16, padding: 10 },
-  thumb: { width: 96, height: 58, borderRadius: 10, backgroundColor: C.navy },
+  warnT: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.ink },
+  warnS: { fontFamily: F.semi, fontSize: 12, lineHeight: 18, color: 'rgba(27,36,64,0.8)' },
+  opt: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 16, padding: 10 },
+  thumb: { width: 96, height: 58, borderRadius: 10, backgroundColor: C.bg },
   play: { position: 'absolute', right: 5, bottom: 5, width: 22, height: 22, borderRadius: 11, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  name: { fontFamily: F.black, fontSize: 15, color: C.white },
-  cue: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.75)' },
+  name: { fontFamily: F.black, fontSize: 15, color: C.ink },
+  cue: { fontFamily: F.semi, fontSize: 12, lineHeight: 16, color: 'rgba(27,36,64,0.75)' },
   use: { backgroundColor: C.red, borderRadius: 12, paddingHorizontal: 14, height: 40, justifyContent: 'center' },
-  useT: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase', letterSpacing: 0.5 },
+  useT: { fontFamily: F.black, fontSize: 13, color: C.ink, textTransform: 'uppercase', letterSpacing: 0.5 },
   reset: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', height: 48, borderRadius: 14, borderWidth: 1.5, borderColor: C.line },
-  resetT: { fontFamily: F.bold, fontSize: 14, color: C.white },
+  resetT: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   cancel: { height: 44, alignItems: 'center', justifyContent: 'center' },
-  cancelT: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
+  cancelT: { fontFamily: F.bold, fontSize: 14, color: C.ink, textDecorationLine: 'underline' },
 });

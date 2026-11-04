@@ -10,6 +10,7 @@ import NoPlan from '../../src/components/NoPlan';
 import { plain } from '../../src/lib/program';
 import Poster from '../../src/components/Poster';
 import PageHeader from '../../src/components/PageHeader';
+import ProgramsHeader from '../../src/components/ProgramsHeader';
 import Pills from '../../src/components/Pills';
 import FullHero from '../../src/components/FullHero';
 
@@ -35,6 +36,7 @@ export default function PlanTab() {
   return (
     <Screen edgeToEdge header={
       <View style={{ gap: 16 }}>
+        <ProgramsHeader active="meals" />
         {tab === 'Stack'
           ? <FullHero image={STACK_IMG} pills={[{ text: 'Your stack' }, ...(saved > 0 ? [{ text: `$${saved}/mo saved`, tone: 'green' as const }] : [])]}
               title="The| Stack"
@@ -107,9 +109,9 @@ export default function PlanTab() {
               <View style={{ flexDirection: 'row', gap: 14, alignItems: 'center' }}>
                 <Poster source={productImage(a.product)} label={a.product} size={72} style={a.verdict === 'CUT' ? { opacity: 0.55 } : undefined} />
                 <View style={{ flex: 1, gap: 6 }}>
-                  <Text style={[st.pill, { backgroundColor: VERDICT_COLOR[a.verdict] || C.white, color: a.verdict === 'CUT' ? C.white : C.navy }]}>{a.verdict}</Text>
+                  <Text style={[st.pill, { backgroundColor: VERDICT_COLOR[a.verdict] || C.ink, color: a.verdict === 'CUT' ? C.ink : C.bg }]}>{a.verdict}</Text>
                   <Text style={st.item}>{a.product}</Text>
-                  <Text style={[st.macro, { color: C.white }]}>${a.cost}/month</Text>
+                  <Text style={[st.macro, { color: C.ink }]}>${a.cost}/month</Text>
                 </View>
               </View>
               <Body style={{ fontSize: 13 }}>{plain(a.why)}</Body>
@@ -135,7 +137,7 @@ export default function PlanTab() {
             <Card key={k}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <Text style={st.slot}>{m.slot}</Text>
-                <Text style={[ui.label, { color: C.red2 }]}>Pick one</Text>
+                <Text style={[ui.label, { color: C.red }]}>Pick one</Text>
               </View>
               <Body style={{ fontSize: 12 }}>{m.target}</Body>
               <View style={{ gap: 10 }}>
@@ -182,7 +184,7 @@ function MealPhoto({ name, ids, fallback }: { name: string; ids?: string[]; fall
   const tiles = mealTiles(name, ids);
   if (!tiles.length) return <FoodPhoto source={fallback} />;
   const T = ({ t, style }: { t: Tile; style?: any }) => (
-    <View style={[{ overflow: 'hidden', backgroundColor: C.navy }, style]}>
+    <View style={[{ overflow: 'hidden', backgroundColor: C.bg }, style]}>
       <Image source={t.source} resizeMode="cover" accessibilityIgnoresInvertColors style={{ width: '100%', height: '100%' }} />
       <View style={st.tileTag}><Text style={st.tileTagT} numberOfLines={1}>{t.label}</Text></View>
     </View>
@@ -206,26 +208,26 @@ const Num = ({ v, l }: { v: string; l: string }) => (
 );
 
 const st = StyleSheet.create({
-  editFoods: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.navy2, padding: 16 },
-  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  editT: { fontFamily: F.black, fontSize: 15, color: C.white },
-  editChev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
+  editFoods: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.card, padding: 16 },
+  editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
+  editT: { fontFamily: F.black, fontSize: 15, color: C.ink },
+  editChev: { fontFamily: F.bold, fontSize: 30, color: C.ink, marginTop: -4 },
   tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   tab: { height: 38, paddingHorizontal: 14, borderRadius: 999, borderWidth: 1, borderColor: C.line, justifyContent: 'center' },
-  tabText: { fontFamily: F.xbold, fontSize: 13, color: C.white },
+  tabText: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
   grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: 14, columnGap: '3.5%' },
-  num: { fontFamily: F.black, fontSize: 20, color: C.white },
-  numL: { fontFamily: F.semi, fontSize: 12, color: C.white },
+  num: { fontFamily: F.black, fontSize: 20, color: C.ink },
+  numL: { fontFamily: F.semi, fontSize: 12, color: C.ink },
   big: { fontFamily: F.black, fontSize: 28 },
-  item: { fontFamily: F.black, fontSize: 17, color: C.white },
-  slot: { fontFamily: F.black, fontSize: 22, color: C.white, textTransform: 'uppercase' },
+  item: { fontFamily: F.black, fontSize: 17, color: C.ink },
+  slot: { fontFamily: F.black, fontSize: 22, color: C.ink, textTransform: 'uppercase' },
   buy: { alignSelf: 'flex-start', height: 40, paddingHorizontal: 14, borderRadius: 10, backgroundColor: C.red, justifyContent: 'center' },
-  buyText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase' },
+  buyText: { fontFamily: F.black, fontSize: 13, color: C.ink, textTransform: 'uppercase' },
   pill: { fontFamily: F.black, fontSize: 11, letterSpacing: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, overflow: 'hidden', alignSelf: 'flex-start' },
   option: { borderTopWidth: 1, borderTopColor: C.line, paddingTop: 14, gap: 4 },
   tileTag: { position: 'absolute', left: 6, bottom: 6, maxWidth: '90%', backgroundColor: 'rgba(9,20,42,0.82)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3 },
-  tileTagT: { fontFamily: F.xbold, fontSize: 11, color: C.white },
-  photo: { width: '100%', aspectRatio: 16 / 10, borderRadius: 14, overflow: 'hidden', marginBottom: 8, backgroundColor: C.navy },
-  optName: { fontFamily: F.xbold, fontSize: 15, color: C.white },
+  tileTagT: { fontFamily: F.xbold, fontSize: 11, color: C.ink },
+  photo: { width: '100%', aspectRatio: 16 / 10, borderRadius: 14, overflow: 'hidden', marginBottom: 8, backgroundColor: C.bg },
+  optName: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
   macro: { fontFamily: F.xbold, fontSize: 12, color: C.green },
 });

@@ -38,12 +38,12 @@ export default function HeroCard({ image, badge, title, subtitle, cta, onPress, 
 }
 
 const st = StyleSheet.create({
-  card: { marginHorizontal: 20, borderRadius: 28, overflow: 'hidden', backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line },
+  card: { marginHorizontal: 20, borderRadius: 28, overflow: 'hidden', backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
   badge: { position: 'absolute', top: 16, left: 16, backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7 },
-  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
+  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.onAccent },
   body: { paddingHorizontal: 20, paddingBottom: 20, paddingTop: 4, gap: 6 },
-  title: { fontFamily: F.black, fontSize: 34, lineHeight: 36, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  subtitle: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.white },
+  title: { fontFamily: F.black, fontSize: 34, lineHeight: 36, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  subtitle: { fontFamily: F.bold, fontSize: 14, lineHeight: 20, color: C.ink },
   cta: { marginTop: 12, height: 58, borderRadius: 16, backgroundColor: C.red, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
-  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
+  ctaText: { fontFamily: F.black, fontSize: 17, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
 });

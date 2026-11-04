@@ -96,10 +96,10 @@ export default function LoadingScreen({ title, sub, steps, stepMs = 650, done = 
                 <View key={s} style={st.row}>
                   <View style={[st.dot, state === 'done' && st.dotDone, state === 'now' && st.dotNow]}>
                     {state === 'done' && (
-                      <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={C.white} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+                      <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={C.ink} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
                     )}
                   </View>
-                  <Text style={[st.step, state === 'next' && { opacity: 0.4 }, state === 'now' && { color: C.white }]}>{s}</Text>
+                  <Text style={[st.step, state === 'next' && { opacity: 0.4 }, state === 'now' && { color: C.ink }]}>{s}</Text>
                 </View>
               );
             })}
@@ -119,14 +119,14 @@ const st = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
   logoBox: { width: 84, height: 84, alignItems: 'center', justifyContent: 'center', marginBottom: 26 },
   ring: { position: 'absolute', width: 84, height: 84, borderRadius: 22, borderWidth: 3, borderColor: C.red },
-  title: { fontFamily: F.black, fontSize: 26, lineHeight: 31, color: C.white, textAlign: 'center' },
-  sub: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 8, maxWidth: 300 },
+  title: { fontFamily: F.black, fontSize: 26, lineHeight: 31, color: C.ink, textAlign: 'center' },
+  sub: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(27,36,64,0.7)', textAlign: 'center', marginTop: 8, maxWidth: 300 },
   steps: { marginTop: 26, gap: 12, alignSelf: 'stretch', maxWidth: 300, marginHorizontal: 'auto' as any, width: '100%' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: 'rgba(255,255,255,0.25)', alignItems: 'center', justifyContent: 'center' },
+  dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: 'rgba(27,36,64,0.25)', alignItems: 'center', justifyContent: 'center' },
   dotNow: { borderColor: C.red },
   dotDone: { backgroundColor: C.green, borderColor: C.green },
-  step: { fontFamily: F.bold, fontSize: 15, color: 'rgba(255,255,255,0.85)', flexShrink: 1 },
-  track: { width: 180, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.12)', marginTop: 28, overflow: 'hidden' },
+  step: { fontFamily: F.bold, fontSize: 15, color: 'rgba(27,36,64,0.85)', flexShrink: 1 },
+  track: { width: 180, height: 4, borderRadius: 2, backgroundColor: 'rgba(27,36,64,0.12)', marginTop: 28, overflow: 'hidden' },
   bar: { height: 4, borderRadius: 2, backgroundColor: C.red },
 });

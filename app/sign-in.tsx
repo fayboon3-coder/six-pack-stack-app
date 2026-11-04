@@ -45,7 +45,7 @@ export default function SignIn() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
@@ -96,12 +96,12 @@ export default function SignIn() {
 const st = StyleSheet.create({
   wrap: { paddingHorizontal: 22, paddingTop: 4 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.red },
-  brand: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: C.white },
-  sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  label: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase', color: C.white },
-  input: { height: 56, borderRadius: 14, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, color: C.white, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
-  err: { fontFamily: F.bold, fontSize: 14, color: C.red2 },
+  brand: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: C.ink },
+  sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  label: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.4, textTransform: 'uppercase', color: C.ink },
+  input: { height: 56, borderRadius: 14, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16 },
+  err: { fontFamily: F.bold, fontSize: 14, color: C.red },
   note: { fontFamily: F.bold, fontSize: 14, color: C.green },
   link: { minHeight: 44, justifyContent: 'center', alignItems: 'center' },
-  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
+  linkText: { fontFamily: F.bold, fontSize: 14, color: C.ink, textDecorationLine: 'underline' },
 });

@@ -48,14 +48,14 @@ export default function FoodPicker({ ids, custom, onChange }: {
           <Text style={st.quickPlus}>+</Text>
         </Pressable>
       )}
-      <TextInput value={q} onChangeText={setQ} placeholder="Search any food (e.g. salmon, bagels, tofu)" placeholderTextColor="rgba(255,255,255,0.45)"
+      <TextInput value={q} onChangeText={setQ} placeholder="Search any food (e.g. salmon, bagels, tofu)" placeholderTextColor="rgba(27,36,64,0.45)"
         style={st.search} accessibilityLabel="Search foods" autoCorrect={false} />
 
       {!q && (
         <View style={st.tabs}>
           {CAT_ORDER.map((c) => (
             <Pressable key={c} accessibilityRole="tab" accessibilityState={{ selected: cat === c }} onPress={() => setCat(c)} style={[st.tab, cat === c && st.tabOn]}>
-              <Text style={[st.tabText, cat === c && { color: C.navy }]}>{CAT_LABEL[c]}{count(c) ? ` · ${count(c)}` : ''}</Text>
+              <Text style={[st.tabText, cat === c && { color: C.bg }]}>{CAT_LABEL[c]}{count(c) ? ` · ${count(c)}` : ''}</Text>
             </Pressable>
           ))}
         </View>
@@ -109,18 +109,18 @@ function AddOwn({ onAdd, onCancel, defaultCat }: { onAdd: (f: Food) => void; onC
     <View style={st.own}>
       <Text style={st.sumTitle}>Add your own food</Text>
       <Text style={st.note}>Use the nutrition label for one serving.</Text>
-      <TextInput value={name} onChangeText={setName} placeholder="Name (e.g. Mom's chili)" placeholderTextColor="rgba(255,255,255,0.45)" style={st.search} />
-      <TextInput value={serving} onChangeText={setServing} placeholder="One serving (e.g. 1 bowl, 1 bar, 2 slices)" placeholderTextColor="rgba(255,255,255,0.45)" style={st.search} />
+      <TextInput value={name} onChangeText={setName} placeholder="Name (e.g. Mom's chili)" placeholderTextColor="rgba(27,36,64,0.45)" style={st.search} />
+      <TextInput value={serving} onChangeText={setServing} placeholder="One serving (e.g. 1 bowl, 1 bar, 2 slices)" placeholderTextColor="rgba(27,36,64,0.45)" style={st.search} />
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <TextInput value={kcal} onChangeText={(t) => setKcal(t.replace(/[^\d]/g, ''))} keyboardType="number-pad" placeholder="Calories" placeholderTextColor="rgba(255,255,255,0.45)" style={[st.search, { flex: 1 }]} />
-        <TextInput value={p} onChangeText={(t) => setP(t.replace(/[^\d.]/g, ''))} keyboardType="decimal-pad" placeholder="Protein (g)" placeholderTextColor="rgba(255,255,255,0.45)" style={[st.search, { flex: 1 }]} />
+        <TextInput value={kcal} onChangeText={(t) => setKcal(t.replace(/[^\d]/g, ''))} keyboardType="number-pad" placeholder="Calories" placeholderTextColor="rgba(27,36,64,0.45)" style={[st.search, { flex: 1 }]} />
+        <TextInput value={p} onChangeText={(t) => setP(t.replace(/[^\d.]/g, ''))} keyboardType="decimal-pad" placeholder="Protein (g)" placeholderTextColor="rgba(27,36,64,0.45)" style={[st.search, { flex: 1 }]} />
       </View>
       <View style={[st.tabs, { flexWrap: 'wrap' }]}>
         {(['protein', 'carb', 'veg', 'fruit', 'dairy', 'snack', 'fat'] as FoodCat[]).map((c) => (
-          <Pressable key={c} onPress={() => setCat(c)} style={[st.tab, cat === c && st.tabOn]}><Text style={[st.tabText, cat === c && { color: C.navy }]}>{CAT_LABEL[c]}</Text></Pressable>
+          <Pressable key={c} onPress={() => setCat(c)} style={[st.tab, cat === c && st.tabOn]}><Text style={[st.tabText, cat === c && { color: C.bg }]}>{CAT_LABEL[c]}</Text></Pressable>
         ))}
       </View>
-      {!!err && <Text style={[st.note, { color: C.red2 }]}>{err}</Text>}
+      {!!err && <Text style={[st.note, { color: C.red }]}>{err}</Text>}
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Pressable accessibilityRole="button" onPress={onCancel} style={[st.addBtn, { flex: 1 }]}><Text style={st.addText}>Cancel</Text></Pressable>
         <Pressable accessibilityRole="button" onPress={save} style={[st.addBtn, { flex: 1, backgroundColor: C.red, borderColor: C.red }]}><Text style={st.addText}>Add food</Text></Pressable>
@@ -130,24 +130,24 @@ function AddOwn({ onAdd, onCancel, defaultCat }: { onAdd: (f: Food) => void; onC
 }
 
 const st = StyleSheet.create({
-  search: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2, color: C.white, paddingHorizontal: 16, fontFamily: F.semi, fontSize: 15 },
+  search: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card, color: C.ink, paddingHorizontal: 16, fontFamily: F.semi, fontSize: 15 },
   tabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  tab: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2 },
-  tabOn: { backgroundColor: C.white, borderColor: C.white },
-  tabText: { fontFamily: F.bold, fontSize: 13, color: C.white },
+  tab: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
+  tabOn: { backgroundColor: C.ink, borderColor: C.ink },
+  tabText: { fontFamily: F.bold, fontSize: 13, color: C.ink },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, paddingVertical: 11, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.navy2 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, paddingVertical: 11, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.16)' },
-  chipText: { fontFamily: F.semi, fontSize: 14, color: C.white },
+  chipText: { fontFamily: F.semi, fontSize: 14, color: C.onAccent },
   tick: { width: 18, height: 18, borderRadius: 9, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  addBtn: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.white, alignItems: 'center', justifyContent: 'center' },
-  addText: { fontFamily: F.black, fontSize: 14, color: C.white, letterSpacing: 0.4, textTransform: 'uppercase' },
+  addBtn: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.ink, alignItems: 'center', justifyContent: 'center' },
+  addText: { fontFamily: F.black, fontSize: 14, color: C.ink, letterSpacing: 0.4, textTransform: 'uppercase' },
   summary: { borderRadius: 16, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 14, gap: 4 },
-  sumTitle: { fontFamily: F.black, fontSize: 16, color: C.white },
-  note: { fontFamily: F.semi, fontSize: 13, lineHeight: 19, color: 'rgba(255,255,255,0.75)' },
+  sumTitle: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  note: { fontFamily: F.semi, fontSize: 13, lineHeight: 19, color: 'rgba(27,36,64,0.75)' },
   quick: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 2, borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.12)', padding: 16 },
-  quickK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  quickT: { fontFamily: F.black, fontSize: 16, color: C.white },
-  quickPlus: { fontFamily: F.black, fontSize: 32, color: C.white, marginTop: -4 },
-  own: { gap: 10, borderRadius: 16, borderWidth: 1.5, borderColor: C.red, padding: 14, backgroundColor: C.navy2 },
+  quickK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
+  quickT: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  quickPlus: { fontFamily: F.black, fontSize: 32, color: C.ink, marginTop: -4 },
+  own: { gap: 10, borderRadius: 16, borderWidth: 1.5, borderColor: C.red, padding: 14, backgroundColor: C.card },
 });

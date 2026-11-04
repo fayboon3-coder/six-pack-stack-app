@@ -23,7 +23,7 @@ export default function StackCheck() {
   VERDICTS.forEach((v) => { counts[v.kind]++; });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <FlatList
         data={list}
@@ -46,7 +46,7 @@ export default function StackCheck() {
               <Text style={st.scoreChev}>›</Text>
             </Pressable>
             <View style={st.search}>
-              <SearchIcon color={C.white} />
+              <SearchIcon color={C.ink} />
               <TextInput accessibilityLabel="Search supplements" value={q} onChangeText={setQ} placeholder="AG1, C4, fat burner, creatine…"
                 placeholderTextColor="#ffffff77" style={st.input} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
               {!!q && <Pressable accessibilityRole="button" accessibilityLabel="Clear" onPress={() => setQ('')} hitSlop={10}><Text style={st.clear}>✕</Text></Pressable>}
@@ -91,22 +91,22 @@ export default function StackCheck() {
 const st = StyleSheet.create({
   score: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: C.green, borderRadius: 16, padding: 14, backgroundColor: 'rgba(63,191,127,0.08)' },
   scoreK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.green },
-  scoreT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.white },
-  scoreChev: { fontFamily: F.bold, fontSize: 28, color: C.white, marginTop: -4 },
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white, textTransform: 'uppercase', letterSpacing: -0.5 },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  search: { height: 56, borderRadius: 16, backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.red, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16 },
-  input: { flex: 1, fontFamily: F.bold, fontSize: 17, color: C.white, minWidth: 0 },
-  clear: { fontFamily: F.black, fontSize: 16, color: C.white },
+  scoreT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ink },
+  scoreChev: { fontFamily: F.bold, fontSize: 28, color: C.ink, marginTop: -4 },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.5 },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  search: { height: 56, borderRadius: 16, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.red, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16 },
+  input: { flex: 1, fontFamily: F.bold, fontSize: 17, color: C.ink, minWidth: 0 },
+  clear: { fontFamily: F.black, fontSize: 16, color: C.ink },
   chip: { minHeight: 40, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, paddingHorizontal: 14, justifyContent: 'center' },
   chipOn: { borderColor: C.red, backgroundColor: 'rgba(226,67,59,0.18)' },
-  chipText: { fontFamily: F.bold, fontSize: 13, color: C.white },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.navy2, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 10 },
-  name: { fontFamily: F.black, fontSize: 16, color: C.white },
-  sub: { fontFamily: F.semi, fontSize: 13, color: C.white },
+  chipText: { fontFamily: F.bold, fontSize: 13, color: C.onAccent },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 10 },
+  name: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  sub: { fontFamily: F.semi, fontSize: 13, color: C.ink },
   badge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 },
-  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', color: C.navy },
-  empty: { backgroundColor: C.navy2, borderRadius: 18, padding: 16, gap: 8 },
-  emptyT: { fontFamily: F.black, fontSize: 18, color: C.white },
+  badgeText: { fontFamily: F.black, fontSize: 11, letterSpacing: 0.8, textTransform: 'uppercase', color: C.bg },
+  empty: { backgroundColor: C.card, borderRadius: 18, padding: 16, gap: 8 },
+  emptyT: { fontFamily: F.black, fontSize: 18, color: C.ink },
 });

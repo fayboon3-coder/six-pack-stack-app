@@ -1,96 +1,44 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, Image, ImageSourcePropType, Linking, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { track } from '../src/lib/track';
+import React, { useEffect } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../src/lib/theme';
-import type { Want } from '../src/lib/lead';
-import { BTL_URL, COACHING_URL, STACK_SCORE_URL } from '../src/lib/access';
-import Backdrop from '../src/components/Backdrop';
-import { twoTone } from '../src/components/TwoTone';
+import { track } from '../src/lib/track';
 
-const PLAN = require('../assets/img/cover_free.jpg');
-const SCORE = require('../assets/img/cover_score.jpg');
-const APP = require('../assets/img/cover_program.jpg');
-const BTL = require('../assets/img/btl_cover.jpg');
-const COACH = require('../assets/img/cover_coaching.jpg');
 const LOGO = require('../assets/logo-b.png');
 
-
-const PATHS: { want: Want | 'score'; img: ImageSourcePropType; tag: string; price: string; title: string; line: string; contain?: boolean }[] = [
-  { want: 'plan', img: PLAN, tag: 'Start here', price: 'Free', title: 'The Free Stack', line: 'Your first 2 weeks free: your calories, your meals and your training, built from a 2-minute quiz.' },
-  { want: 'sub', img: APP, tag: 'Best value', price: '$19.99/mo', title: 'The Full Stack', line: 'All 12 weeks: everything you need to finish on your own. Or $99 a year ($1.90 a week).' },
-  { want: 'coaching', img: COACH, tag: '1:1 with Boon', price: 'Apply', title: 'Six-Pack Stack Coaching', line: 'I audit your stack, build your plan and check in with you every Sunday for 12 weeks.' },
-];
-
-/** The front door: pick what you're here for. */
+/** The front door: logo, one promise, build my plan or log in. */
 export default function Welcome() {
   const router = useRouter();
-  const fade = useRef(PATHS.map(() => new Animated.Value(0))).current;
-  useEffect(() => {
-    Animated.stagger(110, fade.map((v) => Animated.timing(v, { toValue: 1, duration: 420, useNativeDriver: true }))).start();
-  }, []);
-
+  useEffect(() => { track('welcome_view', {}, { once: true }); }, []);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
-      <Backdrop />
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 48, gap: 14 }}>
-        <View style={st.brand}>
-          <Image source={LOGO} style={{ width: 36, height: 36 }} />
-          <Text style={st.brandText}>SIX-PACK STACK</Text>
-        </View>
-        <View style={{ gap: 10, marginTop: 18, marginBottom: 8 }}>
-          <Text style={st.kicker}>Your body. Your plan.</Text>
-          <Text style={st.h} accessibilityRole="header">{twoTone('Which product\nare you|\nhere for?')}</Text>
-          <Text style={st.sub}>Get your free personalized program right{'\u00A0'}now.</Text>
-        </View>
-        {PATHS.map((p, i) => (
-          <Animated.View key={p.want} style={{ opacity: fade[i], transform: [{ translateY: fade[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
-            <Pressable accessibilityRole="button" accessibilityLabel={`${p.title}, ${p.price}`}
-              onPress={() => (track('welcome_pick', { want: p.want }), p.want === 'btl' ? Linking.openURL(BTL_URL) : p.want === 'coaching' ? Linking.openURL(COACHING_URL) : p.want === 'score' ? Linking.openURL(STACK_SCORE_URL) : router.push({ pathname: '/lead', params: { want: p.want } }))}
-              style={({ pressed }) => [st.card, p.want === 'sub' && st.cardSub, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-              <View style={st.thumb}>
-                <Image source={p.img} style={{ width: 100, height: 126 }} resizeMode="cover" accessibilityIgnoresInvertColors />
-              </View>
-              <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 6 }}>
-                  <Text style={st.tag} numberOfLines={1}>{p.tag}</Text>
-                  <View style={[st.price, p.price === 'Free' && { backgroundColor: C.green }]}><Text style={[st.priceText, p.price === 'Free' && { color: C.navy }]}>{p.price}</Text></View>
-                </View>
-                <Text style={st.title}>{p.title}</Text>
-                <Text style={st.line}>{p.line}</Text>
-              </View>
-              <Text style={st.chev}>›</Text>
-            </Pressable>
-          </Animated.View>
-        ))}
-        <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} style={st.link}>
-          <Text style={st.linkText}>Already have an account? Sign in</Text>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <SafeAreaView edges={['top']} style={st.top}>
+        <Image source={LOGO} style={{ width: 72, height: 72 }} accessibilityIgnoresInvertColors />
+        <Text style={st.word} accessibilityRole="header">Six-Pack{'\n'}Stack</Text>
+      </SafeAreaView>
+      <SafeAreaView edges={['bottom']} style={st.sheet}>
+        <Text style={st.h1}>Stop guessing.{'\n'}Start stacking.</Text>
+        <Text style={st.sub}>A plan built around the food you already eat, workouts that fit your week, and a coach checking in every Sunday.</Text>
+        <Pressable accessibilityRole="button" onPress={() => { track('welcome_pick', { want: 'plan' }); router.push('/quiz'); }} style={({ pressed }) => [st.btn, { opacity: pressed ? 0.88 : 1 }]}>
+          <Text style={st.btnT}>Build my plan</Text>
         </Pressable>
-      </ScrollView>
-    </SafeAreaView>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} style={st.ghost}>
+          <Text style={st.ghostT}>Log in</Text>
+        </Pressable>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const st = StyleSheet.create({
-  brand: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingTop: 12 },
-  sub: { fontFamily: F.semi, fontSize: 15, lineHeight: 21, color: C.white },
-  brandText: { fontFamily: F.black, fontSize: 14, letterSpacing: 2.4, color: C.white },
-  heroText: { position: 'absolute', left: 20, right: 20, bottom: 6, gap: 8 },
-  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 40, lineHeight: 43, color: C.white, textTransform: 'uppercase', letterSpacing: -0.8 },
-  pick: { fontFamily: F.black, fontSize: 20, color: C.white, marginTop: 10 },
-  card: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: C.navy2, borderWidth: 1.5, borderColor: C.line, borderRadius: 22, padding: 12, minHeight: 140 },
-  cardHot: { borderColor: C.green },
-  cardSub: { borderColor: C.red, borderWidth: 2 },
-  thumb: { width: 100, height: 126, borderRadius: 14, overflow: 'hidden', backgroundColor: C.navy },
-  tag: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
-  price: { backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
-  priceText: { fontFamily: F.black, fontSize: 10, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
-  title: { fontFamily: F.black, fontSize: 17, lineHeight: 21, color: C.white },
-  line: { fontFamily: F.semi, fontSize: 12.5, lineHeight: 17, color: C.white },
-  chev: { fontFamily: F.bold, fontSize: 30, color: C.white, marginTop: -4 },
-  link: { minHeight: 48, justifyContent: 'center', alignItems: 'center', marginTop: 4 },
-  linkText: { fontFamily: F.bold, fontSize: 14, color: C.white, textDecorationLine: 'underline' },
+  top: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 14, paddingTop: 40 },
+  word: { fontFamily: F.black, fontSize: 30, lineHeight: 30, letterSpacing: -0.5, color: C.ink },
+  sheet: { backgroundColor: C.card, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingHorizontal: 16, paddingTop: 40, paddingBottom: 18, gap: 14 },
+  h1: { fontFamily: F.black, fontSize: 33, lineHeight: 36, textAlign: 'center', letterSpacing: -0.6, color: C.ink },
+  sub: { fontFamily: F.medium, fontSize: 17, lineHeight: 25, textAlign: 'center', color: C.ink, paddingHorizontal: 8, marginBottom: 30 },
+  btn: { height: 54, borderRadius: 27, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  btnT: { fontFamily: F.bold, fontSize: 18, color: C.onAccent },
+  ghost: { height: 52, borderRadius: 26, borderWidth: 1.5, borderColor: '#d5d9e3', backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
+  ghostT: { fontFamily: F.bold, fontSize: 18, color: C.ink },
 });

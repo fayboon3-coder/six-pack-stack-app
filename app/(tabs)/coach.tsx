@@ -44,10 +44,10 @@ export default function Coach() {
   const coached = rows.filter((r) => r.tier === 'coached');
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 40 }}
-        refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.white} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />}>
+        refreshControl={<RefreshControl refreshing={refreshing} tintColor={C.ink} onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />}>
         <Text style={st.kicker}>Coach</Text>
         <Text style={st.title}>{due ? `${due} check-in${due > 1 ? 's' : ''} to review` : 'All caught up'}</Text>
         <Text style={st.sub}>{coached.length} coaching client{coached.length === 1 ? '' : 's'} · {rows.length} in the app</Text>
@@ -64,9 +64,9 @@ export default function Coach() {
                 <View key={f.step} style={{ gap: 4 }}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={st.meta}>{f.label}</Text>
-                    <Text style={st.name}>{f.people}{k > 0 && drop > 0 ? <Text style={[st.meta, { color: C.red2 }]}>  −{drop}%</Text> : null}</Text>
+                    <Text style={st.name}>{f.people}{k > 0 && drop > 0 ? <Text style={[st.meta, { color: C.red }]}>  −{drop}%</Text> : null}</Text>
                   </View>
-                  <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.08)' }}>
+                  <View style={{ height: 8, borderRadius: 4, backgroundColor: 'rgba(27,36,64,0.08)' }}>
                     <View style={{ height: 8, borderRadius: 4, width: `${Math.max(2, (f.people / top) * 100)}%`, backgroundColor: k >= 7 ? C.green : C.red }} />
                   </View>
                 </View>
@@ -150,20 +150,20 @@ export default function Coach() {
 
 const st = StyleSheet.create({
   preview: { borderWidth: 1.5, borderColor: C.red, borderRadius: 18, padding: 14, gap: 8 },
-  vrow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, backgroundColor: C.navy, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
+  vrow: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56, backgroundColor: C.bg, borderRadius: 14, paddingHorizontal: 14, paddingVertical: 10 },
   pbtn: { minHeight: 44, borderRadius: 999, backgroundColor: C.red, paddingHorizontal: 16, justifyContent: 'center' },
-  pbtnText: { fontFamily: F.black, fontSize: 13, color: C.white, textTransform: 'uppercase', letterSpacing: 0.5 },
-  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2, marginTop: 10 },
-  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.white },
-  sub: { fontFamily: F.semi, fontSize: 14, color: C.white },
-  section: { fontFamily: F.black, fontSize: 18, color: C.white },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.navy2, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 14 },
+  pbtnText: { fontFamily: F.black, fontSize: 13, color: C.onAccent, textTransform: 'uppercase', letterSpacing: 0.5 },
+  kicker: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red, marginTop: 10 },
+  title: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: C.ink },
+  sub: { fontFamily: F.semi, fontSize: 14, color: C.ink },
+  section: { fontFamily: F.black, fontSize: 18, color: C.ink },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 18, padding: 14 },
   avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: C.line, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { fontFamily: F.black, fontSize: 16, color: C.white },
-  name: { fontFamily: F.black, fontSize: 16, color: C.white },
-  meta: { fontFamily: F.semi, fontSize: 12, color: C.white },
+  avatarText: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  name: { fontFamily: F.black, fontSize: 16, color: C.ink },
+  meta: { fontFamily: F.semi, fontSize: 12, color: C.ink },
   due: { backgroundColor: C.red, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 5 },
-  dueText: { fontFamily: F.black, fontSize: 11, color: C.white, textTransform: 'uppercase', letterSpacing: 1 },
-  tier: { fontFamily: F.xbold, fontSize: 11, color: C.white, textTransform: 'uppercase', letterSpacing: 1 },
-  invite: { backgroundColor: C.navy2, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line, borderRadius: 14, padding: 12, gap: 2 },
+  dueText: { fontFamily: F.black, fontSize: 11, color: C.ink, textTransform: 'uppercase', letterSpacing: 1 },
+  tier: { fontFamily: F.xbold, fontSize: 11, color: C.ink, textTransform: 'uppercase', letterSpacing: 1 },
+  invite: { backgroundColor: C.card, borderWidth: 1, borderStyle: 'dashed', borderColor: C.line, borderRadius: 14, padding: 12, gap: 2 },
 });

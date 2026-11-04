@@ -22,7 +22,7 @@ export default function VerdictScreen() {
   const locked = !profile || (profile.role !== 'coach' && profile.tier === 'free');
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: C.navy }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 56 }}>
         <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
@@ -86,23 +86,23 @@ const Block = ({ label, text, tone }: { label: string; text: string; tone?: 'gre
 );
 
 const st = StyleSheet.create({
-  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red2 },
-  h: { fontFamily: F.black, fontSize: 28, lineHeight: 32, color: C.white, textTransform: 'uppercase', letterSpacing: -0.4 },
-  verdict: { flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 2, borderRadius: 18, padding: 14, backgroundColor: C.navy2 },
+  k: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.6, textTransform: 'uppercase', color: C.red },
+  h: { fontFamily: F.black, fontSize: 28, lineHeight: 32, color: C.ink, textTransform: 'uppercase', letterSpacing: -0.4 },
+  verdict: { flexDirection: 'row', alignItems: 'center', gap: 14, borderWidth: 2, borderRadius: 18, padding: 14, backgroundColor: C.card },
   mark: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
-  markText: { fontFamily: F.black, fontSize: 22, color: C.navy },
+  markText: { fontFamily: F.black, fontSize: 22, color: C.bg },
   vLabel: { fontFamily: F.black, fontSize: 22, textTransform: 'uppercase' },
-  vSub: { fontFamily: F.bold, fontSize: 13, color: C.white },
-  headline: { fontFamily: F.black, fontSize: 22, lineHeight: 27, color: C.white },
-  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.white },
-  card: { backgroundColor: C.navy2, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 16, gap: 8 },
-  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red2 },
+  vSub: { fontFamily: F.bold, fontSize: 13, color: C.ink },
+  headline: { fontFamily: F.black, fontSize: 22, lineHeight: 27, color: C.ink },
+  body: { fontFamily: F.semi, fontSize: 15, lineHeight: 22, color: C.ink },
+  card: { backgroundColor: C.card, borderRadius: 18, borderWidth: 1, borderColor: C.line, padding: 16, gap: 8 },
+  label: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
   mvr: { paddingVertical: 8, gap: 4 },
-  say: { fontFamily: F.black, fontSize: 15, color: C.white },
-  lock: { backgroundColor: C.navy2, borderRadius: 20, borderWidth: 1.5, borderColor: C.red, padding: 18, gap: 10 },
+  say: { fontFamily: F.black, fontSize: 15, color: C.ink },
+  lock: { backgroundColor: C.card, borderRadius: 20, borderWidth: 1.5, borderColor: C.red, padding: 18, gap: 10 },
   lockIcon: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  lockT: { fontFamily: F.black, fontSize: 18, lineHeight: 23, color: C.white },
+  lockT: { fontFamily: F.black, fontSize: 18, lineHeight: 23, color: C.ink },
   btn: { height: 54, borderRadius: 14, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.white },
-  fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.white },
+  btnText: { fontFamily: F.black, fontSize: 15, letterSpacing: 0.6, textTransform: 'uppercase', color: C.onAccent },
+  fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.ink },
 });

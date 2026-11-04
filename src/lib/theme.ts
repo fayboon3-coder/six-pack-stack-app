@@ -1,20 +1,23 @@
+// Light theme to match the landing page: white backgrounds, navy text, red and navy buttons.
 export const C = {
-  navy: '#0d1b33',
-  navy2: '#142645',
-  tabBar: '#0b1730',
-  line: '#2b4470',
-  white: '#ffffff',
-  red: '#e2433b',
-  red2: '#ff5a50',
-  green: '#3fbf7f',
+  bg: '#ffffff',
+  card: '#f5f6f9',
+  line: '#e3e6ee',
+  ink: '#1b2440',
+  muted: '#6d7aa3',
+  navy: '#1b2440',
+  red: '#d93a31',
+  redTint: '#fdeceb',
+  onAccent: '#ffffff',
+  green: '#12804f',
 };
 
 export const F = {
-  medium: 'Montserrat_500Medium',
-  semi: 'Montserrat_600SemiBold',
-  bold: 'Montserrat_700Bold',
-  xbold: 'Montserrat_800ExtraBold',
-  black: 'Montserrat_900Black',
+  medium: 'Inter_500Medium',
+  semi: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+  xbold: 'Inter_800ExtraBold',
+  black: 'Inter_900Black',
 };
 
-export const R = { card: 18, btn: 14 };
+export const R = { card: 22, btn: 27 };
