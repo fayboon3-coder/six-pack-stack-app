@@ -34,7 +34,25 @@ export default function You() {
   useFocusEffect(useCallback(() => { load(); }, [load]));
   useEffect(() => { if (plan && !viewAs) hasPermission().then((ok) => { if (ok) readPrefs().then((p) => applyReminders(plan, p, { free: isFree(profile) })); }); }, [plan?.train.s]);
 
-  if (!plan) return <NoPlan name={profile?.first_name} />;
+  if (!plan) return (
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <SafeAreaView edges={['top']} style={st.head}><Text style={st.title} accessibilityRole="header">You</Text></SafeAreaView>
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 130, gap: 12 }}>
+        {profile?.role === 'coach' && (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/coach')} style={st.card2}>
+            <View style={{ flex: 1 }}><Text style={st.rowTitle}>Coach dashboard</Text><Text style={st.small}>Your clients and check-ins</Text></View><Chevron />
+          </Pressable>
+        )}
+
+        <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
+          <Image source={LOGO} style={{ width: 44, height: 44 }} />
+          <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
+        </Pressable>
+        {profile?.role !== 'coach' && <Pressable accessibilityRole="button" onPress={() => router.push('/quiz')} style={st.card2}><View style={{ flex: 1 }}><Text style={st.rowTitle}>Build my free plan</Text><Text style={st.small}>2-minute quiz</Text></View><Chevron /></Pressable>}
+        <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
+      </ScrollView>
+    </View>
+  );
   const week = weekOf(plan.train.s);
   const toSun = daysToSunday();
   const sunday = new Date(); sunday.setDate(sunday.getDate() + toSun);
@@ -54,7 +72,18 @@ export default function You() {
         </Pressable>
       </SafeAreaView>
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 130, gap: 12 }}>
+        {profile?.role === 'coach' && (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/coach')} style={st.card2}>
+            <View style={{ flex: 1 }}><Text style={st.rowTitle}>Coach dashboard</Text><Text style={st.small}>Your clients and check-ins</Text></View><Chevron />
+          </Pressable>
+        )}
+
         {!!session && <DaysStacked plan={plan} userId={session.user.id} />}
+        <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
+          <Image source={LOGO} style={{ width: 44, height: 44 }} />
+          <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
+          <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+        </Pressable>
 
         <Section title="Upcoming check-ins">
           <View style={st.weekRow}>{days.map((d, k) => <Text key={k} style={st.dow}>{DOW[d.getDay()]}</Text>)}</View>
@@ -87,18 +116,6 @@ export default function You() {
           </View>
           <Chevron />
         </Pressable>
-
-        <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.card2}>
-          <Image source={LOGO} style={{ width: 40, height: 40 }} />
-          <View style={{ flex: 1 }}><Text style={st.rowTitle}>Want me in your corner?</Text><Text style={st.small}>See how 1:1 coaching works</Text></View>
-          <Chevron />
-        </Pressable>
-
-        {profile?.role === 'coach' && (
-          <Pressable accessibilityRole="button" onPress={() => router.push('/coach')} style={st.card2}>
-            <View style={{ flex: 1 }}><Text style={st.rowTitle}>Coach dashboard</Text><Text style={st.small}>Your clients and check-ins</Text></View><Chevron />
-          </Pressable>
-        )}
 
         <RemindersCard compact />
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
@@ -147,6 +164,7 @@ const st = StyleSheet.create({
   rowTitle: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   num: { fontFamily: F.xbold, fontSize: 26, color: C.ink, marginTop: 6 },
   redCard: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.redTint, borderWidth: 1, borderColor: '#f3c9c6' },
+  coachBanner: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.red },
   card2: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 22, backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
   ghost: { height: 52, borderRadius: 26, borderWidth: 1.5, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   ghostT: { fontFamily: F.bold, fontSize: 17, color: C.ink },
