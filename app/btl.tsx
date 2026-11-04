@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { C, F } from '../src/lib/theme';
@@ -52,11 +52,12 @@ export default function Btl() {
           ))}
         </View>
 
-        <View style={st.buy}>
+        {/* iPhone: no outside checkout for a digital product (App Store 3.1.1). Sold on the website. */}
+        {Platform.OS !== 'ios' && <View style={st.buy}>
           <Text style={st.price}>$39.99 <Text style={st.once}>one time</Text></Text>
           <Text style={st.body}>Skip one product you didn't need and it's paid for itself.</Text>
           <Button title="Get Beyond the Label" onPress={() => Linking.openURL(BTL_URL)} />
-        </View>
+        </View>}
 
         <Pressable accessibilityRole="button" onPress={() => router.push('/stack-check')} style={st.link}>
           <Text style={st.linkText}>Not sure yet? Check a product free in Stack Check</Text>
