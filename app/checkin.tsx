@@ -19,6 +19,7 @@ import Page from '../src/components/Page';
 import PageTitle from '../src/components/PageTitle';
 import { isoDate, loggedDays } from '../src/lib/logs';
 import { readDay } from '../src/lib/daily';
+import { CoachCard } from '../src/components/Coach';
 
 type Angle = 'front' | 'side' | 'back';
 
@@ -161,6 +162,9 @@ export default function CheckinScreen() {
               placeholderTextColor={C.muted} style={[st.input, { minHeight: 80 }]} multiline />
           </>
         )}
+        <View style={{ height: 24 }} />
+        <CoachCard where="checkin" title="Want me to read this?"
+          body="Coached clients send this check-in to me. I go through every answer and send your adjustments within 24 hours." />
       </Page>
       {busy && (
         <LoadingScreen overlay

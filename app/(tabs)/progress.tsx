@@ -12,6 +12,7 @@ import NoPlan from '../../src/components/NoPlan';
 import { plain, weekOf } from '../../src/lib/program';
 import { exName } from '../../src/lib/workoutMeta';
 import type { Checkin } from '../../src/lib/types';
+import { CoachCard } from '../../src/components/Coach';
 
 type Log = { exercise_id: string; weight: number | null; reps: number | null; logged_on: string };
 const W = 300, H = 70;
@@ -141,11 +142,14 @@ export default function Progress() {
         {!!plan.goal_long && <Text style={[st.small, { marginTop: 10 }]}>{plain(plan.goal_long)}</Text>}
       </Panel>
 
+      <CoachCard where="progress" title={pct > 0 && pct < 100 ? `${100 - pct}% to go. Want me to get you there?` : 'Want me to get you to your goal?'}
+        body="12 weeks with me. Follow the plan and miss your goal, and I'll coach you up to 12 more weeks for free." />
+
       {!!rows.length && (
         <Panel title="Check-ins" right={`${rows.length} done`} bodyStyle={{ paddingVertical: 4 }}>
           {[...rows].reverse().map((r, k) => (
             <View key={r.id} style={[st.exRow, k < rows.length - 1 && st.line]}>
-              <Text style={[st.exT, { width: 70, flex: 0, fontFamily: F.bold }]}>Week {r.week}</Text>
+              <Text style={[st.exT, { width: 84, flex: 0, fontFamily: F.bold }]}>Week {r.week}</Text>
               <Text style={[st.exT]}>{r.weight != null ? `${Number(r.weight).toFixed(1)} lbs` : '–'}</Text>
               {r.workouts != null && <Text style={st.small}>{r.workouts} workouts</Text>}
             </View>

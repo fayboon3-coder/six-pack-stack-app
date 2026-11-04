@@ -12,6 +12,7 @@ import { WHATSAPP } from '../src/components/NoPlan';
 import { track } from '../src/lib/track';
 import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import { isCoached, isFree } from '../src/lib/access';
+import { showCoaching } from '../src/components/Coach';
 
 const FACE = require('../assets/logo-b.png');
 
@@ -114,6 +115,11 @@ export default function Ask() {
         <View style={st.bar}>
           {!blocked && (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerStyle={st.starters}>
+              {showCoaching(profile) && (
+                <Pressable accessibilityRole="button" onPress={() => { track('coaching_tap', { where: 'stack_chat' }); router.push('/coaching'); }} style={[st.chip, { backgroundColor: C.navy, borderColor: C.navy }]}>
+                  <Text style={[st.chipT, { color: '#ffffff' }]}>1:1 coaching with Boon</Text>
+                </Pressable>
+              )}
               {STARTERS.map((s) => (
                 <Pressable key={s} accessibilityRole="button" onPress={() => send(s)} disabled={thinking} style={st.chip}><Text style={st.chipT}>{s}</Text></Pressable>
               ))}

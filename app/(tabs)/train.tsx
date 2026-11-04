@@ -15,6 +15,7 @@ import { isLocked } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
 import { canEditTraining } from '../../src/lib/trainingSave';
 import { trainingDows } from '../../src/lib/daily';
+import { CoachCard } from '../../src/components/Coach';
 
 const LOGO = require('../../assets/logo-b.png');
 const LETTER = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -137,6 +138,9 @@ export default function Train() {
           </Pressable>
         )}
       </Panel>
+
+      <CoachCard where="training" title="Stuck on a lift? I'll fix it."
+        body="Coached clients send me their week every Sunday. I read it myself and change one thing at a time, so you never stall for long." />
     </Page>
   );
 }

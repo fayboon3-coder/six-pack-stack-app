@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
 import { C } from '../lib/theme';
+import { CoachFab } from './Coach';
 
 const TABS = [
   { key: 'index', path: '/', also: ['train', 'plan'], label: 'Programs', d: 'M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12' },
@@ -20,6 +21,7 @@ export default function TabBar({ state, navigation }: any) {
   const cur = state?.routes?.[state.index]?.name;
   return (
     <View pointerEvents="box-none" style={[st.wrap, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+      {cur !== 'stack' && cur !== 'boon' && cur !== 'coach' && <CoachFab bottom={66 + Math.max(insets.bottom, 12) + 14} />}
       <View style={st.bar}>
         {TABS.map((t) => {
           const on = cur === t.key || t.also.includes(cur);

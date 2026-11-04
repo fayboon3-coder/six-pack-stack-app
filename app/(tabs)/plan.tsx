@@ -10,6 +10,7 @@ import NoPlan from '../../src/components/NoPlan';
 import ProgramsHeader from '../../src/components/ProgramsHeader';
 import { addProtein, num, proteinGoal, readDay } from '../../src/lib/daily';
 import { isCoached } from '../../src/lib/access';
+import { CoachCard } from '../../src/components/Coach';
 
 import { readMeals, writeMeals, type MealDay } from '../../src/lib/mealsToday';
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -98,6 +99,8 @@ export default function Meals() {
       )}
       <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h4" stroke="#d22f26" strokeWidth={2} fill="none" strokeLinecap="round" /></Svg>}
         title="All meal options" sub="Every option, your numbers and rules" onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Meals' } })} />
+      <CoachCard where="meals" title="Meals built around your actual week"
+        body="Late shifts, date nights, weekends away. With 1:1 coaching I build your meals around your life and adjust them every Sunday. Text me from any restaurant." />
       {own && (
         <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M12 5v14M5 12h14" stroke="#d22f26" strokeWidth={2.2} fill="none" strokeLinecap="round" /></Svg>}
           title="Your foods" sub="Add or swap foods and rebuild your meals" onPress={() => router.push('/foods')} />

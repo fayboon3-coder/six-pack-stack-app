@@ -16,6 +16,7 @@ import { getStreak } from '../src/lib/streak';
 import RemindersCard from '../src/components/RemindersCard';
 import { ClockIcon, FlameIcon, TrophyIcon } from '../src/components/icons';
 import { RoundBtn } from '../src/components/PageTitle';
+import { CoachCard } from '../src/components/Coach';
 import Backdrop from '../src/components/Backdrop';
 import SwapSheet from '../src/components/SwapSheet';
 import { SwapIcon } from '../src/components/icons';
@@ -158,6 +159,8 @@ export default function Workout() {
           ))}
           <Text style={st.doneSub}>Want a nudge on your next training day?</Text>
           <RemindersCard compact />
+          <CoachCard where="workout_done" title="Want me in your corner for the next 12 weeks?"
+            body="Your plan in 48 hours, Sunday check-ins with me, and you can text me anytime on WhatsApp." />
           <Button title="Back to my plan" onPress={() => router.back()} />
         </ScrollView>
       </SafeAreaView>

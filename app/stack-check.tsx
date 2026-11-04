@@ -7,6 +7,7 @@ import { useAuth } from '../src/lib/auth';
 import { plain } from '../src/lib/program';
 import Page from '../src/components/Page';
 import PageTitle from '../src/components/PageTitle';
+import { CoachCard } from '../src/components/Coach';
 import { C, F } from '../src/lib/theme';
 import { BackIcon, SearchIcon } from '../src/components/icons';
 import AskBoonCard from '../src/components/AskBoonCard';
@@ -75,6 +76,8 @@ export default function StackCheck() {
         </View>
         <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke={C.ink} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
       </Pressable>
+      <CoachCard where="stack_check" title="Want the full stack audit, 1:1?"
+        body="With coaching I go through everything you take, keep what works and drop what's wasting your money. Then I build the plan around it." />
       <Text style={st2.fine}>No sponsors, no affiliate links. Take anything prescribed? Keep taking it and check with your doctor.</Text>
     </Page>
   );
