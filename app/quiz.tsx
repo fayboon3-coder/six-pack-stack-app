@@ -401,11 +401,11 @@ function Loading({ onDone }: { onDone: () => void }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', paddingHorizontal: 24, paddingTop: 70 }}>
       <View style={{ width: 200, height: 200, alignItems: 'center', justifyContent: 'center' }}>
-        <Animated.View style={[StyleSheet.absoluteFill, { borderRadius: 100, borderWidth: 2, borderColor: C.red,
+        <Animated.View style={[StyleSheet.absoluteFill, { borderRadius: 100, borderWidth: 2, borderColor: C.navy,
           opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0] }), transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.18] }) }] }]} />
         <Svg width={200} height={200} style={StyleSheet.absoluteFill}>
           <Circle cx={100} cy={100} r={R} stroke="#e8eaf0" strokeWidth={10} fill="none" />
-          <Circle cx={100} cy={100} r={R} stroke={C.red} strokeWidth={10} fill="none" strokeLinecap="round" strokeDasharray={`${L}`} strokeDashoffset={L - (L * pct) / 100} transform="rotate(-90 100 100)" />
+          <Circle cx={100} cy={100} r={R} stroke={C.navy} strokeWidth={10} fill="none" strokeLinecap="round" strokeDasharray={`${L}`} strokeDashoffset={L - (L * pct) / 100} transform="rotate(-90 100 100)" />
         </Svg>
         <Animated.Image source={LOGO} style={{ width: 58, height: 58, marginBottom: 6 }} accessibilityIgnoresInvertColors />
         <Text style={{ fontFamily: F.black, fontSize: 24, color: C.ink }}>{pct}%</Text>

@@ -52,7 +52,9 @@
       "typedRoutes": false
     },
     "splash": {
-      "backgroundColor": "#0d1b33"
+      "backgroundColor": "#ffffff",
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain"
     }
   }
 }

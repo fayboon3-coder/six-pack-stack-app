@@ -79,7 +79,7 @@ export default function LoadingScreen({ title, sub, steps, stepMs = 650, done = 
 
   return (
     <Animated.View style={[overlay ? [StyleSheet.absoluteFill, { zIndex: 50 }] : { flex: 1 }, { opacity: fade }]}>
-      <Backdrop />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: '#ffffff' }]} />
       <View style={st.center}>
         <View style={st.logoBox}>
           <Animated.View style={[st.ring, { opacity: ringOpacity, transform: [{ scale: ringScale }] }]} />
@@ -96,7 +96,7 @@ export default function LoadingScreen({ title, sub, steps, stepMs = 650, done = 
                 <View key={s} style={st.row}>
                   <View style={[st.dot, state === 'done' && st.dotDone, state === 'now' && st.dotNow]}>
                     {state === 'done' && (
-                      <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={C.ink} strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+                      <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#ffffff" strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
                     )}
                   </View>
                   <Text style={[st.step, state === 'next' && { opacity: 0.4 }, state === 'now' && { color: C.ink }]}>{s}</Text>
@@ -118,7 +118,7 @@ export default function LoadingScreen({ title, sub, steps, stepMs = 650, done = 
 const st = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28 },
   logoBox: { width: 84, height: 84, alignItems: 'center', justifyContent: 'center', marginBottom: 26 },
-  ring: { position: 'absolute', width: 84, height: 84, borderRadius: 22, borderWidth: 3, borderColor: C.red },
+  ring: { position: 'absolute', width: 84, height: 84, borderRadius: 22, borderWidth: 3, borderColor: C.navy },
   title: { fontFamily: F.black, fontSize: 26, lineHeight: 31, color: C.ink, textAlign: 'center' },
   sub: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: 'rgba(27,36,64,0.7)', textAlign: 'center', marginTop: 8, maxWidth: 300 },
   steps: { marginTop: 26, gap: 12, alignSelf: 'stretch', maxWidth: 300, marginHorizontal: 'auto' as any, width: '100%' },

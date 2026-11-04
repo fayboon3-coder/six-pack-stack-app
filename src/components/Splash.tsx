@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { C } from '../lib/theme';
 
 const LOGO = require('../../assets/logo-b.png');
@@ -49,7 +48,7 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: out, zIndex: 100 }]} pointerEvents="none">
-      <LinearGradient colors={['#13284d', C.bg, '#070f1f']} style={StyleSheet.absoluteFill} />
+      <View style={[StyleSheet.absoluteFill, { backgroundColor: '#ffffff' }]} />
       <View style={st.center}>
         <View style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
           <Animated.View style={[st.ring, { opacity: ringOpacity, transform: [{ scale: ringScale }] }]} />
@@ -67,9 +66,9 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
 
 const st = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  ring: { position: 'absolute', width: 120, height: 120, borderRadius: 30, borderWidth: 3, borderColor: C.red },
+  ring: { position: 'absolute', width: 120, height: 120, borderRadius: 30, borderWidth: 3, borderColor: C.navy },
   word: { fontFamily: 'Inter_900Black', fontSize: 26, letterSpacing: 3, color: C.ink },
-  tag: { fontFamily: 'Inter_800ExtraBold', fontSize: 11, letterSpacing: 4, color: C.red },
+  tag: { fontFamily: 'Inter_800ExtraBold', fontSize: 11, letterSpacing: 4, color: C.navy },
   track: { width: 140, height: 4, borderRadius: 2, backgroundColor: 'rgba(27,36,64,0.12)', marginTop: 28, overflow: 'hidden' },
-  bar: { height: 4, borderRadius: 2, backgroundColor: C.red },
+  bar: { height: 4, borderRadius: 2, backgroundColor: C.navy },
 });
