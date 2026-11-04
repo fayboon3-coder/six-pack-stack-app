@@ -9,7 +9,10 @@
         "resourceClass": "m-medium"
       },
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_RC_IOS_KEY": "appl_xOHRUlMqBXvuSrpVovMIdFVYfLw"
+      }
     },
     "preview": {
       "distribution": "internal",
