@@ -24,7 +24,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
       onPress={onPress} style={({ pressed }) => [st.card, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       <View style={{ width: cw, height: ih }}>
         {!!coverItem?.video && <Image source={thumb(coverItem.video, 'hq')} style={{ width: cw, height: ih }} resizeMode="cover" accessibilityIgnoresInvertColors />}
-        <LinearGradient colors={['rgba(13,27,51,0.15)', 'rgba(13,27,51,0.35)', C.card]} locations={[0, 0.5, 1]}
+        <LinearGradient colors={['rgba(245,246,249,0)', 'rgba(245,246,249,0.15)', 'rgba(245,246,249,0.92)', C.card]} locations={[0, 0.45, 0.8, 1]}
           style={{ position: 'absolute', left: 0, top: 0, width: cw, height: ih }} />
         <View style={[st.badge, done && { backgroundColor: C.green }]}><Text style={st.badgeText}>{badge}</Text></View>
         <View style={st.play}><PlayIcon size={22} /></View>

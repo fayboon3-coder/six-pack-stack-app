@@ -219,8 +219,6 @@ export default function CheckinScreen() {
             <Section n={1} title="Your numbers" sub="Weigh in each morning after the bathroom. Send the average." done={done.numbers}>
               <NumberRow icon={<ScaleIcon color={C.red} />} label="Weight" hint="7-day average" unit="lbs" placeholder="196.4"
                 value={weight} onChange={(t) => setWeight(t.replace(/[^\d.]/g, ''))} />
-              <NumberRow icon={<RulerIcon color={C.red} />} label="Waist" hint="At the belly button" unit="in" placeholder="34.5"
-                value={waist} onChange={(t) => setWaist(t.replace(/[^\d.]/g, ''))} />
               <NumberRow icon={<StepsIcon color={C.red} />} label="Steps" hint="Daily average" unit="/day" placeholder="8,000" kb="number-pad"
                 value={steps} onChange={(t) => setSteps(t.replace(/\D/g, ''))} />
             </Section>

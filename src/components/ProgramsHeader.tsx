@@ -7,7 +7,7 @@ import { C, F } from '../lib/theme';
 export default function ProgramsHeader({ active, sub }: { active: 'train' | 'meals'; sub?: string }) {
   const router = useRouter();
   return (
-    <View style={{ gap: 14 }}>
+    <View style={{ gap: 14, paddingHorizontal: 16, paddingTop: 12 }}>
       <View>
         {!!sub && <Text style={st.sub}>{sub}</Text>}
         <Text style={st.title} accessibilityRole="header">Programs</Text>

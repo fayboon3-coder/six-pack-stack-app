@@ -118,7 +118,7 @@ export function CoachingCard() {
       <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/apply'); }} style={st.btn}>
         <Text style={st.btnText}>Apply for coaching</Text>
       </Pressable>
-      <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.ink }]}>
+      <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: C.navy }]}>
         <Text style={st.btnText}>See how coaching works</Text>
       </Pressable>
       <Text style={st.small}>2-minute application. Follow the plan and miss your goal, and I coach you up to 12 more weeks free.</Text>
@@ -134,7 +134,7 @@ export function BtlCard() {
         <Text style={st.kicker}>Beyond the Label · $39.99</Text>
         <Text style={st.title}>What actually works, and what's marketing</Text>
         <Text style={st.body}>My full investigation of 47 supplements and gadgets. Check anything before you buy it.</Text>
-        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: C.ink }]}>
+        <Pressable accessibilityRole="link" onPress={() => Linking.openURL(BTL_URL)} style={[st.btn, { backgroundColor: C.navy }]}>
           <Text style={st.btnText}>Get Beyond the Label</Text>
         </Pressable>
       </View>

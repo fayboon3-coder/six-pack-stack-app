@@ -14,7 +14,7 @@ export default function FullHero({ image, pills, title, lede, ratio = 0.92 }: {
   return (
     <View style={{ width: w, height: h, alignSelf: 'center' }}>
       <Image source={image} style={{ width: w, height: h }} resizeMode="cover" accessibilityIgnoresInvertColors />
-      <LinearGradient colors={['rgba(13,27,51,0.45)', 'rgba(13,27,51,0)', 'rgba(13,27,51,0.6)', C.bg]} locations={[0, 0.25, 0.62, 1]}
+      <LinearGradient colors={['rgba(255,255,255,0)', 'rgba(255,255,255,0)', 'rgba(255,255,255,0.88)', C.bg]} locations={[0, 0.35, 0.68, 1]}
         style={{ position: 'absolute', left: 0, top: 0, width: w, height: h }} />
       <View style={st.text}>
         {!!pills?.length && (

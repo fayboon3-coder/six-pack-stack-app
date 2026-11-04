@@ -79,7 +79,7 @@ export default function You() {
 
         <Section title="Nutrition" onPress={() => router.push('/plan')}>
           <View style={{ flexDirection: 'row', gap: 18 }}>
-            <View style={{ flex: 1 }}><Text style={st.small}>Calories target</Text><Text style={st.num}>{Number(plan.kcal).toLocaleString('en-US')}</Text></View>
+            <View style={{ flex: 1 }}><Text style={st.small}>Calories target</Text><Text style={st.num}>{String(plan.kcal)}</Text></View>
             <View style={{ flex: 1 }}><Text style={st.small}>Protein target</Text><Text style={st.num}>{plan.protein} g</Text></View>
           </View>
         </Section>
