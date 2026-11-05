@@ -38,6 +38,14 @@ jobs:
           echo "EXPO_ASC_API_KEY_PATH=$PWD/asc-key.p8" >> "$GITHUB_ENV"
         env:
           ASC_KEY: ${{ secrets.ASC_API_KEY || secrets.KEY }}
+      - name: Set up iOS signing (creates the certificate and profile with the API key)
+        run: |
+          script -qec "eas credentials:configure-build --platform ios --profile production" /dev/null < <(yes '') | tail -60
+        env:
+          EXPO_ASC_KEY_ID: CBFD353969
+          EXPO_ASC_ISSUER_ID: 9f482997-7bf9-4d18-b66e-c33697f1123c
+          EXPO_APPLE_TEAM_ID: 3Q8MNR4RLV
+          EXPO_APPLE_TEAM_TYPE: INDIVIDUAL
       - name: Build and submit
         run: eas build --platform ios --profile production --auto-submit --non-interactive
         env:
