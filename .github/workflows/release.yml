@@ -37,7 +37,7 @@ jobs:
           printf '%s\n' "$ASC_KEY" > asc-key.p8
           echo "EXPO_ASC_API_KEY_PATH=$PWD/asc-key.p8" >> "$GITHUB_ENV"
         env:
-          ASC_KEY: ${{ secrets.ASC_API_KEY }}
+          ASC_KEY: ${{ secrets.ASC_API_KEY || secrets.KEY }}
       - name: Build and submit
         run: eas build --platform ios --profile production --auto-submit --non-interactive
         env:
