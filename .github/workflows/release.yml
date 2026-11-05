@@ -37,7 +37,7 @@ jobs:
           printf '%s\n' "$ASC_KEY" > asc-key.p8
           echo "EXPO_ASC_API_KEY_PATH=$PWD/asc-key.p8" >> "$GITHUB_ENV"
         env:
-          ASC_KEY: ${{ secrets.KEY || secrets.KEY }}
+          ASC_KEY: ${{ secrets.KEY }}
       - name: Set up iOS signing (creates the certificate and profile with the API key)
         run: |
           (sleep 20; for i in $(seq 1 40); do printf '\r'; sleep 3; done) | timeout 240 script -qfec "eas credentials:configure-build --platform ios --profile production" /dev/null || true
