@@ -7,7 +7,7 @@ import { GOALS, type Quiz } from './quiz';
  * and the app picks them up here: the email is filled in and matching quiz answers are
  * pre-selected. Nothing personal ever goes in a link.
  */
-type Saved = { email?: string; goal?: string; spend?: string; train?: string; stack?: string[]; at?: number };
+type Saved = { name?: string; email?: string; goal?: string; spend?: string; train?: string; stack?: string[]; at?: number };
 
 export function readHandoff(): Saved | null {
   if (Platform.OS !== 'web') return null;
@@ -21,12 +21,13 @@ export function readHandoff(): Saved | null {
 const GOAL: Record<string, string> = { 'Lose fat and see my abs': GOALS[1], 'Build muscle': GOALS[2], Both: GOALS[1] };
 const SPEND: Record<string, string> = { 'Under $50': 'Under $50', '$50–100': '$50–$100', '$100–200': '$100–$200', '$200+': '$200+' };
 const DAYS: Record<string, string> = { '4+': '4 days', '2–3': '3 days' };
+// Product ids: the Stack Score uses the app's Stack Check ids (older visits used short ids, kept so they still map).
 const TRIED: [string, string[]][] = [
-  ['Fat burners', ['fatburner', 'carnitine', 'cla', 'garcinia', 'gte', 'appetite', 'acv', 'detox']],
-  ['Pre-workout', ['pre', 'citrulline', 'caffeine', 'nootropic']],
-  ['Test boosters', ['testbooster', 'tongkat', 'turk', 'fadogia', 'shilajit']],
-  ['Greens powder', ['greens']],
-  ['Protein powder', ['whey', 'plant', 'casein', 'gainer']],
+  ['Fat burners', ['fat_burners', 'l_carnitine', 'cla', 'apple_cider_vinegar_gummies', 'skinny_and_detox_teas', 'fatburner', 'carnitine', 'garcinia', 'gte', 'appetite', 'acv', 'detox']],
+  ['Pre-workout', ['pre_workout', 'citrulline', 'beta_alanine', 'caffeine_pills', 'pre', 'caffeine', 'nootropic']],
+  ['Test boosters', ['testosterone_boosters', 'tongkat_ali', 'hormone_balancing_supplements', 'testbooster', 'tongkat', 'turk', 'fadogia', 'shilajit']],
+  ['Greens powder', ['greens_powders', 'greens']],
+  ['Protein powder', ['whey_protein', 'plant_protein', 'mass_gainers_and_meal_replacements', 'whey', 'plant', 'casein', 'gainer']],
   ['Creatine', ['creatine']],
 ];
 

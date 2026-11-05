@@ -10,6 +10,10 @@ describe('Stack Score → app handoff', () => {
     expect(q.days).toBe('4 days');
     expect(q.tried).toEqual(['Fat burners', 'Pre-workout', 'Protein powder']);
   });
+  it('maps the new Stack Check product ids', () => {
+    const q = quizFromHandoff({ stack: ['greens_powders', 'tongkat_ali', 'creatine'], at: Date.now() });
+    expect(q.tried).toEqual(['Test boosters', 'Greens powder', 'Creatine']);
+  });
   it('handles "I take nothing" and missing data', () => {
     expect(quizFromHandoff({ stack: [], at: Date.now() }).tried).toEqual(['None of these']);
     expect(quizFromHandoff(null)).toEqual({});

@@ -33,7 +33,7 @@ export default function LeadScreen() {
   useEffect(() => {
     readLead().then((l) => {
       if (l) { setName(l.first_name); setEmail(l.email); return; }
-      const h = readHandoff(); if (h?.email) setEmail(h.email); // came from the Stack Score
+      const h = readHandoff(); if (h?.email) setEmail(h.email); if (h?.name) setName(h.name); // came from the Stack Score
     });
     Linking.getInitialURL().then((u) => { const s = u ? Linking.parse(u).queryParams?.src : undefined; if (s) setSrc(String(s).slice(0, 80)); }).catch(() => {});
   }, []);
