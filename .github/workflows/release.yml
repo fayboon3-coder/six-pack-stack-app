@@ -1,7 +1,7 @@
 name: Build and send to the App Store
 
 # Run by hand (Actions → "Build and send to the App Store" → Run workflow).
-# Needs the ASC_API_KEY repo secret (contents of the Admin App Store Connect
+# Needs the KEY repo secret (contents of the Admin App Store Connect
 # API key .p8). EAS uses it to create the signing certificate and profile and
 # to upload the build to App Store Connect / TestFlight. No Apple password needed.
 on:
@@ -33,11 +33,11 @@ jobs:
         run: eas init --non-interactive --force
       - name: Write the App Store Connect API key
         run: |
-          if [ -z "$ASC_KEY" ]; then echo "Add the ASC_API_KEY secret first (contents of AuthKey_CBFD353969.p8)."; exit 1; fi
+          if [ -z "$ASC_KEY" ]; then echo "Add the KEY secret first (contents of AuthKey_CBFD353969.p8)."; exit 1; fi
           printf '%s\n' "$ASC_KEY" > asc-key.p8
           echo "EXPO_ASC_API_KEY_PATH=$PWD/asc-key.p8" >> "$GITHUB_ENV"
         env:
-          ASC_KEY: ${{ secrets.ASC_API_KEY || secrets.KEY }}
+          ASC_KEY: ${{ secrets.KEY || secrets.KEY }}
       - name: Set up iOS signing (creates the certificate and profile with the API key)
         run: |
           (sleep 20; for i in $(seq 1 40); do printf '\r'; sleep 3; done) | timeout 240 script -qfec "eas credentials:configure-build --platform ios --profile production" /dev/null || true
