@@ -23,7 +23,10 @@
     "production": {
       "ios": {
         "ascAppId": "6830837912",
-        "appleTeamId": "3Q8MNR4RLV"
+        "appleTeamId": "3Q8MNR4RLV",
+        "ascApiKeyPath": "./asc-key.p8",
+        "ascApiKeyIssuerId": "9f482997-7bf9-4d18-b66e-c33697f1123c",
+        "ascApiKeyId": "CBFD353969"
       }
     }
   }
