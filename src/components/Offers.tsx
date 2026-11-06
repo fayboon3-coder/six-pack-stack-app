@@ -21,22 +21,27 @@ const Tick = ({ children }: { children: string }) => (
   </View>
 );
 
-/** The full app (subscription): yearly with a 7-day free trial, or monthly. Sold through the App Store. */
-export function SubscriptionCard({ source = 'other' }: { source?: string }) {
+export type PlanId = 'yearly' | 'monthly';
+
+/**
+ * Everything needed to sell The Full Stack, shared by the subscription card and the
+ * full-page offer after the plan: plan choice, real prices, and the buy/restore actions.
+ * iPhone: Apple's purchase sheet. Web: RevenueCat's secure checkout.
+ */
+export function useSubscribe(source: string) {
   const { refresh, session } = useAuth();
-  const [plan, setPlan] = useState<'yearly' | 'monthly'>('yearly');
-  const [offers, setOffers] = useState<Record<'yearly' | 'monthly', Offer> | null>(null);
+  const [plan, setPlan] = useState<PlanId>('yearly');
+  const [offers, setOffers] = useState<Record<PlanId, Offer> | null>(null);
   const [busy, setBusy] = useState<'' | 'buy' | 'restore'>('');
   const [msg, setMsg] = useState('');
   const live = purchasesEnabled();
-  const web = !live && webCheckoutEnabled() && !!session && session.user.id !== 'demo';
+  const web = !live && webCheckoutEnabled() && !!session && (session.user.id !== 'demo' || process.env.EXPO_PUBLIC_DEMO_PAY === '1'); // DEMO_PAY: design previews only
   useEffect(() => { if (live) getOffers().then(setOffers); }, [live]);
-  useEffect(() => { track('paywall_view', { source, live }, { once: true }); }, [source]);
-  const price = (id: 'yearly' | 'monthly') => offers?.[id].price || FALLBACK_PRICES[id];
+  useEffect(() => { track('paywall_view', { source, live, web }, { once: true }); }, [source]);
+  const price = (id: PlanId) => offers?.[id].price || FALLBACK_PRICES[id];
 
   const start = async () => {
     if (web && session) {
-      // Web: RevenueCat's secure checkout (card, Apple Pay, Google Pay), tied to this account.
       track('purchase_tap', { plan, source, platform: 'web' });
       setBusy('buy');
       const url = webCheckoutUrl(session.user.id, session.user.email);
@@ -60,6 +65,19 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
     setMsg(found ? 'Restored. Weeks 3–12 are unlocked.' : 'No active subscription found on this Apple ID.');
     setBusy('');
   };
+  const can = web || (live && !!offers);
+  const label = !live && !web ? 'Opens with the App Store launch'
+    : busy === 'buy' ? 'One second…'
+    : plan === 'yearly' ? 'Start my 7-day free trial' : 'Start monthly';
+  const legal = web
+    ? `${plan === 'yearly' ? `Free for 7 days, then ${price('yearly')} a year. Pick yearly on the next screen to get the free trial.` : `${price('monthly')} a month.`} Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time from the link in your receipt email.`
+    : `${plan === 'yearly' ? `Free for 7 days, then ${price('yearly')} a year.` : `${price('monthly')} a month.`} Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.`;
+  return { plan, setPlan, price, start, doRestore, busy, msg, can, label, live, web, legal };
+}
+
+/** The full app (subscription): yearly with a 7-day free trial, or monthly. */
+export function SubscriptionCard({ source = 'other' }: { source?: string }) {
+  const { plan, setPlan, price, start, doRestore, busy, msg, can, label, live, web, legal } = useSubscribe(source);
 
   const Opt = ({ id, title, per, note, best }: { id: 'yearly' | 'monthly'; title: string; per: string; note: string; best?: boolean }) => {
     const on = plan === id;
@@ -72,10 +90,6 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       </Pressable>
     );
   };
-  const can = web || (live && !!offers);
-  const label = !live && !web ? 'Opens with the App Store launch'
-    : busy === 'buy' ? 'One second…'
-    : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly';
   return (
     <View style={[st.card, { borderColor: C.red }]}>
       <Cover src={PROGRAM_IMG} />
@@ -99,12 +113,7 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       {!!msg && <Text style={[st.small, { fontFamily: F.bold }]}>{msg}</Text>}
       {web && (
         <>
-          <Text style={st.legal}>
-            {plan === 'yearly'
-              ? `Free for 7 days, then ${price('yearly')} a year. Pick yearly on the next screen to get the free trial.`
-              : `${price('monthly')} a month.`}{' '}
-            Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time from the link in your receipt email.
-          </Text>
+          <Text style={st.legal}>{legal}</Text>
           <View style={st.links}>
             <Pressable accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} hitSlop={8}><Text style={st.link}>Terms</Text></Pressable>
             <Pressable accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} hitSlop={8}><Text style={st.link}>Privacy</Text></Pressable>
@@ -113,12 +122,7 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       )}
       {live && (
         <>
-          <Text style={st.legal}>
-            {plan === 'yearly'
-              ? `Free for 7 days, then ${price('yearly')} a year.`
-              : `${price('monthly')} a month.`}{' '}
-            Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.
-          </Text>
+          <Text style={st.legal}>{legal}</Text>
           <View style={st.links}>
             <Pressable accessibilityRole="button" onPress={doRestore} disabled={!!busy} hitSlop={8}><Text style={st.link}>{busy === 'restore' ? 'Restoring…' : 'Restore purchases'}</Text></Pressable>
             <Pressable accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} hitSlop={8}><Text style={st.link}>Terms</Text></Pressable>
