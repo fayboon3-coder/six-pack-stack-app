@@ -8,8 +8,7 @@ import { Button } from '../src/components/ui';
 import FullHero from '../src/components/FullHero';
 import { CoachingCard } from '../src/components/Offers';
 import { coachingFirst, isFree } from '../src/lib/access';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { purchasesEnabled, TRIAL_SEEN, webCheckoutEnabled } from '../src/lib/purchases';
+import { purchasesEnabled, webCheckoutEnabled } from '../src/lib/purchases';
 import { plain } from '../src/lib/program';
 import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
@@ -52,10 +51,10 @@ export default function Ready() {
   }
 
   const first = plan.train.d[0];
-  // Free users on the iPhone app see the 7-day trial offer once, at the moment they're most excited.
-  const startWeek1 = async () => {
-    const seen = await AsyncStorage.getItem(TRIAL_SEEN).catch(() => '1');
-    router.replace(isFree(profile) && (purchasesEnabled() || webCheckoutEnabled()) && !seen ? '/trial' : '/');
+  // Every free user sees the 7-day trial offer right after their plan, the moment they're most excited.
+  // iPhone: the Apple purchase sheet. Web: the secure web checkout.
+  const startWeek1 = () => {
+    router.replace(isFree(profile) && (purchasesEnabled() || webCheckoutEnabled()) ? '/trial' : '/');
   };
   const hot = coachingFirst(profile);
   return (
