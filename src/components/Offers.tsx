@@ -5,7 +5,7 @@ import { C, F } from '../lib/theme';
 import { COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
 import { useAuth } from '../lib/auth';
 import { track } from '../lib/track';
-import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, webCheckoutEnabled, webCheckoutUrl, type Offer } from '../lib/purchases';
+import { buy, FALLBACK_PRICES, FALLBACK_TRIALS, getOffers, purchasesEnabled, restore, webCheckoutEnabled, webCheckoutUrl, type Offer } from '../lib/purchases';
 import { CheckIcon, LockIcon } from './icons';
 
 const PROGRAM_IMG = require('../../assets/img/cover_program.jpg');
@@ -22,6 +22,9 @@ const Tick = ({ children }: { children: string }) => (
 );
 
 export type PlanId = 'yearly' | 'monthly';
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+/** "7 days" → "7-day", "2 weeks" → "2-week" */
+const trialAdj = (t: string) => t.replace(/^(\d+) (\w+?)s?$/, '$1-$2');
 
 /**
  * Everything needed to sell The Full Stack, shared by the subscription card and the
@@ -39,6 +42,11 @@ export function useSubscribe(source: string) {
   useEffect(() => { if (live) getOffers().then(setOffers); }, [live]);
   useEffect(() => { track('paywall_view', { source, live, web }, { once: true }); }, [source]);
   const price = (id: PlanId) => offers?.[id].price || FALLBACK_PRICES[id];
+  /** The free trial on a plan ("7 days", "2 weeks"), or '' if none. iPhone: what the App Store actually offers. */
+  const trial = (id: PlanId) => (offers ? offers[id].trial : FALLBACK_TRIALS[id]);
+  const per = (id: PlanId) => (id === 'yearly' ? 'a year' : 'a month');
+  /** One line on what happens today, e.g. "$0 today. 2 weeks free, then $19.99 a month." */
+  const today = (id: PlanId) => trial(id) ? `$0 today. ${cap(trial(id))} free, then ${price(id)} ${per(id)}.` : `${price(id)} today, then ${price(id)} ${per(id)}. Cancel anytime.`;
 
   const start = async () => {
     if (web && session) {
@@ -68,16 +76,17 @@ export function useSubscribe(source: string) {
   const can = web || (live && !!offers);
   const label = !live && !web ? 'Opens with the App Store launch'
     : busy === 'buy' ? 'One second…'
-    : plan === 'yearly' ? 'Start my 7-day free trial' : 'Start monthly';
+    : trial(plan) ? `Start my ${trialAdj(trial(plan))} free trial` : plan === 'yearly' ? 'Start yearly' : 'Start monthly';
+  const terms = trial(plan) ? `Free for ${trial(plan)}, then ${price(plan)} ${per(plan)}.` : `${price(plan)} ${per(plan)}.`;
   const legal = web
-    ? `${plan === 'yearly' ? `Free for 7 days, then ${price('yearly')} a year. Pick yearly on the next screen to get the free trial.` : `${price('monthly')} a month.`} Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time from the link in your receipt email.`
-    : `${plan === 'yearly' ? `Free for 7 days, then ${price('yearly')} a year.` : `${price('monthly')} a month.`} Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.`;
-  return { plan, setPlan, price, start, doRestore, busy, msg, can, label, live, web, legal };
+    ? `${terms} Pick the same plan on the next screen. Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time before the trial ends and you pay nothing, from the link in your receipt email.`
+    : `${terms} Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.`;
+  return { plan, setPlan, price, trial, today, start, doRestore, busy, msg, can, label, live, web, legal };
 }
 
 /** The full app (subscription): yearly with a 7-day free trial, or monthly. */
 export function SubscriptionCard({ source = 'other' }: { source?: string }) {
-  const { plan, setPlan, price, start, doRestore, busy, msg, can, label, live, web, legal } = useSubscribe(source);
+  const { plan, setPlan, price, trial, start, doRestore, busy, msg, can, label, live, web, legal } = useSubscribe(source);
 
   const Opt = ({ id, title, per, note, best }: { id: 'yearly' | 'monthly'; title: string; per: string; note: string; best?: boolean }) => {
     const on = plan === id;
@@ -96,8 +105,8 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       <Text style={st.kicker}>All 12 weeks</Text>
       <Text style={st.title}>The Full Stack</Text>
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Opt id="yearly" title="Yearly" per="/yr" note="$1.90 a week · 7-day free trial" best />
-        <Opt id="monthly" title="Monthly" per="/mo" note="Cancel anytime" />
+        <Opt id="yearly" title="Yearly" per="/yr" note={trial('yearly') ? `$1.90 a week · ${trial('yearly')} free` : '$1.90 a week'} best />
+        <Opt id="monthly" title="Monthly" per="/mo" note={trial('monthly') ? `${cap(trial('monthly'))} free · cancel anytime` : 'Cancel anytime'} />
       </View>
       <View style={{ gap: 8 }}>
         <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>

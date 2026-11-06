@@ -14,6 +14,8 @@ import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase';
 
 export const ENTITLEMENT = 'full_stack';
 export const FALLBACK_PRICES = { yearly: '$99', monthly: '$19.99' };
+/** The free trial on each plan (web products and the App Store intro offers are set up to match). */
+export const FALLBACK_TRIALS: Record<'yearly' | 'monthly', string> = { yearly: '7 days', monthly: '2 weeks' };
 
 const IOS_KEY = process.env.EXPO_PUBLIC_RC_IOS_KEY || '';
 const ANDROID_KEY = process.env.EXPO_PUBLIC_RC_ANDROID_KEY || '';
@@ -57,20 +59,33 @@ export async function setupPurchases(userId: string) {
   }
 }
 
-export type Offer = { id: 'yearly' | 'monthly'; price: string; pkg: any | null };
+/** trial: e.g. "7 days" or "2 weeks"; empty when the store has no free trial on this product. */
+export type Offer = { id: 'yearly' | 'monthly'; price: string; trial: string; pkg: any | null };
+
+/** "7 days" / "2 weeks" / "1 month" from the store's free intro offer, or '' if there isn't one. */
+function trialText(product: any): string {
+  const ip = product?.introPrice;
+  if (!ip || ip.price !== 0) return '';
+  const n = ip.periodNumberOfUnits || ip.cycles || 1;
+  const unit = String(ip.periodUnit || '').toUpperCase();
+  const word = unit.startsWith('DAY') ? 'day' : unit.startsWith('WEEK') ? 'week' : unit.startsWith('MONTH') ? 'month' : unit.startsWith('YEAR') ? 'year' : '';
+  if (!word) return '';
+  if (word === 'week' && n === 1) return '7 days';
+  return `${n} ${word}${n === 1 ? '' : 's'}`;
+}
 
 /** The two options with the store's real local prices (falls back to US prices). */
 export async function getOffers(): Promise<Record<'yearly' | 'monthly', Offer>> {
   const base = {
-    yearly: { id: 'yearly' as const, price: FALLBACK_PRICES.yearly, pkg: null },
-    monthly: { id: 'monthly' as const, price: FALLBACK_PRICES.monthly, pkg: null },
+    yearly: { id: 'yearly' as const, price: FALLBACK_PRICES.yearly, trial: FALLBACK_TRIALS.yearly, pkg: null },
+    monthly: { id: 'monthly' as const, price: FALLBACK_PRICES.monthly, trial: FALLBACK_TRIALS.monthly, pkg: null },
   };
   if (!purchasesEnabled() || !configuredFor) return base;
   try {
     const o = await lib().getOfferings();
     const cur = o.current;
-    if (cur?.annual) base.yearly = { id: 'yearly', price: cur.annual.product.priceString, pkg: cur.annual };
-    if (cur?.monthly) base.monthly = { id: 'monthly', price: cur.monthly.product.priceString, pkg: cur.monthly };
+    if (cur?.annual) base.yearly = { id: 'yearly', price: cur.annual.product.priceString, trial: trialText(cur.annual.product), pkg: cur.annual };
+    if (cur?.monthly) base.monthly = { id: 'monthly', price: cur.monthly.product.priceString, trial: trialText(cur.monthly.product), pkg: cur.monthly };
   } catch { /* keep fallback prices */ }
   return base;
 }

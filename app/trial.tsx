@@ -59,13 +59,14 @@ function Chip({ text, tone = 'white', style }: { text: string; tone?: 'white' | 
   return <View style={[s.chip, { backgroundColor: bg }, style]}><Text style={[s.chipText, { color: fg }]}>{text}</Text></View>;
 }
 
-function PlanPicker({ plan, setPlan, price }: { plan: PlanId; setPlan: (p: PlanId) => void; price: (p: PlanId) => string }) {
-  const Opt = ({ id, title, per, note, best }: { id: PlanId; title: string; per: string; note: string; best?: boolean }) => {
+function PlanPicker({ plan, setPlan, price, trial }: { plan: PlanId; setPlan: (p: PlanId) => void; price: (p: PlanId) => string; trial: (p: PlanId) => string }) {
+  const Opt = ({ id, title, per, note }: { id: PlanId; title: string; per: string; note: string }) => {
+    const free = trial(id);
     const on = plan === id;
     return (
       <Pressable accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => { setPlan(id); track('plan_pick', { plan: id }); }}
         style={[s.opt, on && s.optOn]}>
-        {best && <View style={s.best}><Text style={s.bestText}>7 days free</Text></View>}
+        {!!free && <View style={s.best}><Text style={s.bestText}>{free} free</Text></View>}
         <View style={[s.radio, on && s.radioOn]}>{on && <View style={s.radioDot} />}</View>
         <Text style={s.optTitle}>{title}</Text>
         <Text style={s.optPrice}>{price(id)}<Text style={s.per}>{per}</Text></Text>
@@ -75,7 +76,7 @@ function PlanPicker({ plan, setPlan, price }: { plan: PlanId; setPlan: (p: PlanI
   };
   return (
     <View style={{ flexDirection: 'row', gap: 10, alignSelf: 'stretch' }}>
-      <Opt id="yearly" title="Yearly" per="/yr" note="$1.90 a week" best />
+      <Opt id="yearly" title="Yearly" per="/yr" note="Just $1.90 a week" />
       <Opt id="monthly" title="Monthly" per="/mo" note="Cancel anytime" />
     </View>
   );
@@ -101,14 +102,15 @@ export default function TrialOffer() {
   const wide = width >= 820;
   const { plan, profile } = useAuth();
   const sub = useSubscribe('after_plan');
-  const { plan: pick, setPlan, price, start, doRestore, busy, msg, can, label, live, legal } = sub;
+  const { plan: pick, setPlan, price, trial, today, start, doRestore, busy, msg, can, label, live, legal } = sub;
+  const t = trial(pick);
+  const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 
   const skip = () => { track('trial_offer_skip'); router.replace('/'); };
   // Already paid (e.g. they just subscribed): straight in.
   useEffect(() => { if (profile && !isFree(profile)) router.replace('/'); }, [profile?.tier]);
 
   const name = plan?.name || profile?.first_name || '';
-  const today = pick === 'yearly' ? '$0 today. Cancel before day 7 and pay nothing.' : `${price('monthly')} today. Cancel anytime.`;
   const phoneW = Math.min(wide ? 250 : width * 0.56, 260);
 
   const Cta = ({ big }: { big?: boolean }) => (
@@ -143,12 +145,12 @@ export default function TrialOffer() {
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 56 }]}>
             <Rise style={[{ alignItems: wide ? 'flex-start' : 'center', gap: 16 }, wide && { flex: 1.1 }]}>
               <View style={s.pill}><View style={s.pillDot} /><Text style={s.pillText}>{name ? `${name}, your plan is ready` : 'Your plan is ready'}</Text></View>
-              <Text style={[s.h1, !wide && { textAlign: 'center' }]}>Get all 12 weeks.{'\n'}<Text style={{ color: L.red }}>Free for 7 days.</Text></Text>
+              <Text style={[s.h1, !wide && { textAlign: 'center' }]}>Get all 12 weeks.{'\n'}<Text style={{ color: L.red }}>{t ? `Free for ${t}.` : 'Unlock it today.'}</Text></Text>
               <Text style={[s.lede, !wide && { textAlign: 'center' }]}>Weeks 1–2 build the habits. Weeks 3–12 are where your body changes: heavier training, calorie re-sets, and the photos start to look different.</Text>
-              <PlanPicker plan={pick} setPlan={setPlan} price={price} />
+              <PlanPicker plan={pick} setPlan={setPlan} price={price} trial={trial} />
               <View style={{ alignSelf: 'stretch', gap: 8 }}>
                 <Cta big />
-                <Text style={[s.micro, !wide && { textAlign: 'center' }]}>{live || sub.web ? today : 'Subscriptions open with the App Store launch.'}</Text>
+                <Text style={[s.micro, !wide && { textAlign: 'center' }]}>{live || sub.web ? today(pick) : 'Subscriptions open with the App Store launch.'}</Text>
                 {!!msg && <Text style={[s.micro, { fontFamily: F.bold, color: L.ink, textAlign: wide ? 'left' : 'center' }]}>{msg}</Text>}
               </View>
             </Rise>
@@ -168,8 +170,8 @@ export default function TrialOffer() {
           <View style={[{ gap: 12 }, wide && { flexDirection: 'row' }]}>
             {[
               { k: 'Weeks 1–2', t: 'Strip', d: 'Clean up your stack, set your calories, learn the lifts.', state: 'Free · Ready', on: true },
-              { k: 'Weeks 3–8', t: 'Stack', d: 'Training gets heavier. Calories re-set at week 4 so the scale keeps moving.', state: 'Unlocks with trial' },
-              { k: 'Weeks 9–12', t: 'Six-Pack', d: 'The final cut. Re-set at week 8, progress photos, your before and after.', state: 'Unlocks with trial' },
+              { k: 'Weeks 3–8', t: 'Stack', d: 'Training gets heavier. Calories re-set at week 4 so the scale keeps moving.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
+              { k: 'Weeks 9–12', t: 'Six-Pack', d: 'The final cut. Re-set at week 8, progress photos, your before and after.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
             ].map((w, i) => (
               <Rise key={w.t} delay={i * 90} style={[s.week, wide && { flex: 1 }, w.on && { borderColor: '#bfe3cf' }]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -236,7 +238,7 @@ export default function TrialOffer() {
           <LinearGradient colors={['#1d2a4d', L.navy]} style={s.recap}>
             <Text style={[s.h2, { color: '#fff', textAlign: 'center' }]}>Less than one tub of <Text style={{ color: '#ff7a70' }}>pre-workout</Text> a month.</Text>
             <Text style={[s.body, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
-              {pick === 'yearly' ? `7 days free, then ${price('yearly')} a year. That's $1.90 a week.` : `${price('monthly')} a month. Cancel anytime.`}
+              {t ? `${cap(t)} free, then ${price(pick)} ${pick === 'yearly' ? "a year. That's $1.90 a week." : 'a month. Cancel anytime.'}` : `${price(pick)} ${pick === 'yearly' ? 'a year' : 'a month'}. Cancel anytime.`}
             </Text>
             <View style={{ alignSelf: 'stretch', gap: 10 }}>
               {['All 12 weeks of training and meals', 'Calorie re-sets at weeks 4 and 8', 'All 47 product verdicts + Ask Boon', 'Sunday check-ins, photos and streaks'].map((t) => (
@@ -253,7 +255,7 @@ export default function TrialOffer() {
         {/* FAQ */}
         <View style={[s.wrap, { paddingVertical: 44, gap: 10 }]}>
           <Text style={[s.h2, { textAlign: 'center', marginBottom: 6 }]}>Questions</Text>
-          <Faq q="Do I pay anything today?" a={`Not on yearly. You get 7 days free, then it's ${price('yearly')} a year. Cancel before day 7 and you pay nothing. Monthly starts at ${price('monthly')} today.`} />
+          <Faq q="Do I pay anything today?" a={`No. ${trial('yearly') ? `Yearly is ${trial('yearly')} free, then ${price('yearly')} a year.` : `Yearly is ${price('yearly')} a year.`} ${trial('monthly') ? `Monthly is ${trial('monthly')} free, then ${price('monthly')} a month.` : `Monthly is ${price('monthly')} a month.`} Cancel before your trial ends and you pay nothing.`} />
           <Faq q="How do I cancel?" a={Platform.OS === 'web' ? 'Use the link in your receipt email, any time. It takes a few seconds.' : 'iPhone Settings → your name → Subscriptions → Six-Pack Stack. It takes a few seconds.'} />
           <Faq q="What if I skip this?" a="You keep your free weeks 1–2. Weeks 3–12 stay locked until you unlock them, and you can do that any time from the Boon tab." />
           <Faq q="Is this the same as coaching?" a="No. The app is my system, run by you. Coaching is me in your corner 1:1: I review your check-in every Sunday and adjust your plan myself. You can apply any time." />
@@ -277,13 +279,13 @@ export default function TrialOffer() {
       <View style={[s.sticky, { paddingBottom: 12 + insets.bottom }]}>
         <View style={[s.wrap, { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 0 }]}>
           <View style={{ flex: 1 }}>
-            <Text style={s.stickyT}>{pick === 'yearly' ? '7 days free' : `${price('monthly')}/mo`}</Text>
-            <Text style={s.stickyS}>{pick === 'yearly' ? `then ${price('yearly')}/yr · cancel anytime` : 'Cancel anytime'}</Text>
+            <Text style={s.stickyT}>{t ? `${cap(t)} free` : `${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}`}</Text>
+            <Text style={s.stickyS}>{t ? `then ${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}. Cancel anytime.` : 'Cancel anytime'}</Text>
           </View>
           <Pressable accessibilityRole="button" onPress={start} disabled={!can || !!busy}
             style={[s.stickyBtn, (!can || !!busy) && { opacity: 0.55 }]}>
             <LinearGradient colors={[L.red, L.redDeep]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-            {busy === 'buy' ? <ActivityIndicator color="#fff" /> : <Text style={s.stickyBtnText}>{can ? (pick === 'yearly' ? 'Start free trial' : 'Start monthly') : 'Coming soon'}</Text>}
+            {busy === 'buy' ? <ActivityIndicator color="#fff" /> : <Text style={s.stickyBtnText}>{can ? (t ? 'Start free trial' : pick === 'yearly' ? 'Start yearly' : 'Start monthly') : 'Coming soon'}</Text>}
           </Pressable>
         </View>
       </View>
@@ -355,7 +357,7 @@ const s = StyleSheet.create({
   sticky: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(255,255,255,0.97)', borderTopWidth: 1, borderTopColor: L.line,
     paddingTop: 12, paddingHorizontal: 20, shadowColor: '#16203b', shadowOpacity: 0.1, shadowRadius: 18, shadowOffset: { width: 0, height: -6 }, elevation: 12 },
   stickyT: { fontFamily: F.black, fontSize: 17, color: L.ink },
-  stickyS: { fontFamily: F.semi, fontSize: 12, color: L.muted },
+  stickyS: { fontFamily: F.semi, fontSize: 11.5, color: L.muted },
   stickyBtn: { height: 50, borderRadius: 13, overflow: 'hidden', paddingHorizontal: 22, alignItems: 'center', justifyContent: 'center' },
   stickyBtnText: { fontFamily: F.black, fontSize: 15.5, color: '#fff' },
 });
