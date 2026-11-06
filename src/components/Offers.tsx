@@ -5,7 +5,7 @@ import { C, F } from '../lib/theme';
 import { COACHING_URL, PRIVACY_URL, TERMS_URL } from '../lib/access';
 import { useAuth } from '../lib/auth';
 import { track } from '../lib/track';
-import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, type Offer } from '../lib/purchases';
+import { buy, FALLBACK_PRICES, getOffers, purchasesEnabled, restore, webCheckoutEnabled, webCheckoutUrl, type Offer } from '../lib/purchases';
 import { CheckIcon, LockIcon } from './icons';
 
 const PROGRAM_IMG = require('../../assets/img/cover_program.jpg');
@@ -23,17 +23,26 @@ const Tick = ({ children }: { children: string }) => (
 
 /** The full app (subscription): yearly with a 7-day free trial, or monthly. Sold through the App Store. */
 export function SubscriptionCard({ source = 'other' }: { source?: string }) {
-  const { refresh } = useAuth();
+  const { refresh, session } = useAuth();
   const [plan, setPlan] = useState<'yearly' | 'monthly'>('yearly');
   const [offers, setOffers] = useState<Record<'yearly' | 'monthly', Offer> | null>(null);
   const [busy, setBusy] = useState<'' | 'buy' | 'restore'>('');
   const [msg, setMsg] = useState('');
   const live = purchasesEnabled();
+  const web = !live && webCheckoutEnabled() && !!session && session.user.id !== 'demo';
   useEffect(() => { if (live) getOffers().then(setOffers); }, [live]);
   useEffect(() => { track('paywall_view', { source, live }, { once: true }); }, [source]);
   const price = (id: 'yearly' | 'monthly') => offers?.[id].price || FALLBACK_PRICES[id];
 
   const start = async () => {
+    if (web && session) {
+      // Web: RevenueCat's secure checkout (card, Apple Pay, Google Pay), tied to this account.
+      track('purchase_tap', { plan, source, platform: 'web' });
+      setBusy('buy');
+      const url = webCheckoutUrl(session.user.id, session.user.email);
+      if (typeof window !== 'undefined') window.location.href = url; else Linking.openURL(url);
+      return;
+    }
     if (!offers) return;
     setBusy('buy'); setMsg('');
     track('purchase_tap', { plan, source });
@@ -63,7 +72,8 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       </Pressable>
     );
   };
-  const label = !live ? 'Opens with the App Store launch'
+  const can = web || (live && !!offers);
+  const label = !live && !web ? 'Opens with the App Store launch'
     : busy === 'buy' ? 'One second…'
     : plan === 'yearly' ? 'Start 7-day free trial' : 'Start monthly';
   return (
@@ -83,10 +93,24 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
         <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
-      <Pressable accessibilityRole="button" onPress={start} disabled={!live || !offers || !!busy} style={[st.btn, (!live || !offers || !!busy) && { opacity: 0.55 }]}>
+      <Pressable accessibilityRole="button" onPress={start} disabled={!can || !!busy} style={[st.btn, (!can || !!busy) && { opacity: 0.55 }]}>
         {busy === 'buy' ? <ActivityIndicator color={C.ink} /> : <Text style={st.btnText}>{label}</Text>}
       </Pressable>
       {!!msg && <Text style={[st.small, { fontFamily: F.bold }]}>{msg}</Text>}
+      {web && (
+        <>
+          <Text style={st.legal}>
+            {plan === 'yearly'
+              ? `Free for 7 days, then ${price('yearly')} a year. Pick yearly on the next screen to get the free trial.`
+              : `${price('monthly')} a month.`}{' '}
+            Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time from the link in your receipt email.
+          </Text>
+          <View style={st.links}>
+            <Pressable accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} hitSlop={8}><Text style={st.link}>Terms</Text></Pressable>
+            <Pressable accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} hitSlop={8}><Text style={st.link}>Privacy</Text></Pressable>
+          </View>
+        </>
+      )}
       {live && (
         <>
           <Text style={st.legal}>

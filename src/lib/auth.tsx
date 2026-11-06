@@ -4,7 +4,8 @@ import { supabase } from './supabase';
 import type { Plan, Profile } from './types';
 import { buildFreePlan, clearPendingQuiz, readPendingQuiz } from './quiz';
 import { setPreviewing, type ViewAs } from './preview';
-import { setupPurchases } from './purchases';
+import { confirmWebPurchase, PURCHASED_FLAG, setupPurchases } from './purchases';
+import { track } from './track';
 
 type Ctx = {
   session: Session | null;
@@ -104,6 +105,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(data.session);
       await load(data.session);
       setLoading(false);
+      // Back from the web checkout (/app?purchased=1): unlock as soon as RevenueCat has it.
+      if (data.session && typeof window !== 'undefined' && window.location?.search?.includes(`${PURCHASED_FLAG}=1`)) {
+        track('purchase_done', { platform: 'web' }, { once: true });
+        window.history?.replaceState?.(null, '', window.location.pathname);
+        if (await confirmWebPurchase()) await load(data.session);
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange(async (_e, s) => {
       setSession(s);

@@ -61,7 +61,7 @@ export default function DeleteAccount() {
               <Text key={t} style={st.li}>•  {t}</Text>
             ))}
           </View>
-          <Text style={st.body}>It can't be undone. If you paid for The Full Stack, cancel the subscription in your App Store settings too. Deleting the account doesn't cancel it.</Text>
+          <Text style={st.body}>It can't be undone. If you paid for The Full Stack, cancel the subscription too (in your App Store settings, or from the link in your receipt email if you paid on the web). Deleting the account doesn't cancel it.</Text>
           <Text style={st.body}>You'll still get my emails until you unsubscribe. The link is at the bottom of every email.</Text>
           <Text style={[st.k, { marginTop: 10 }]}>Type DELETE to confirm</Text>
           <TextInput value={typed} onChangeText={setTyped} autoCapitalize="characters" autoCorrect={false} placeholder="DELETE"

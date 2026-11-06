@@ -19,8 +19,22 @@ const IOS_KEY = process.env.EXPO_PUBLIC_RC_IOS_KEY || '';
 const ANDROID_KEY = process.env.EXPO_PUBLIC_RC_ANDROID_KEY || '';
 const KEY = Platform.OS === 'ios' ? IOS_KEY : Platform.OS === 'android' ? ANDROID_KEY : '';
 
-/** True when this build can sell the subscription. */
+/** True when this build can sell the subscription through the App Store / Play Store. */
 export const purchasesEnabled = () => !!KEY;
+
+/**
+ * On the web the subscription is sold through RevenueCat Billing (Stripe): a hosted
+ * checkout page where the person picks yearly (7-day free trial) or monthly. The
+ * purchase is tied to their account ID, so the same "full_stack" entitlement unlocks
+ * the app everywhere. After paying, RevenueCat sends them back to /app?purchased=1.
+ */
+const WEB_CHECKOUT = 'https://pay.rev.cat/utmodkowwofcuown/';
+export const webCheckoutEnabled = () => Platform.OS === 'web';
+export function webCheckoutUrl(userId: string, email?: string | null) {
+  const q = email ? `?email=${encodeURIComponent(email)}` : '';
+  return `${WEB_CHECKOUT}${encodeURIComponent(userId)}${q}`;
+}
+export const PURCHASED_FLAG = 'purchased';
 
 let Purchases: any = null;
 let configuredFor: string | null = null;
@@ -102,6 +116,18 @@ export async function restore(): Promise<boolean> {
     await syncSubscription();
     return true;
   } catch { return false; }
+}
+
+/**
+ * Back from the web checkout: RevenueCat can take a few seconds to record the purchase,
+ * so ask the server a few times. True once the subscription shows as active.
+ */
+export async function confirmWebPurchase(tries = 6): Promise<boolean> {
+  for (let i = 0; i < tries; i++) {
+    if (await syncSubscription()) return true;
+    await new Promise((r) => setTimeout(r, 2500));
+  }
+  return false;
 }
 
 /** Where people manage or cancel (Apple's own subscriptions page). */
