@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
 import { C, F } from '../src/lib/theme';
@@ -13,13 +13,22 @@ import { isoDate } from '../src/lib/logs';
 import { health } from '../src/lib/health';
 import { track } from '../src/lib/track';
 import HealthCard from '../src/components/HealthCard';
+import { applyReminders, askPermission, readPrefs, type ReminderPrefs } from '../src/lib/reminders';
+import { isFree } from '../src/lib/access';
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
 const label = (iso: string) => iso === isoDate() ? 'Today' : new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
 /** Morning weigh-in: one number, and the trend does the rest. */
 export default function WeighIn() {
-  const { session } = useAuth();
+  const { session, plan, profile } = useAuth();
+  const [prefs, setPrefs] = useState<ReminderPrefs | null>(null);
+  useEffect(() => { if (Platform.OS !== 'web') readPrefs().then(setPrefs); }, []);
+  const remindMe = async () => {
+    if (!prefs || !(await askPermission())) return;
+    const next = { ...prefs, weigh: true, weighHour: prefs.weighHour ?? 7 };
+    setPrefs(next); await applyReminders(plan, next, { free: isFree(profile) }); track('reminder_on', { kind: 'weigh', where: 'weigh_in' });
+  };
   const router = useRouter();
   const [series, setSeries] = useState<TrendPoint[]>([]);
   const [txt, setTxt] = useState('');
@@ -77,6 +86,10 @@ export default function WeighIn() {
           <Text style={st.hint}>The scale jumps 1–3 lbs from water and salt. Your trend smooths that out, so weigh in most mornings and don't sweat any one number.</Text>
         )}
         {toHealth && <Text style={st.hint}>Also saves to Apple Health.</Text>}
+        {!!saved && !!prefs && !prefs.weigh && (
+          <Pressable accessibilityRole="button" onPress={remindMe} style={st.remind}><Text style={st.remindT}>Remind me every morning at 7:00</Text></Pressable>
+        )}
+        {!!saved && !!prefs?.weigh && <Text style={st.hint}>Morning reminder is on.</Text>}
       </View>
 
       <HealthCard />
@@ -111,6 +124,8 @@ const st = StyleSheet.create({
   resK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1, color: C.green },
   resV: { fontFamily: F.black, fontSize: 28, color: C.ink },
   resS: { fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: C.ink, textAlign: 'center' },
+  remind: { height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center', backgroundColor: C.bg },
+  remindT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   cta: { flex: 1, height: 54, borderRadius: 27, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   ctaT: { fontFamily: F.bold, fontSize: 18, color: '#fff' },
   r: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 11 },

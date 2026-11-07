@@ -164,7 +164,7 @@ export default function You() {
         </Pressable>
 
         <HealthCard compact />
-        <RemindersCard compact />
+        <RemindersCard />
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
         {profile?.role !== 'coach' && <Text accessibilityRole="link" onPress={() => router.push('/delete-account')} style={st.legal}>Delete my account</Text>}
       </ScrollView>

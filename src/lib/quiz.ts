@@ -139,10 +139,10 @@ export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
     ],
     week1: [
       `Train ${tr.d.map((x) => x.t.split(' ')[0]).join(', ')}`,
-      `Eat about ${fmt(t.kcal)} calories and ${t.protein} g of protein a day (pick from your meals)`,
+      `Eat about ${fmt(t.kcal)} calories and ${t.protein} g of protein a day (pick from your meals, snap anything else to log it)`,
       'Walk 8,000 steps a day',
       ...(q.tried.some((x) => ['Fat burners', 'Test boosters', 'Greens powder'].includes(x)) ? ['Stop reordering fat burners, test boosters and greens powders. Finish or toss what you have.'] : []),
-      'Weigh in every morning',
+      'Weigh in every morning. Your trend and goal date show up after a week',
       'Sunday: do your check-in in the app',
     ],
     eat_out: picked ? buildEatOut(q.spots) : SAMPLE.eat_out,

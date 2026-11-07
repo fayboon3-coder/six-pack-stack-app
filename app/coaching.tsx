@@ -34,7 +34,8 @@ const GETS: [string, string][] = [
   ['A full stack audit', "Every product you take: cut, keep or swap. Most guys save money in week one."],
   ['Sunday check-ins I read myself', 'I change one thing at a time, so a stall gets fixed that week.'],
   ['Text me anytime on WhatsApp', 'Answers within 24 hours on weekdays.'],
-  ['Every week of the app unlocked', 'All 12 weeks, Stack Check and Stack, your AI coach.'],
+  ['Your own coach home in the app', 'My notes on your week and your one thing to focus on, right when you open it.'],
+  ['Every week of the app unlocked', 'All 12 weeks, food logging, your trend weight, Stack Check and Stack, your AI coach.'],
 ];
 const CHAT = [
   { me: true, t: 'Down 2.4 lbs but I blew it at a birthday Saturday 😬' },

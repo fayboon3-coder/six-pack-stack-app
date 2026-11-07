@@ -1,6 +1,6 @@
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { supabase, SUPABASE_URL, SUPABASE_KEY } from './supabase';
-import { search, type Verdict } from './stackcheck';
+import { VERDICTS, type Verdict } from './stackcheck';
 
 /**
  * Food and label scanning:
@@ -53,13 +53,22 @@ export async function lookupBarcode(code: string): Promise<Nutrition & { image?:
   } catch { return null; }
 }
 
-/** Is this probably a supplement? Then show Boon's verdict instead of (or with) the macros. */
-export function supplementMatch(text: string): Verdict | null {
-  const t = text.toLowerCase();
-  const hits = search(t);
-  if (hits.length) return hits[0];
-  // Try word by word (labels like "Optimum Nutrition Micronized Creatine Powder")
-  for (const w of t.split(/[^a-z0-9]+/).filter((x) => x.length > 3)) { const h = search(w); if (h.length && h[0].name.toLowerCase().includes(w)) return h[0]; }
+const norm = (x: string) => ` ${x.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()} `;
+/**
+ * Is this a product Boon has a verdict on? Match the product name, longest name or nickname wins
+ * (so "Micronized Creatine Powder" is creatine, not whey because of the brand).
+ */
+export function supplementMatch(...texts: (string | null | undefined)[]): Verdict | null {
+  for (const text of texts) {
+    if (!text) continue;
+    const t = norm(text);
+    let best: Verdict | null = null, len = 0;
+    for (const v of VERDICTS) for (const a of [v.name, ...v.aliases]) {
+      const n = norm(a);
+      if (n.trim().length > 2 && t.includes(n) && n.length > len) { best = v; len = n.length; }
+    }
+    if (best) return best;
+  }
   return null;
 }
 
@@ -114,6 +123,6 @@ export async function scanLabel(uri: string): Promise<{ ok: true; label: LabelRe
     kcal: r0(l.kcal) ?? undefined, protein: r0(l.protein) ?? undefined, carbs: r0(l.carbs) ?? undefined, fat: r0(l.fat) ?? undefined,
     ingredients: Array.isArray(l.ingredients) ? l.ingredients.slice(0, 20).map(String) : undefined, note: l.note,
   };
-  label.match = label.kind === 'supplement' ? supplementMatch(`${l.match || ''} ${label.name} ${label.brand || ''}`.trim()) : null;
+  label.match = label.kind === 'supplement' ? supplementMatch(l.match, label.name, `${label.name} ${label.brand || ''}`) : null;
   return { ok: true, label };
 }

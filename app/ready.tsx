@@ -96,13 +96,13 @@ export default function Ready() {
   const days = plan.train.d.length;
   const phases = [
     { n: 'Strip', w: 'Weeks 1–4', t: plain(plan.phase1) || 'Lock in your calories, protein and training. Build the habit.' },
-    { n: 'Stack', w: 'Weeks 5–8', t: plain(plan.phase2) || 'Calories re-set to your new weight. Lifts get heavier.' },
-    { n: 'Six-Pack', w: 'Weeks 9–12', t: plain(plan.phase3) || 'Final re-set and the push to see your abs.' },
+    { n: 'Stack', w: 'Weeks 5–8', t: plain(plan.phase2) || 'Calories adjust to your trend every week. Lifts get heavier.' },
+    { n: 'Six-Pack', w: 'Weeks 9–12', t: plain(plan.phase3) || 'The push to see your abs, with your photos side by side.' },
   ];
   const today = (plan.week1 && plan.week1.length ? plan.week1.map(plain) : [
     `Do ${first?.t || 'your first workout'}. Every move has a form video.`,
-    `Hit ${plan.protein}g of protein. Your meals already add up to it.`,
-    `Walk ${plan.steps} steps.`,
+    `Hit ${plan.protein}g of protein. Your meals add up to it, and you can snap anything else to log it.`,
+    `Weigh in tomorrow morning. Your trend and goal date start there.`,
   ]).slice(0, 3);
   const pw = wide ? 230 : Math.min(140, (width - 80) / 2);
 

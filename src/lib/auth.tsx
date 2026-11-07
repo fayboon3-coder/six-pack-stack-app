@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile({ id: 'demo', email: 'demo@example.com', first_name: 'Jake', role: 'client', tier: process.env.EXPO_PUBLIC_DEMO_TIER as any, start_date: null, quiz: q });
         setPlan({ ...fp, train: { ...fp.train, s: process.env.EXPO_PUBLIC_DEMO_START || fp.train.s } });
       } else
-      setPlan({ ...demo, name: 'Boon', train: { ...demo.train, s: process.env.EXPO_PUBLIC_DEMO_START || '2026-11-01' } });
+      setPlan({ ...demo, name: process.env.EXPO_PUBLIC_DEMO_NAME || 'Boon', train: { ...demo.train, s: process.env.EXPO_PUBLIC_DEMO_START || '2026-11-01' } });
       if (process.env.EXPO_PUBLIC_DEMO_ROLE === 'coach') setProfile({ id: 'demo', email: 'demo@example.com', first_name: 'Boon', role: 'coach', tier: 'coached', start_date: null });
       setLoading(false);
       return;

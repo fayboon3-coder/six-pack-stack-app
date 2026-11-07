@@ -36,7 +36,7 @@ export default function Scan() {
     setFound(p);
     const cats = String((p as any).categories || '').toLowerCase();
     const sup = /supplement|vitamin|protein powder|creatine|pre-workout|sport/.test(cats) || p.kcal === 0;
-    setVerdict(sup ? supplementMatch(`${p.name} ${p.brand || ''}`) : null);
+    setVerdict(sup ? supplementMatch(p.name, `${p.name} ${p.brand || ''}`) : null);
   };
 
   const add = async (n: Nutrition) => {

@@ -69,7 +69,7 @@ export default function Boon() {
           <Eyebrow>Your program</Eyebrow>
           <Card>
             <Text style={ui.label}>The Full Stack</Text>
-            <Body>All 12 weeks are unlocked: your training, your meal plan, eating-out orders, the grocery list and every Stack Check verdict. Your calories re-set at weeks 4 and 8, so do your Sunday check-in.</Body>
+            <Body>All 12 weeks are unlocked: your training, your meal plan, eating-out orders and grocery list, food scanning, your trend weight and every Stack Check verdict. Weigh in most mornings and your calories adjust to your trend every week.</Body>
           </Card>
           <CoachingCard />
         </>

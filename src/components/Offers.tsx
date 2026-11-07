@@ -111,10 +111,10 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
       </View>
       <View style={{ gap: 8 }}>
         <Tick>Weeks 3–12: the Stack and Six-Pack phases, where your body changes</Tick>
-        <Tick>Calories re-set at weeks 4 and 8 so your progress keeps moving</Tick>
-        <Tick>Your meal plan, swaps, eating-out orders and grocery list</Tick>
-        <Tick>Stack Check: all 47 product verdicts (Beyond the Label, built in)</Tick>
-        <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
+        <Tick>Calories that adjust to your trend weight every week</Tick>
+        <Tick>Your meal plan, eating-out orders and grocery list, plus snap-a-meal and barcode logging</Tick>
+        <Tick>Stack Check: all 47 product verdicts, and Stack, your AI coach (40 questions a day)</Tick>
+        <Tick>Trend weight, goal date, photo compare and a weekly recap you can share</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
       <Pressable accessibilityRole="button" onPress={() => start('card')} disabled={!can || !!busy} style={[st.btn, (!can || !!busy) && { opacity: 0.55 }]}>
@@ -151,7 +151,7 @@ export function CoachingCard() {
       <Cover src={COACH_IMG} />
       <Text style={st.kicker}>1:1 with Boon</Text>
       <Text style={st.title}>Six-Pack Stack Coaching</Text>
-      <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. 12 weeks, with a results guarantee.</Text>
+      <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. You get your own coach home in the app with my notes and your one thing each week. 12 weeks, with a results guarantee.</Text>
       <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/coaching-application'); }} style={st.btn}>
         <Text style={st.btnText}>Apply for coaching</Text>
       </Pressable>

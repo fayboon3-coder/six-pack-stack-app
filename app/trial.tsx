@@ -25,6 +25,8 @@ const IMG = {
   stack: require('../assets/img/pay/lp-stackcheck.jpg'),
   workout: require('../assets/img/pay/lp-workout.jpg'),
   you: require('../assets/img/pay/lp-you.jpg'),
+  progress: require('../assets/img/pay/lp-progress.jpg'),
+  food: require('../assets/img/pay/lp-food.jpg'),
   boon: require('../assets/img/pay/boon-red.jpg'),
 };
 const RESULTS = [
@@ -187,7 +189,7 @@ export default function TrialOffer() {
               <Phone src={IMG.programs} width={phoneW} tilt={-4} />
               <Chip text="✓ Weeks 1–2 ready" tone="green" style={[s.floatChip, { top: 40, left: wide ? 0 : 4 }]} />
               <Chip text="Weeks 3–12 unlock today" tone="red" style={[s.floatChip, { top: phoneW * 0.95, right: wide ? 0 : 2 }]} />
-              <Chip text="Calories re-set at wk 4 & 8" style={[s.floatChip, { bottom: 30, left: wide ? 10 : 8 }]} />
+              <Chip text="Calories adjust every week" style={[s.floatChip, { bottom: 30, left: wide ? 10 : 8 }]} />
             </Rise>
           </View>
         </LinearGradient>
@@ -199,8 +201,8 @@ export default function TrialOffer() {
           <View style={[{ gap: 12 }, wide && { flexDirection: 'row' }]}>
             {[
               { k: 'Weeks 1–2', t: 'Strip', d: 'Clean up your stack, set your calories, learn the lifts.', state: 'Free · Ready', on: true },
-              { k: 'Weeks 3–8', t: 'Stack', d: 'Training gets heavier. Calories re-set at week 4 so the scale keeps moving.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
-              { k: 'Weeks 9–12', t: 'Six-Pack', d: 'The final cut. Re-set at week 8, progress photos, your before and after.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
+              { k: 'Weeks 3–8', t: 'Stack', d: 'Training gets heavier. Your calories adjust to your trend every week, so the scale keeps moving.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
+              { k: 'Weeks 9–12', t: 'Six-Pack', d: 'The final cut. Your goal date, your photos side by side, your before and after.', state: t ? 'Unlocks with trial' : 'Unlocks today' },
             ].map((w, i) => (
               <Rise key={w.t} delay={i * 90} style={[s.week, wide && { flex: 1 }, w.on && { borderColor: '#bfe3cf' }]}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -217,14 +219,17 @@ export default function TrialOffer() {
         {/* FEATURES */}
         <View style={[s.wrap, { gap: 56, paddingBottom: 48 }]}>
           <Feature title="Train with" accent="a real plan" img={IMG.workout}
-            body="Every exercise has a form video and 3 cues. Log your sets, see last week's numbers and beat them. The rest timer runs itself."
-            chips={[{ t: 'Form video for every lift' }, { t: 'New PR: +10 lb', tone: 'green' }]} />
-          <Feature title="Know what's" accent="worth buying" img={IMG.stack} flip
-            body="All 47 products I investigated, each with a verdict. Score your whole stack, cut the waste, and ask Boon, the AI coach built on my plans, any time."
+            body="Every exercise has a form video and 3 cues. The app gives you today's target, weight and reps, so you add a little every week. The rest timer runs itself."
+            chips={[{ t: "Today's target: 140 × 8" }, { t: 'New PR: +10 lb', tone: 'green' }]} />
+          <Feature title="Log food in" accent="seconds" img={IMG.food} flip
+            body="Snap your plate and Stack counts the calories and protein. Scan a barcode for anything packaged. Your meals are already planned from foods you like."
+            chips={[{ t: 'Snap a meal' }, { t: '+52 g protein', tone: 'green' }]} />
+          <Feature title="Know what's" accent="worth buying" img={IMG.stack}
+            body="All 47 products I investigated, each with a verdict. Scan a barcode or snap a label in the store and see mine. Ask Stack, the AI coach built on my plans, any time."
             chips={[{ t: 'Skip it: fat burners', tone: 'red' }, { t: 'Worth it: creatine', tone: 'green' }]} />
-          <Feature title="Stay on" accent="track" img={IMG.you}
-            body="A 2-minute check-in every Sunday. Your calories re-set at weeks 4 and 8, streaks keep you honest, and your progress photos show what the scale can't."
-            chips={[{ t: 'Sunday check-in · 2 min' }, { t: 'On track ✓', tone: 'green' }]} />
+          <Feature title="See it" accent="working" img={IMG.progress} flip
+            body="Weigh in each morning and see your real trend and the date you'll hit your goal. Calories adjust every week, photos compare side by side, and Apple Health syncs your steps."
+            chips={[{ t: 'On pace for Jan 29' }, { t: '−4.5 lbs', tone: 'green' }]} />
         </View>
 
         {/* RESULTS */}
@@ -270,7 +275,7 @@ export default function TrialOffer() {
               {t ? `${cap(t)} free, then ${price(pick)} ${pick === 'yearly' ? "a year. That's $1.90 a week." : 'a month. Cancel anytime.'}` : `${price(pick)} ${pick === 'yearly' ? 'a year' : 'a month'}. Cancel anytime.`}
             </Text>
             <View style={{ alignSelf: 'stretch', gap: 10 }}>
-              {['All 12 weeks of training and meals', 'Calorie re-sets at weeks 4 and 8', 'All 47 product verdicts + Stack, your AI coach', 'Sunday check-ins, photos and streaks'].map((t) => (
+              {['All 12 weeks of training and meals', 'Calories that adjust to your trend every week', 'Snap a meal, barcode and label scanning', 'Stack, your AI coach, plus all 47 verdicts', 'Trend weight, goal date and photo compare'].map((t) => (
                 <View key={t} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
                   <View style={s.tick}><Text style={s.tickMark}>✓</Text></View>
                   <Text style={[s.small, { color: '#fff', fontFamily: F.semi, flex: 1 }]}>{t}</Text>
@@ -286,7 +291,7 @@ export default function TrialOffer() {
           <Text style={[s.h2, { textAlign: 'center', marginBottom: 6 }]}>Questions</Text>
           <Faq q="Do I pay anything today?" a={`No. ${trial('yearly') ? `Yearly is ${trial('yearly')} free, then ${price('yearly')} a year.` : `Yearly is ${price('yearly')} a year.`} ${trial('monthly') ? `Monthly is ${trial('monthly')} free, then ${price('monthly')} a month.` : `Monthly is ${price('monthly')} a month.`} Cancel before your trial ends and you pay nothing.`} />
           <Faq q="How do I cancel?" a={Platform.OS === 'web' ? 'Use the link in your receipt email, any time. It takes a few seconds.' : 'iPhone Settings → your name → Subscriptions → Six-Pack Stack. It takes a few seconds.'} />
-          <Faq q="What if I skip this?" a="You keep your free weeks 1–2. Weeks 3–12 stay locked until you unlock them, and you can do that any time from the Boon tab." />
+          <Faq q="What if I skip this?" a="You keep your free weeks 1–2, food logging and your weight trend. Weeks 3–12 stay locked until you unlock them, and you can do that any time from your Programs tab." />
           <Faq q="Is this the same as coaching?" a="No. The app is my system, run by you. Coaching is me in your corner 1:1: I review your check-in every Sunday and adjust your plan myself. You can apply any time." />
         </View>
 
