@@ -21,6 +21,7 @@ import Backdrop from '../src/components/Backdrop';
 import SwapSheet from '../src/components/SwapSheet';
 import { SwapIcon } from '../src/components/icons';
 import { exName } from '../src/lib/workoutMeta';
+import FormVideo from '../src/components/FormVideo';
 import { applySwap, resetSwap, type TrainCfg } from '../src/lib/training';
 import { canEditTraining, saveTraining } from '../src/lib/trainingSave';
 
@@ -194,13 +195,7 @@ export default function Workout() {
 
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }} keyboardShouldPersistTaps="handled"
           keyboardDismissMode="interactive" automaticallyAdjustKeyboardInsets>
-          <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${exName(ex[0], plan)}`} style={st.video} disabled={!info?.video}
-            onPress={() => info?.video && Linking.openURL(`https://www.youtube.com/watch?v=${info.video}`)}>
-            {!!info?.video && <Image source={thumb(info.video, 'hq')} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />}
-            <View style={st.play}><PlayIcon color="#fff" size={24} /></View>
-            <Text style={[st.vTag, { left: 12 }]}>HD form demo</Text>
-            <Text style={[st.vTag, { right: 12, fontFamily: F.medium, fontSize: 12 }]}>Curated YouTube video</Text>
-          </Pressable>
+          <FormVideo id={info?.video} name={exName(ex[0], plan)} target={`${nSets} sets · ${repsOf(ex[1])} reps`} cues={(info?.cues || []).slice(0, 3)} />
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 14 }}>
             <Text style={st.exName} accessibilityRole="header">{exName(ex[0], plan)}</Text>
