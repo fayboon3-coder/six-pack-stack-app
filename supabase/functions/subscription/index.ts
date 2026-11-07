@@ -23,6 +23,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2.45.4';
 const ENTITLEMENT = 'full_stack';
 const KIT_TAGS: Record<string, string> = {
   'trial-started': '25304554',
+  'trial-2w': '25561474',   // monthly plan: 2-week trial, so its trial emails go out on its own timing
   'trial-lapsed': '25304555',
   'sub-active': '25304556',
   'sub-cancelled': '25304557',
@@ -110,7 +111,11 @@ Deno.serve(async (req) => {
     const active = state ? state.active : ['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION', 'PRODUCT_CHANGE'].includes(ev.type);
     const { profile, tier } = await applyTier(admin, userId, active);
     const tag = tagFor(ev.type, ev.period_type);
-    if (profile && tag && profile.role === 'client' && profile.tier !== 'coached') await kitTag(profile.email, profile.first_name, tag);
+    if (profile && tag && profile.role === 'client' && profile.tier !== 'coached') {
+      // Tag the 2-week trial first, so the trial emails already know which timing to use.
+      if (tag === 'trial-started' && /monthly/i.test(String(ev.product_id || ''))) await kitTag(profile.email, profile.first_name, 'trial-2w');
+      await kitTag(profile.email, profile.first_name, tag);
+    }
     return json({ ok: true, tier, tag });
   }
   if (body?.event) return json({ error: 'unauthorized' }, 401);
