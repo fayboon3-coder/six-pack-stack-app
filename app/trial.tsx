@@ -69,8 +69,17 @@ function PlanPicker({ plan, setPlan, price, trial }: { plan: PlanId; setPlan: (p
         {!!free && <View style={s.best}><Text style={s.bestText}>{free} free</Text></View>}
         <View style={[s.radio, on && s.radioOn]}>{on && <View style={s.radioDot} />}</View>
         <Text style={s.optTitle}>{title}</Text>
-        <Text style={s.optPrice}>{price(id)}<Text style={s.per}>{per}</Text></Text>
-        <Text style={s.optNote}>{note}</Text>
+        {free && Platform.OS === 'web' ? (
+          <>
+            <Text style={[s.optPrice, { color: L.green }]}>$0<Text style={s.per}> today</Text></Text>
+            <Text style={s.optThen}>then {price(id)}{per}</Text>
+          </>
+        ) : (
+          <>
+            <Text style={s.optPrice}>{price(id)}<Text style={s.per}>{per}</Text></Text>
+            <Text style={s.optNote}>{note}</Text>
+          </>
+        )}
       </Pressable>
     );
   };
@@ -345,6 +354,7 @@ const s = StyleSheet.create({
   optPrice: { fontFamily: F.black, fontSize: 26, color: L.ink, letterSpacing: -0.5 },
   per: { fontFamily: F.bold, fontSize: 14, color: L.muted },
   optNote: { fontFamily: F.semi, fontSize: 12, color: L.body },
+  optThen: { fontFamily: F.bold, fontSize: 13.5, color: L.ink },
   cta: { height: 56, borderRadius: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 18,
     shadowColor: L.red, shadowOpacity: 0.32, shadowRadius: 18, shadowOffset: { width: 0, height: 10 }, elevation: 6 },
   ctaText: { fontFamily: F.black, fontSize: 17, color: '#fff', letterSpacing: -0.2 },
