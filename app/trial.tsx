@@ -248,7 +248,7 @@ export default function TrialOffer() {
               {t ? `${cap(t)} free, then ${price(pick)} ${pick === 'yearly' ? "a year. That's $1.90 a week." : 'a month. Cancel anytime.'}` : `${price(pick)} ${pick === 'yearly' ? 'a year' : 'a month'}. Cancel anytime.`}
             </Text>
             <View style={{ alignSelf: 'stretch', gap: 10 }}>
-              {['All 12 weeks of training and meals', 'Calorie re-sets at weeks 4 and 8', 'All 47 product verdicts + Ask Boon', 'Sunday check-ins, photos and streaks'].map((t) => (
+              {['All 12 weeks of training and meals', 'Calorie re-sets at weeks 4 and 8', 'All 47 product verdicts + Stack, your AI coach', 'Sunday check-ins, photos and streaks'].map((t) => (
                 <View key={t} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
                   <View style={s.tick}><Text style={s.tickMark}>✓</Text></View>
                   <Text style={[s.small, { color: '#fff', fontFamily: F.semi, flex: 1 }]}>{t}</Text>
