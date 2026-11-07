@@ -85,7 +85,7 @@ function PlanPicker({ plan, setPlan, price, trial }: { plan: PlanId; setPlan: (p
 function Faq({ q, a }: { q: string; a: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => setOpen(!open)} style={s.faq}>
+    <Pressable accessibilityRole="button" accessibilityState={{ expanded: open }} onPress={() => { if (!open) track('paywall_faq', { q }, { once: true }); setOpen(!open); }} style={s.faq}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <Text style={[s.faqQ, { flex: 1 }]}>{q}</Text>
         <Text style={s.faqPlus}>{open ? '−' : '+'}</Text>
@@ -106,15 +106,22 @@ export default function TrialOffer() {
   const t = trial(pick);
   const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
 
-  const skip = () => { track('trial_offer_skip'); router.replace('/'); };
+  const depth = useRef(0);
+  const skip = () => { track('trial_offer_skip', { depth: depth.current }); router.replace('/'); };
+  /** How far down the page people get, in quarters (25/50/75/100), once each. */
+  const onScroll = (e: any) => {
+    const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
+    const pct = Math.min(100, Math.round(((contentOffset.y + layoutMeasurement.height) / Math.max(1, contentSize.height)) * 100));
+    for (const q of [25, 50, 75, 100]) if (pct >= q && depth.current < q) { depth.current = q; track('paywall_scroll', { pct: q }, { once: true }); }
+  };
   // Already paid (e.g. they just subscribed): straight in.
   useEffect(() => { if (profile && !isFree(profile)) router.replace('/'); }, [profile?.tier]);
 
   const name = plan?.name || profile?.first_name || '';
   const phoneW = Math.min(wide ? 250 : width * 0.56, 260);
 
-  const Cta = ({ big }: { big?: boolean }) => (
-    <Pressable accessibilityRole="button" onPress={start} disabled={!can || !!busy}
+  const Cta = ({ big, where }: { big?: boolean; where: string }) => (
+    <Pressable accessibilityRole="button" onPress={() => start(where)} disabled={!can || !!busy}
       style={({ pressed }) => [s.cta, big && { height: 60 }, (!can || !!busy) && { opacity: 0.55 }, pressed && { transform: [{ scale: 0.985 }] }]}>
       <LinearGradient colors={[L.red, L.redDeep]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
       {busy === 'buy' ? <ActivityIndicator color="#fff" /> : <Text style={s.ctaText}>{label}{can ? '  →' : ''}</Text>}
@@ -139,7 +146,7 @@ export default function TrialOffer() {
 
   return (
     <View style={{ flex: 1, backgroundColor: L.white }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 130 + insets.bottom }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 130 + insets.bottom }} showsVerticalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={250}>
         {/* HERO */}
         <LinearGradient colors={[L.bg, '#fbf4f3']} style={{ paddingTop: insets.top + 28 }}>
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 56 }]}>
@@ -149,7 +156,7 @@ export default function TrialOffer() {
               <Text style={[s.lede, !wide && { textAlign: 'center' }]}>Weeks 1–2 build the habits. Weeks 3–12 are where your body changes: heavier training, calorie re-sets, and the photos start to look different.</Text>
               <PlanPicker plan={pick} setPlan={setPlan} price={price} trial={trial} />
               <View style={{ alignSelf: 'stretch', gap: 8 }}>
-                <Cta big />
+                <Cta big where="hero" />
                 <Text style={[s.micro, !wide && { textAlign: 'center' }]}>{live || sub.web ? today(pick) : 'Subscriptions open with the App Store launch.'}</Text>
                 {!!msg && <Text style={[s.micro, { fontFamily: F.bold, color: L.ink, textAlign: wide ? 'left' : 'center' }]}>{msg}</Text>}
               </View>
@@ -248,7 +255,7 @@ export default function TrialOffer() {
                 </View>
               ))}
             </View>
-            <View style={{ alignSelf: 'stretch' }}><Cta /></View>
+            <View style={{ alignSelf: 'stretch' }}><Cta where="recap" /></View>
           </LinearGradient>
         </View>
 
@@ -282,7 +289,7 @@ export default function TrialOffer() {
             <Text style={s.stickyT}>{t ? `${cap(t)} free` : `${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}`}</Text>
             <Text style={s.stickyS}>{t ? `then ${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}. Cancel anytime.` : 'Cancel anytime'}</Text>
           </View>
-          <Pressable accessibilityRole="button" onPress={start} disabled={!can || !!busy}
+          <Pressable accessibilityRole="button" onPress={() => start('sticky')} disabled={!can || !!busy}
             style={[s.stickyBtn, (!can || !!busy) && { opacity: 0.55 }]}>
             <LinearGradient colors={[L.red, L.redDeep]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
             {busy === 'buy' ? <ActivityIndicator color="#fff" /> : <Text style={s.stickyBtnText}>{can ? (t ? 'Start free trial' : pick === 'yearly' ? 'Start yearly' : 'Start monthly') : 'Coming soon'}</Text>}

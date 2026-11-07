@@ -32,13 +32,47 @@ begin
   select t.src, t.name as step, count(distinct t.anon_id) as people
   from tagged t
   where t.name in ('ss_visit','ss_preview_tap','ss_start','ss_gate','ss_done','ss_plan_tap',
-                   'app_open','quiz_done','plan_ready','paywall_view','purchase_done',
+                   'app_open','quiz_done','plan_ready','paywall_view','paywall_scroll','purchase_tap',
+                   'trial_offer_skip','purchase_done',
                    'coach_view','coaching_view','apply_view','apply_start','apply_done')
   group by t.src, t.name;
 end $$;
 
 revoke all on function public.funnel_by_source(int) from public, anon;
 grant execute on function public.funnel_by_source(int) to authenticated;
+
+-- The payment page in detail: how far people scroll, which plan and which button they
+-- tap, which questions they open, and how far down "Not now" people got.
+-- One row per (metric, detail) with the number of people.
+create or replace function public.paywall_breakdown(p_days int default 30)
+returns table (metric text, detail text, people bigint)
+language plpgsql stable security definer set search_path = public as $$
+begin
+  if not public.is_coach() then
+    raise exception 'coach only';
+  end if;
+  return query
+  with ev as (
+    select e.anon_id, e.name, e.props from public.events e
+    where e.created_at > now() - make_interval(days => p_days)
+      and e.name in ('paywall_view','paywall_scroll','plan_pick','purchase_tap','paywall_faq','trial_offer_skip','purchase_done')
+  )
+  select ev.name::text as metric,
+         coalesce(case ev.name
+           when 'paywall_view' then ev.props->>'source'
+           when 'paywall_scroll' then (ev.props->>'pct') || '%'
+           when 'plan_pick' then ev.props->>'plan'
+           when 'purchase_tap' then coalesce(ev.props->>'plan','?') || ' · ' || coalesce(ev.props->>'where','?')
+           when 'paywall_faq' then ev.props->>'q'
+           when 'trial_offer_skip' then 'scrolled ' || coalesce(ev.props->>'depth','0') || '%'
+           when 'purchase_done' then coalesce(ev.props->>'plan', ev.props->>'platform', '')
+         end, '') as detail,
+         count(distinct ev.anon_id) as people
+  from ev group by 1, 2 order by 1, 3 desc;
+end $$;
+
+revoke all on function public.paywall_breakdown(int) from public, anon;
+grant execute on function public.paywall_breakdown(int) to authenticated;
 
 -- Make sure your own account can read it (change the email if you sign in with another one):
 update public.profiles set role = 'coach'

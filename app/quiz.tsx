@@ -14,7 +14,7 @@ import { whatsMissing } from '../src/lib/mealplan';
 import { foodById, type Food } from '../src/data/foods';
 import { kitTag } from '../src/lib/kit';
 import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
-import { quizFromHandoff, readHandoff } from '../src/lib/handoff';
+import { hasGoal, quizFromHandoff, readHandoff } from '../src/lib/handoff';
 import { useAuth } from '../src/lib/auth';
 import { readLead } from '../src/lib/lead';
 import { track } from '../src/lib/track';
@@ -74,7 +74,11 @@ const EMPTY: Q2 = {
 export default function QuizScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ src?: string; name?: string; email?: string }>();
-  const [i, setI] = useState(0);
+  // Came from the Stack Score on this browser: their goal, training, stack and name are already
+  // known, so skip the goal question and say so.
+  const [fromScore] = useState(() => hasGoal(readHandoff()));
+  const first = fromScore ? STEP_IDS.indexOf('sex') : 0;
+  const [i, setI] = useState(first);
   const [a, setA] = useState<Q2>(() => { const { email, ...pre } = quizFromHandoff(readHandoff()); return { ...EMPTY, ...pre }; });
   const [err, setErr] = useState('');
   const step: StepId = STEP_IDS[i];
@@ -91,18 +95,18 @@ export default function QuizScreen() {
     }).catch(() => {});
   }, [params.src]);
   useEffect(() => {
-    if (i === 0) track('quiz_start', { src: a.src || null }, { once: true });
+    if (i === first) track('quiz_start', { src: a.src || null, from_score: fromScore }, { once: true });
     track('quiz_step', { step: step, n: i + 1 }, { once: true });
   }, [i]);
 
   const set = (k: keyof Q2, v: any) => { setErr(''); setA((x) => ({ ...x, [k]: v })); };
   const next = () => { setErr(''); setI((x) => Math.min(STEP_IDS.length - 1, x + 1)); };
-  const back = () => { setErr(''); if (i === 0) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(i - 1); };
+  const back = () => { setErr(''); if (i === first) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(i - 1); };
   const go = (to: StepId) => { setErr(''); setI(STEP_IDS.indexOf(to)); };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
 
-  const n = Math.min(i + 1, ASKED);
+  const n = Math.min(i + 1 - first, ASKED - first);
   const showBar = i < ASKED;
   let body: React.ReactNode = null;
   let cta: React.ReactNode = <Cta title="Continue" onPress={next} />;
@@ -112,7 +116,10 @@ export default function QuizScreen() {
       <Options opts={GOAL_OPTS} value={a.goal} onPick={(v) => set('goal', v)} big /></>;
     cta = <Cta title="Continue" onPress={() => (a.goal ? next() : setErr('Pick one to continue.'))} />;
   } else if (step === 'sex') {
-    body = <><Q q="Male or female?" sub="Sets your starting calorie and protein numbers." />
+    body = <>{fromScore && i === first && (
+        <View style={qs.fromScore}><Text style={qs.fromScoreT}>{a.first_name ? `${a.first_name}, your Stack Score is in.` : 'Your Stack Score is in.'}</Text>
+          <Text style={qs.fromScoreS}>Your goal, training and stack are already filled in. A few quick questions about you and the food you like, then your plan is built.</Text></View>)}
+      <Q q="Male or female?" sub="Sets your starting calorie and protein numbers." />
       <Options opts={[{ v: 'Male', t: 'Male' }, { v: 'Female', t: 'Female' }]} value={a.sex} onPick={(v) => set('sex', v)} /></>;
     cta = <Cta title="Continue" onPress={() => (a.sex ? next() : setErr('Pick one to continue.'))} />;
   } else if (step === 'height') {
@@ -197,7 +204,7 @@ export default function QuizScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={st.top}>
           <BackBtn onPress={back} />
-          {showBar && <View style={st.barBg} accessibilityLabel={`Question ${n} of ${ASKED}`}><View style={[st.barFg, { width: `${Math.round((n / ASKED) * 100)}%` }]} /></View>}
+          {showBar && <View style={st.barBg} accessibilityLabel={`Question ${n} of ${ASKED - first}`}><View style={[st.barFg, { width: `${Math.round((n / (ASKED - first)) * 100)}%` }]} /></View>}
         </View>
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 22, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
           {body}
@@ -577,4 +584,10 @@ export const st = StyleSheet.create({
   stepDot: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center' },
   input: { height: 56, borderRadius: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, color: C.ink, fontFamily: F.medium, fontSize: 17, paddingHorizontal: 18, outlineWidth: 0 },
   saveRow: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 14, borderWidth: 1.5, borderColor: C.line },
+});
+
+const qs = StyleSheet.create({
+  fromScore: { backgroundColor: '#e6f4ec', borderRadius: 16, padding: 14, gap: 4, marginBottom: 18, borderWidth: 1, borderColor: '#bfe3cf' },
+  fromScoreT: { fontFamily: F.black, fontSize: 15, color: C.green },
+  fromScoreS: { fontFamily: F.semi, fontSize: 13.5, lineHeight: 19, color: C.ink },
 });

@@ -1,6 +1,6 @@
 import './setup-mocks';
 import { describe, expect, it } from 'vitest';
-import { quizFromHandoff } from '../src/lib/handoff';
+import { hasGoal, quizFromHandoff } from '../src/lib/handoff';
 
 describe('Stack Score → app handoff', () => {
   it('maps Stack Score answers to quiz answers', () => {
@@ -17,5 +17,16 @@ describe('Stack Score → app handoff', () => {
   it('handles "I take nothing" and missing data', () => {
     expect(quizFromHandoff({ stack: [], at: Date.now() }).tried).toEqual(['None of these']);
     expect(quizFromHandoff(null)).toEqual({});
+  });
+  it('carries goal, training style, eating and name from the new Stack Score', () => {
+    const q = quizFromHandoff({ name: 'Jake', goalKey: 'recomp', train: '0–1', style: 'Weights, a set plan', prog: 'Yes, I track it', out: 'Most meals', weekend: 'I undo the whole week', at: Date.now() });
+    expect(q.goal).toBe('Lose fat'); // the app's "Both at once"
+    expect(q.days).toBe('3 days');
+    expect(q.experience).toBe('1–3 years');
+    expect(q.eat_out).toBe('4+ times a week');
+    expect(q.struggle).toBe('Weekends');
+    expect(q.first_name).toBe('Jake');
+    expect(hasGoal({ goalKey: 'cut', at: 1 })).toBe(true);
+    expect(hasGoal({ at: 1 })).toBe(false);
   });
 });

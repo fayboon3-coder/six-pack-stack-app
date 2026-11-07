@@ -48,9 +48,10 @@ export function useSubscribe(source: string) {
   /** One line on what happens today, e.g. "$0 today. 2 weeks free, then $19.99 a month." */
   const today = (id: PlanId) => trial(id) ? `$0 today. ${cap(trial(id))} free, then ${price(id)} ${per(id)}.` : `${price(id)} today, then ${price(id)} ${per(id)}. Cancel anytime.`;
 
-  const start = async () => {
+  /** where: which button on the page was tapped (hero, recap, sticky), for the funnel report. */
+  const start = async (where: string = 'card') => {
     if (web && session) {
-      track('purchase_tap', { plan, source, platform: 'web' });
+      track('purchase_tap', { plan, source, where, platform: 'web' });
       setBusy('buy');
       const url = webCheckoutUrl(session.user.id, session.user.email);
       if (typeof window !== 'undefined') window.location.href = url; else Linking.openURL(url);
@@ -58,7 +59,7 @@ export function useSubscribe(source: string) {
     }
     if (!offers) return;
     setBusy('buy'); setMsg('');
-    track('purchase_tap', { plan, source });
+    track('purchase_tap', { plan, source, where });
     const r = await buy(offers[plan]);
     track(r.ok ? 'purchase_done' : 'purchase_fail', { plan, source, reason: r.ok ? null : r.reason });
     if (r.ok) { await refresh(); setMsg("You're in. Weeks 3–12 are unlocked."); }
@@ -116,7 +117,7 @@ export function SubscriptionCard({ source = 'other' }: { source?: string }) {
         <Tick>Weekly check-ins, progress photos, streaks and personal-record alerts</Tick>
       </View>
       <Text style={[st.small, { fontFamily: F.black }]}>Less than one tub of pre-workout a month.</Text>
-      <Pressable accessibilityRole="button" onPress={start} disabled={!can || !!busy} style={[st.btn, (!can || !!busy) && { opacity: 0.55 }]}>
+      <Pressable accessibilityRole="button" onPress={() => start('card')} disabled={!can || !!busy} style={[st.btn, (!can || !!busy) && { opacity: 0.55 }]}>
         {busy === 'buy' ? <ActivityIndicator color={C.ink} /> : <Text style={st.btnText}>{label}</Text>}
       </Pressable>
       {!!msg && <Text style={[st.small, { fontFamily: F.bold }]}>{msg}</Text>}
