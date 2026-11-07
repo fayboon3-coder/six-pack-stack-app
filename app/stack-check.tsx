@@ -135,7 +135,7 @@ function Library() {
                 placeholderTextColor="#1b244077" style={st.input} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
               {!!q && <Pressable accessibilityRole="button" accessibilityLabel="Clear" onPress={() => setQ('')} hitSlop={10}><Text style={st.clear}>✕</Text></Pressable>}
             </View>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
+            {!!plan && <View style={{ flexDirection: 'row', gap: 8 }}>
               <Pressable accessibilityRole="button" onPress={() => router.push('/scan')} style={st.scan}>
                 <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12" stroke="#fff" strokeWidth={2} strokeLinecap="round" /></Svg>
                 <Text style={st.scanT}>Scan barcode</Text>
@@ -146,7 +146,7 @@ function Library() {
                   <Text style={st.scanT}>Snap the label</Text>
                 </Pressable>
               )}
-            </View>
+            </View>}
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
               {FILTERS.map((x) => {
                 const n = x === 'All' ? VERDICTS.length : x === 'Worth it' ? counts.worth : x === 'Depends' ? counts.situational : counts.skip;
