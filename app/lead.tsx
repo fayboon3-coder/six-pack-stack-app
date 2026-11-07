@@ -29,13 +29,22 @@ export default function LeadScreen() {
   const [src, setSrc] = useState<string | undefined>();
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
+  const [auto, setAuto] = useState(false);
 
   useEffect(() => {
-    readLead().then((l) => {
+    let s0: string | undefined;
+    const ready = Linking.getInitialURL().then((u) => { const s = u ? Linking.parse(u).queryParams?.src : undefined; if (s) { s0 = String(s).slice(0, 80); setSrc(s0); } }).catch(() => {});
+    readLead().then(async (l) => {
       if (l) { setName(l.first_name); setEmail(l.email); return; }
       const h = readHandoff(); if (h?.email) setEmail(h.email); if (h?.name) setName(h.name); // came from the Stack Score
+      // They just gave their name and email on the Stack Score: don't ask again, go straight to the quiz.
+      if (want === 'plan' && h?.name && h?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(h.email)) {
+        setAuto(true); await ready;
+        const e = h.email.trim().toLowerCase();
+        await captureLead({ first_name: h.name.trim(), email: e, want, src: s0 });
+        router.replace({ pathname: '/quiz' as any, params: { name: h.name.trim(), email: e, ...(s0 ? { src: s0 } : {}) } });
+      }
     });
-    Linking.getInitialURL().then((u) => { const s = u ? Linking.parse(u).queryParams?.src : undefined; if (s) setSrc(String(s).slice(0, 80)); }).catch(() => {});
   }, []);
 
   const go = async () => {
@@ -49,6 +58,8 @@ export default function LeadScreen() {
     if (c.next === 'coaching') return router.replace('/coaching');
     router.replace({ pathname: c.next as any, params: { name: name.trim(), email: e, ...(src ? { src } : {}) } });
   };
+
+  if (auto) return <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}><Backdrop /></SafeAreaView>;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
