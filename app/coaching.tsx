@@ -140,7 +140,7 @@ export default function Coaching() {
   const W = Math.min(width, 640);
   const colW = (W - 16) / 3;
   useEffect(() => { track('coaching_view', {}, { once: true }); }, []);
-  const apply = (where: string) => { track('coaching_apply_tap', { where }); router.push('/apply'); };
+  const apply = (where: string) => { track('coaching_apply_tap', { where }); router.push('/coaching-application'); };
   const tick = <View style={s.tick}><Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg></View>;
 
   return (

@@ -152,7 +152,7 @@ export function CoachingCard() {
       <Text style={st.kicker}>1:1 with Boon</Text>
       <Text style={st.title}>Six-Pack Stack Coaching</Text>
       <Text style={st.body}>I audit your supplements, build your plan around your life, review your check-in every Sunday and answer you on WhatsApp. 12 weeks, with a results guarantee.</Text>
-      <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/apply'); }} style={st.btn}>
+      <Pressable accessibilityRole="button" onPress={() => { track('coaching_apply_tap'); router.push('/coaching-application'); }} style={st.btn}>
         <Text style={st.btnText}>Apply for coaching</Text>
       </Pressable>
       <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={[st.btn, { backgroundColor: C.navy }]}>
