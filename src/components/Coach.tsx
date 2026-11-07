@@ -62,7 +62,7 @@ const st = StyleSheet.create({
   fabTag: { position: 'absolute', top: -6, right: -8, backgroundColor: C.red, borderRadius: 10, paddingHorizontal: 6, paddingVertical: 2, borderWidth: 2, borderColor: C.bg },
   fabTagT: { fontFamily: F.black, fontSize: 11, color: C.onAccent },
   card: { backgroundColor: C.navy, borderRadius: 22, padding: 18, gap: 12 },
-  av: { width: 46, height: 46, borderRadius: 23, borderWidth: 2, borderColor: C.red },
+  av: { width: 46, height: 46, borderRadius: 23, borderWidth: 2, borderColor: 'rgba(255,255,255,0.9)' },
   k: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1, color: '#ff8a83' },
   t: { fontFamily: F.xbold, fontSize: 18, lineHeight: 23, color: '#ffffff', marginTop: 2 },
   b: { fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: '#ffffff' },
