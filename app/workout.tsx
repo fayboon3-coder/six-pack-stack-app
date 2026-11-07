@@ -24,6 +24,8 @@ import { exName } from '../src/lib/workoutMeta';
 import FormVideo from '../src/components/FormVideo';
 import { applySwap, resetSwap, type TrainCfg } from '../src/lib/training';
 import { canEditTraining, saveTraining } from '../src/lib/trainingSave';
+import { suggestNext } from '../src/lib/trend';
+import { health } from '../src/lib/health';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -62,6 +64,10 @@ export default function Workout() {
 
   useEffect(() => {
     if (!day || !session) return;
+    if (process.env.EXPO_PUBLIC_DEMO === '1') { // design previews only
+      setPrev(Object.fromEntries(day.x.map((x, k) => [x[0], k % 2 ? [{ weight: 50, reps: 10 }, { weight: 50, reps: 9 }, { weight: 50, reps: 8 }] : [{ weight: 135, reps: 10 }, { weight: 135, reps: 10 }, { weight: 135, reps: 10 }]])));
+      return;
+    }
     lastSession(session.user.id, day.x.map((x) => x[0]), isoDate()).then(setPrev);
   }, [day, session]);
 
@@ -91,8 +97,9 @@ export default function Workout() {
     const e = list[k];
     if (e.done) return update(k, { done: false });
     const p = prev[ex[0]]?.[k];
-    const w = e.w || (p?.weight != null ? String(p.weight) : '');
-    const r = e.r || (p?.reps != null ? String(p.reps) : '');
+    const sg = suggestNext(ex[1], prev[ex[0]] || [], week, /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/.test(ex[0]));
+    const w = e.w || (sg?.weight != null ? String(sg.weight) : p?.weight != null ? String(p.weight) : '');
+    const r = e.r || (sg && sg.tag !== 'start' ? String(sg.reps) : p?.reps != null ? String(p.reps) : '');
     update(k, { done: true, w, r });
     setRest(REST);
     // Personal record: more weight than any set last time, or same top weight for more reps
@@ -129,10 +136,14 @@ export default function Workout() {
   const mmss = (t: number) => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
   const last = i === day.x.length - 1;
   const p0 = prev[ex[0]] || [];
+  // Auto progression: today's target from last time (double progression, holds on re-set weeks).
+  const lower = /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/.test(ex[0]);
+  const sug = suggestNext(ex[1], p0, week, lower);
   const beat = list.some((e, k) => e.done && p0[k]?.weight != null && Number(e.w) > Number(p0[k]!.weight));
 
   const finish = async () => {
     setFinished(true);
+    health.saveWorkout(new Date(startedAt), new Date()).catch(() => {});
     track('workout_done', { prs: prs.length });
     if (prs.length) askForRatingAfterWin('pr');
     if (session) setStreak(await getStreak(session.user.id, plan.train.d.length));
@@ -206,6 +217,18 @@ export default function Workout() {
             )}
           </View>
           <Text style={st.target}>{nSets} sets · {repsOf(ex[1])} reps</Text>
+          {!!sug && (
+            <View style={[st.sug, sug.tag === 'up' && st.sugUp]} accessibilityLabel={`Today's target: ${sug.note}`}>
+              <View style={[st.sugBadge, sug.tag === 'up' && { backgroundColor: C.green }]}>
+                <Text style={st.sugBadgeT}>{sug.tag === 'up' ? '▲' : sug.tag === 'hold' ? '=' : sug.tag === 'start' ? '1' : '+1'}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={st.sugK}>TODAY'S TARGET</Text>
+                <Text style={st.sugV}>{sug.weight != null ? `${sug.weight} lbs × ${sug.reps}` : `${sug.reps} reps`}</Text>
+                <Text style={st.sugN}>{sug.note}</Text>
+              </View>
+            </View>
+          )}
           {!!ex[2] && <Text style={st.note}>{ex[2]}</Text>}
           <View style={{ gap: 6, marginTop: 10 }}>
             {(info?.cues || []).slice(0, 3).map((c, k) => (
@@ -228,10 +251,10 @@ export default function Workout() {
                   <Text style={[st.setNo, { width: 34 }]}>{k + 1}</Text>
                   <Text style={st.last} numberOfLines={1}>{p ? `${p.weight ?? '–'} × ${p.reps ?? '–'}` : '—'}</Text>
                   <TextInput value={e.w} onChangeText={(t) => update(k, { w: t.replace(/[^\d.]/g, '') })} keyboardType="decimal-pad"
-                    placeholder={p?.weight != null ? String(p.weight) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
+                    placeholder={sug?.weight != null ? String(sug.weight) : p?.weight != null ? String(p.weight) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 74 }, k === nextUndone && { borderColor: '#e2433b' }]} />
                   <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
-                    placeholder={p?.reps != null ? String(p.reps) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
+                    placeholder={sug && sug.tag !== 'start' ? String(sug.reps) : p?.reps != null ? String(p.reps) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 64 }]} />
                   <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Complete set ${k + 1}`} hitSlop={6}
                     onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.red, borderWidth: 0 }]}>
@@ -334,4 +357,11 @@ const st = StyleSheet.create({
   swapBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1.5, borderColor: '#d9dde7', backgroundColor: C.bg },
   swapT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
   restTime: { fontFamily: F.black, fontSize: 22, color: C.ink },
+  sug: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 12, padding: 12, borderRadius: 16, backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
+  sugUp: { backgroundColor: '#e7f6ee', borderColor: 'rgba(18,128,79,0.25)' },
+  sugBadge: { width: 34, height: 34, borderRadius: 17, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  sugBadgeT: { fontFamily: F.black, fontSize: 13, color: '#fff' },
+  sugK: { fontFamily: F.bold, fontSize: 10, letterSpacing: 1, color: C.ink },
+  sugV: { fontFamily: F.black, fontSize: 18, color: C.ink },
+  sugN: { fontFamily: F.medium, fontSize: 13, color: C.ink },
 });

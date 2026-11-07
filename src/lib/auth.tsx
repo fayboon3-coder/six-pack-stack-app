@@ -13,6 +13,8 @@ type Ctx = {
   plan: Plan | null;
   loading: boolean;
   refresh: () => Promise<void>;
+  /** Show a plan that was just saved (e.g. new calories) without reloading everything. */
+  updatePlan: (p: Plan) => void;
   signOut: () => Promise<void>;
   /** Coach only: see the app as a free user, subscriber or coaching client (nothing saved). */
   viewAs: ViewAs | null;
@@ -126,7 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pv = useMemo(() => (isCoachAccount && viewAs && profile ? previewProfilePlan(profile, viewAs) : null), [isCoachAccount, viewAs, profile]);
 
   return (
-    <AuthCtx.Provider value={{ session, profile: pv ? pv.profile : profile, plan: pv ? pv.plan : plan, loading, refresh, signOut,
+    <AuthCtx.Provider value={{ session, profile: pv ? pv.profile : profile, plan: pv ? pv.plan : plan, loading, refresh, updatePlan: setPlan, signOut,
       viewAs: pv ? viewAs : null, setViewAs, isCoachAccount }}>
       {children}
     </AuthCtx.Provider>

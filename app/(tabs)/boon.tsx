@@ -14,6 +14,7 @@ import { COACHING_URL, isCoached, isFree, PRIVACY_URL, TERMS_URL } from '../../s
 import { CoachingCard, SubscriptionCard } from '../../src/components/Offers';
 import RemindersCard from '../../src/components/RemindersCard';
 import AskBoonCard from '../../src/components/AskBoonCard';
+import CoachThread from '../../src/components/CoachThread';
 
 const FACE_IMG = require('../../assets/hero/boon_wide.jpg');
 const COACH_COVER = require('../../assets/img/cover_coaching.jpg');
@@ -29,11 +30,14 @@ export default function Boon() {
   const sub = !free && !coached; // The Full Stack subscriber
 
   useFocusEffect(useCallback(() => {
-    if (!session) return;
+    if (!session || (isCoached(profile) && profile?.role !== 'coach')) return;
     supabase.from('coach_reviews').select('id,week,body,created_at').eq('user_id', session.user.id)
       .order('created_at', { ascending: false }).limit(20)
       .then(({ data }) => setReviews((data as Review[]) || []));
   }, [session]));
+
+  // 1:1 clients get their own space: the check-in and review thread with Boon.
+  if (isCoached(profile)) return <CoachThread />;
 
   return (
     <Screen header={

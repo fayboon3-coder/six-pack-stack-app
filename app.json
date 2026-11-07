@@ -2,7 +2,7 @@
   "expo": {
     "name": "Six-Pack Stack",
     "slug": "six-pack-stack",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -10,10 +10,12 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.boonfay.sixpackstack",
       "infoPlist": {
-        "NSCameraUsageDescription": "Take your progress photos for your Sunday check-in.",
-        "NSPhotoLibraryUsageDescription": "Choose progress photos for your Sunday check-in.",
+        "NSCameraUsageDescription": "Take progress photos, snap meals to log them, and scan food barcodes and labels.",
+        "NSPhotoLibraryUsageDescription": "Choose progress photos, meal photos and labels to scan.",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSMotionUsageDescription": "Six-Pack Stack counts your daily steps so your Days Stacked score fills in on its own."
+        "NSMotionUsageDescription": "Six-Pack Stack counts your daily steps so your Days Stacked score fills in on its own.",
+        "NSHealthShareUsageDescription": "Six-Pack Stack reads your steps, weight, sleep and workouts from Apple Health so your trend weight and Days Stacked fill in on their own.",
+        "NSHealthUpdateUsageDescription": "Six-Pack Stack saves your weigh-ins and finished workouts to Apple Health."
       }
     },
     "android": {
@@ -35,14 +37,31 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Take your progress photos for your Sunday check-in.",
-          "photosPermission": "Choose progress photos for your Sunday check-in."
+          "cameraPermission": "Take progress photos, snap meals to log them, and scan food barcodes and labels.",
+          "photosPermission": "Choose progress photos, meal photos and labels to scan.",
+          "microphonePermission": false
         }
       ],
       [
         "expo-sensors",
         {
           "motionPermission": "Six-Pack Stack counts your daily steps so your Days Stacked score fills in on its own."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Take progress photos, snap meals to log them, and scan food barcodes and labels.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "Six-Pack Stack reads your steps, weight, sleep and workouts from Apple Health so your trend weight and Days Stacked fill in on their own.",
+          "NSHealthUpdateUsageDescription": "Six-Pack Stack saves your weigh-ins and finished workouts to Apple Health.",
+          "background": false
         }
       ]
     ],

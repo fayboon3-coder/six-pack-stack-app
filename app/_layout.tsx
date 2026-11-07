@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
@@ -19,6 +19,7 @@ function Gate() {
   useEffect(() => { track('app_open', {}, { once: true }); }, []);
   const segments = useSegments();
   const router = useRouter();
+  const landed = useRef(false);
 
   useEffect(() => {
     if (loading) return;
@@ -26,6 +27,13 @@ function Gate() {
     const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'apply', 'coaching', 'stack-check', 'verdict'].includes(seg || '');
     if (!session && !open) router.replace('/welcome');
     if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) router.replace('/');
+    // 1:1 coaching clients open on their coach home (once per launch).
+    if (session && profile && !landed.current) {
+      landed.current = true;
+      const sub = (segments as string[])[1];
+      const home = seg === '(tabs)' && (!sub || sub === 'index');
+      if (home && profile.role === 'client' && profile.tier === 'coached') router.replace('/corner');
+    }
   }, [session, loading, segments, router, profile]);
 
   if (loading) {
@@ -60,6 +68,11 @@ function Gate() {
       <Stack.Screen name="trial" options={{ gestureEnabled: false }} />
       <Stack.Screen name="delete-account" options={{ presentation: 'modal' }} />
       <Stack.Screen name="client/[id]" />
+      <Stack.Screen name="weigh-in" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="photos" />
+      <Stack.Screen name="recap" />
+      <Stack.Screen name="log-food" />
+      <Stack.Screen name="scan" />
     </Stack>
   );
 }

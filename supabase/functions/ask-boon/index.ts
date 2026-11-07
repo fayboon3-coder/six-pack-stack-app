@@ -19,6 +19,25 @@ const CORS = {
 
 /** Questions per day by tier. The coach has no limit. */
 const LIMITS: Record<string, number> = { free: 5, self: 40, coached: 60 };
+/** Photo and label scans per day by tier (counted apart from chat questions). */
+const SCAN_LIMITS: Record<string, number> = { free: 3, self: 30, coached: 50 };
+const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+const FOOD_PHOTO = `You estimate food from a photo for a fitness app. Look at the photo and list each food you can see with a realistic portion and its calories, protein, carbs and fat. Use typical US portions and restaurant-style prep when it looks like takeout (count visible oil, sauce and dressing). Round calories to the nearest 5 and grams to whole numbers. If the photo is not food, or you can't tell, return an empty items list and say why in note.
+Reply with JSON only, no other text:
+{"items":[{"name":"...","portion":"...","kcal":0,"protein":0,"carbs":0,"fat":0}],"confidence":"high|medium|low","note":"one short plain sentence, e.g. what you assumed"}`;
+
+const LABEL = `You read product labels for a fitness app: a Nutrition Facts panel, a Supplement Facts panel, or the front of a package. Read only what is printed; never guess numbers that aren't visible.
+- Food: name, brand, serving size and per-serving calories, protein, carbs and fat.
+- Supplement: name, brand, serving, the main ingredients with amounts, and the closest product in Boon's LIBRARY below (its name exactly as written there, or null).
+Reply with JSON only, no other text:
+{"kind":"food|supplement|other","name":"...","brand":"...","serving":"...","kcal":null,"protein":null,"carbs":null,"fat":null,"ingredients":["..."],"match":null,"note":"one short plain sentence"}`;
+
+function parseJson(text: string) {
+  const m = text.match(/\{[\s\S]*\}/);
+  if (!m) return null;
+  try { return JSON.parse(m[0]); } catch { return null; }
+}
 
 // LIBRARY:START
 const LIBRARY = `Whey Protein (also: whey, protein powder, optimum nutrition, gold standard) | Worth it | swap: Plain whey, third-party tested | Food in a tub, and that's the point
@@ -80,6 +99,7 @@ HOW YOU TALK (Boon's voice)
 - Like a friend who's been there. Empathy first, no blame. Calm, no hype, no jargon.
 - Short, punchy sentences. Plain words. Phrases he uses: "I get it", "here's exactly how", "think about it".
 - Ground every answer in the person's actual plan numbers when they apply.
+- When they send a photo (a meal, a label, a supplement, a menu, their form), look closely and answer about what you actually see. If you can't tell, say so and ask for a clearer photo. Never comment on their body or looks unless they ask about their progress, and then only kindly and about the plan.
 - Answers are for a phone screen: usually 2 to 6 short sentences. A short list (max 4 items) only when it really helps. No headers, no tables, no emojis, no markdown except **bold** for one key number or action.
 - Give one or two clear actions, not a lecture.
 
@@ -170,8 +190,14 @@ Deno.serve(async (req) => {
   if (!user) return json({ error: 'signed_out' }, 401);
   const admin = createClient(url, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
+  const mode = body.mode ? String(body.mode) : 'chat';
+  if (!['chat', 'food_photo', 'label'].includes(mode)) return json({ error: 'unknown_mode' }, 400);
+  const image = typeof body.image === 'string' && body.image.length < 6_000_000 ? body.image : null;
+  const media = IMAGE_TYPES.includes(String(body.media)) ? String(body.media) : 'image/jpeg';
+  if (mode !== 'chat' && !image) return json({ error: 'no_image' }, 400);
+
   const question = String(body.question || '').trim().slice(0, 1500);
-  if (!question) return json({ error: 'empty' }, 400);
+  if (mode === 'chat' && !question && !image) return json({ error: 'empty' }, 400);
 
   const [{ data: profile }, { data: planRow }] = await Promise.all([
     admin.from('profiles').select('first_name,role,tier,quiz').eq('id', user.id).single(),
@@ -180,6 +206,35 @@ Deno.serve(async (req) => {
   const isCoach = profile?.role === 'coach';
   const limit = isCoach ? Infinity : LIMITS[profile?.tier || 'free'] ?? 5;
   const today = new Date().toISOString().slice(0, 10);
+
+  // Photo and label scans: one image in, JSON out. Not saved to the chat.
+  if (mode !== 'chat') {
+    const scanLimit = isCoach ? Infinity : SCAN_LIMITS[profile?.tier || 'free'] ?? 3;
+    if (scanLimit !== Infinity) {
+      const { data: u } = await admin.from('ai_usage').select('scans').eq('user_id', user.id).eq('day', today).maybeSingle();
+      if (((u as any)?.scans || 0) >= scanLimit) return json({ error: 'limit', limit: scanLimit, left: 0 }, 429);
+    }
+    const hint = String(body.hint || '').slice(0, 200);
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model: Deno.env.get('ASK_BOON_MODEL') || 'claude-sonnet-5-5',
+        max_tokens: 800,
+        system: mode === 'label' ? `${LABEL}\n\nLIBRARY (name | verdict | swap | why)\n${LIBRARY}` : FOOD_PHOTO,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: media, data: image } },
+          { type: 'text', text: mode === 'label' ? 'Read this label.' : `Estimate this meal.${hint ? ` They said: ${hint}` : ''}` },
+        ] }],
+      }),
+    });
+    if (!r.ok) { console.error('anthropic scan', r.status, await r.text()); return json({ error: 'busy' }, 502); }
+    const out = await r.json();
+    const text = (out.content || []).filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n');
+    const result = parseJson(text);
+    if (scanLimit !== Infinity) await admin.rpc('ai_bump_scan', { uid: user.id, d: today }).then(() => {}, () => {});
+    return json({ result: result || { items: [], note: "I couldn't read that one. Try again in better light." } });
+  }
 
   if (limit !== Infinity) {
     const { data: u } = await admin.from('ai_usage').select('questions').eq('user_id', user.id).eq('day', today).maybeSingle();
@@ -194,7 +249,11 @@ Deno.serve(async (req) => {
     .eq('user_id', user.id).order('created_at', { ascending: false }).limit(12);
   const history: Msg[] = (hist || []).reverse().map((m: any) => ({ role: m.role, content: m.content }));
   while (history.length && history[0].role !== 'user') history.shift();
-  const messages: Msg[] = [...history, { role: 'user', content: question }];
+  // A photo with the question (a meal, a label, a supplement shelf, their form): the AI sees it this once.
+  const asked = question || 'What do you think of this?';
+  const messages: any[] = [...history, image
+    ? { role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: media, data: image } }, { type: 'text', text: asked }] }
+    : { role: 'user', content: asked }];
 
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -220,8 +279,8 @@ Deno.serve(async (req) => {
   let used = 0;
   if (limit !== Infinity) { const { data: n } = await admin.rpc('ai_bump', { uid: user.id, d: today }); used = Number(n) || 0; }
   await admin.from('chat_messages').insert([
-    { user_id: user.id, role: 'user', content: question },
+    { user_id: user.id, role: 'user', content: image ? `[Photo] ${asked}` : asked },
     { user_id: user.id, role: 'assistant', content: answer },
   ]);
-  return json({ answer, left: limit === Infinity ? null : Math.max(0, limit - used), limit: limit === Infinity ? null : limit });
+  return json({ answer, saw_image: !!image, left: limit === Infinity ? null : Math.max(0, limit - used), limit: limit === Infinity ? null : limit });
 });

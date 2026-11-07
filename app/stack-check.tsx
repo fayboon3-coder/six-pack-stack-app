@@ -99,6 +99,7 @@ const st2 = StyleSheet.create({
 /** Library: type any supplement or gadget, get Boon's verdict. */
 function Library() {
   const router = useRouter();
+  const { plan } = useAuth();
   const [q, setQ] = useState('');
   const [f, setF] = useState<(typeof FILTERS)[number]>('All');
   const list = useMemo(() => search(q).filter((v) => f === 'All' || KIND[v.kind].label === f), [q, f]);
@@ -133,6 +134,18 @@ function Library() {
               <TextInput accessibilityLabel="Search supplements" value={q} onChangeText={setQ} placeholder="AG1, C4, fat burner, creatine…"
                 placeholderTextColor="#1b244077" style={st.input} autoCorrect={false} autoCapitalize="none" returnKeyType="search" />
               {!!q && <Pressable accessibilityRole="button" accessibilityLabel="Clear" onPress={() => setQ('')} hitSlop={10}><Text style={st.clear}>✕</Text></Pressable>}
+            </View>
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Pressable accessibilityRole="button" onPress={() => router.push('/scan')} style={st.scan}>
+                <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M4 6v12M7 6v12M10 6v12M14 6v12M16 6v12M20 6v12" stroke="#fff" strokeWidth={2} strokeLinecap="round" /></Svg>
+                <Text style={st.scanT}>Scan barcode</Text>
+              </Pressable>
+              {!!plan && (
+                <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: '/log-food', params: { go: 'label' } })} style={[st.scan, { backgroundColor: C.red }]}>
+                  <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#fff" strokeWidth={2} fill="none" strokeLinejoin="round" /></Svg>
+                  <Text style={st.scanT}>Snap the label</Text>
+                </Pressable>
+              )}
             </View>
             <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
               {FILTERS.map((x) => {
@@ -172,6 +185,8 @@ function Library() {
 }
 
 const st = StyleSheet.create({
+  scan: { flex: 1, flexDirection: 'row', gap: 8, height: 46, borderRadius: 23, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  scanT: { fontFamily: F.bold, fontSize: 15, color: '#fff' },
   score: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1.5, borderColor: C.green, borderRadius: 16, padding: 14, backgroundColor: 'rgba(63,191,127,0.08)' },
   scoreK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.green },
   scoreT: { fontFamily: F.black, fontSize: 15, lineHeight: 20, color: C.ink },

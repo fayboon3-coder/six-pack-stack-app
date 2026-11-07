@@ -12,10 +12,13 @@ import { daysToSunday, PHOTO_WEEKS, weekOf } from '../../src/lib/program';
 import { isoDate, loggedDays } from '../../src/lib/logs';
 import { getStreak } from '../../src/lib/streak';
 import { applyReminders, hasPermission, readPrefs } from '../../src/lib/reminders';
-import { isFree } from '../../src/lib/access';
+import { isCoached, isFree } from '../../src/lib/access';
 import Leaderboard from '../../src/components/Leaderboard';
 import { addProtein, num, proteinGoal, readDay, undoProtein } from '../../src/lib/daily';
-import { kcalEaten, readMeals } from '../../src/lib/mealsToday';
+import { kcalToday } from '../../src/lib/food';
+import { afterProtein } from '../../src/lib/reminders';
+import HealthCard from '../../src/components/HealthCard';
+import { registerPush } from '../../src/lib/push';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -35,10 +38,10 @@ export default function You() {
   const [bump, setBump] = useState(0);
   const loadFood = useCallback(async () => {
     const d = await readDay(); setProtein(d.protein); setCanUndo(d.adds.length > 0);
-    if (plan) setKcal(kcalEaten(plan, await readMeals()));
+    if (plan) setKcal(await kcalToday(plan));
   }, [plan]);
   useFocusEffect(useCallback(() => { loadFood(); }, [loadFood]));
-  const addG = async (g: number) => { await addProtein(g); await loadFood(); setBump((b) => b + 1); };
+  const addG = async (g: number) => { const d = await addProtein(g); if (plan) afterProtein(d.protein, proteinGoal(plan)).catch(() => {}); await loadFood(); setBump((b) => b + 1); };
   const undoG = async () => { await undoProtein(); await loadFood(); setBump((b) => b + 1); };
 
   const load = useCallback(async () => {
@@ -49,7 +52,7 @@ export default function You() {
     getStreak(session.user.id, plan.train.d.length).then((s) => setTotal(s.workouts)).catch(() => {});
   }, [session, plan]);
   useFocusEffect(useCallback(() => { load(); }, [load]));
-  useEffect(() => { if (plan && !viewAs) hasPermission().then((ok) => { if (ok) readPrefs().then((p) => applyReminders(plan, p, { free: isFree(profile) })); }); }, [plan?.train.s]);
+  useEffect(() => { if (plan && !viewAs) hasPermission().then((ok) => { if (ok) { readPrefs().then((p) => applyReminders(plan, p, { free: isFree(profile) })); registerPush().catch(() => {}); } }); }, [plan?.train.s]);
 
   if (!plan) return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -88,7 +91,7 @@ export default function You() {
         <Pressable accessibilityRole="button" accessibilityLabel="Reminders" onPress={() => router.push('/boon')} style={st.round}>
           <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0" stroke={C.ink} strokeWidth={1.9} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
         </Pressable>
-        <Pressable accessibilityRole="button" accessibilityLabel={profile?.role === 'coach' ? 'Coach dashboard' : '1:1 coaching'} onPress={() => router.push(profile?.role === 'coach' ? '/coach' : '/coaching')} style={st.round}>
+        <Pressable accessibilityRole="button" accessibilityLabel={profile?.role === 'coach' ? 'Coach dashboard' : '1:1 coaching'} onPress={() => router.push(profile?.role === 'coach' ? '/coach' : isCoached(profile) ? '/corner' : '/coaching')} style={st.round}>
           <Svg width={20} height={20} viewBox="0 0 24 24"><Circle cx={9} cy={8} r={3.5} stroke={C.ink} strokeWidth={1.9} fill="none" /><Path d="M3 20c.6-3.4 3-5 6-5s5.4 1.6 6 5M15.5 4.6a3.5 3.5 0 0 1 0 6.8M17.5 15c2 .6 3.2 2.2 3.5 5" stroke={C.ink} strokeWidth={1.9} fill="none" strokeLinecap="round" /></Svg>
         </Pressable>
         <Pressable accessibilityRole="button" accessibilityLabel="Settings" onPress={() => router.push('/boon')} style={st.round}>
@@ -103,11 +106,19 @@ export default function You() {
         )}
 
         {!!session && <DaysStacked key={'ds' + bump} plan={plan} userId={session.user.id} onProtein={() => setAdding(true)} />}
-        <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
-          <Image source={LOGO} style={{ width: 44, height: 44 }} />
-          <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
-          <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-        </Pressable>
+        {isCoached(profile) ? (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/corner')} style={[st.coachBanner, { backgroundColor: C.navy }]}>
+            <Image source={require('../../assets/hero/boon_avatar.jpg')} style={{ width: 44, height: 44, borderRadius: 22, borderWidth: 2, borderColor: C.red }} />
+            <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Your coach</Text><Text style={[st.small, { color: C.onAccent }]}>This week's note and your one thing</Text></View>
+            <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+          </Pressable>
+        ) : profile?.role !== 'coach' && (
+          <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
+            <Image source={LOGO} style={{ width: 44, height: 44 }} />
+            <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
+            <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+          </Pressable>
+        )}
 
         {!!session && !viewAs && <Leaderboard userId={session.user.id} />}
 
@@ -129,7 +140,7 @@ export default function You() {
 
         <Section title="Nutrition" onPress={() => router.push('/plan')}>
           <View style={{ flexDirection: 'row', gap: 18 }}>
-            <Target label="Calories target" value={fmt(kcalGoal)} left={`${fmt(Math.max(0, kcalGoal - kcal))} left`} pct={kcal / kcalGoal} color="#ffb347" onAdd={() => router.push('/plan')} addLabel="Log a meal" />
+            <Target label="Calories target" value={fmt(kcalGoal)} left={`${fmt(Math.max(0, kcalGoal - kcal))} left`} pct={kcal / kcalGoal} color="#ffb347" onAdd={() => router.push('/log-food')} addLabel="Log food" />
             <Target label="Protein target" value={`${fmt(pg)} g`} left={`${fmt(Math.max(0, pg - protein))} g left`} pct={protein / pg} color="#d22f26" onAdd={() => setAdding(!adding)} addLabel="Add protein" />
           </View>
           {adding && (
@@ -152,6 +163,7 @@ export default function You() {
           <Chevron />
         </Pressable>
 
+        <HealthCard compact />
         <RemindersCard compact />
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
         {profile?.role !== 'coach' && <Text accessibilityRole="link" onPress={() => router.push('/delete-account')} style={st.legal}>Delete my account</Text>}

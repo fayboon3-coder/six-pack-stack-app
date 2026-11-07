@@ -38,10 +38,10 @@ export async function loadHistory(userId: string): Promise<ChatMsg[]> {
 }
 
 export type AskResult =
-  | { ok: true; answer: string; left: number | null; limit: number | null }
+  | { ok: true; answer: string; left: number | null; limit: number | null; sawImage: boolean }
   | { ok: false; reason: 'limit' | 'not_live' | 'signed_out' | 'busy' | 'offline'; limit?: number };
 
-export async function ask(question: string, preview?: { plan: unknown; tier: string }): Promise<AskResult> {
+export async function ask(question: string, preview?: { plan: unknown; tier: string }, image?: { data: string; media: string }): Promise<AskResult> {
   const { data: { session } } = await supabase.auth.getSession();
   const demo = process.env.EXPO_PUBLIC_DEMO === '1'; // design previews only, never set in real builds
   if (!session && !demo) return { ok: false, reason: 'signed_out' };
@@ -49,10 +49,10 @@ export async function ask(question: string, preview?: { plan: unknown; tier: str
     const r = await fetch(FN, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', apikey: SUPABASE_KEY, Authorization: `Bearer ${session ? session.access_token : SUPABASE_KEY}` },
-      body: JSON.stringify({ question, ...(preview ? { previewPlan: preview.plan, previewTier: preview.tier } : {}) }),
+      body: JSON.stringify({ question, ...(image ? { image: image.data, media: image.media } : {}), ...(preview ? { previewPlan: preview.plan, previewTier: preview.tier } : {}) }),
     });
     const j = await r.json().catch(() => ({}));
-    if (r.ok && j.answer) return { ok: true, answer: j.answer, left: j.left ?? null, limit: j.limit ?? null };
+    if (r.ok && j.answer) return { ok: true, answer: j.answer, left: j.left ?? null, limit: j.limit ?? null, sawImage: !!j.saw_image };
     if (r.status === 429) return { ok: false, reason: 'limit', limit: j.limit };
     if (j.error === 'not_live') return { ok: false, reason: 'not_live' };
     if (r.status === 401) return { ok: false, reason: 'signed_out' };
@@ -70,6 +70,10 @@ export async function questionsLeft(userId: string, tier: string, isCoach: boole
     .eq('day', new Date().toISOString().slice(0, 10)).maybeSingle();
   return Math.max(0, limit - (data?.questions || 0));
 }
+
+/** Apple 5.1.2(i): say plainly what goes to the AI provider and get a yes first. v2 adds photos you choose to send. */
+export const AI_CONSENT_KEY = 'sps:aiConsent:v2';
+export const AI_CONSENT_TEXT = 'Stack is an AI. To answer, it sends your question, any photo you choose to send, and the parts of your plan it needs (like your goal, calories and foods) to Anthropic, the company that makes the AI. It never gets your progress photos or payment details.';
 
 export const STARTERS = [
   'Can I drink on this plan?',

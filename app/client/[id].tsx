@@ -8,11 +8,13 @@ import { Button } from '../../src/components/ui';
 import { BackIcon, BoltIcon, DumbbellIcon, ForkIcon, ScaleIcon, TrophyIcon } from '../../src/components/icons';
 import { plain } from '../../src/lib/program';
 import Backdrop from '../../src/components/Backdrop';
+import { sendPush } from '../../src/lib/push';
+import { trendSeries, ratePerWeek } from '../../src/lib/trend';
 
 type Checkin = {
   id: string; week: number; checkin_date: string; weight: number | null; waist: number | null; steps: number | null;
   workouts: number | null; nutrition_days: number | null; energy: number | null; hunger: number | null;
-  win: string | null; hardest: string | null; questions: string | null; share_win: boolean | null;
+  win: string | null; hardest: string | null; questions: string | null; share_win: boolean | null; stronger?: string | null;
 };
 type Review = { id: string; week: number | null; body: string; created_at: string };
 
@@ -20,7 +22,11 @@ type Review = { id: string; week: number | null; body: string; created_at: strin
 export default function ClientDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const [profile, setProfile] = useState<{ email: string | null; first_name: string | null; tier: string } | null>(null);
+  const [profile, setProfile] = useState<{ email: string | null; first_name: string | null; tier: string; push_token?: string | null } | null>(null);
+  const [focus, setFocus] = useState('');
+  const [trend, setTrend] = useState<{ t: number; rate: number | null; n: number } | null>(null);
+  const [nudge, setNudge] = useState('');
+  const [nudged, setNudged] = useState('');
   const [goal, setGoal] = useState('');
   const [checkins, setCheckins] = useState<Checkin[]>([]);
   const [photos, setPhotos] = useState<Record<string, { angle: string; url: string }[]>>({});
@@ -32,7 +38,7 @@ export default function ClientDetail() {
   const load = useCallback(async () => {
     if (!id) return;
     const [{ data: p }, { data: pl }, { data: c }, { data: ph }, { data: r }] = await Promise.all([
-      supabase.from('profiles').select('email,first_name,tier').eq('id', id).maybeSingle(),
+      supabase.from('profiles').select('*').eq('id', id).maybeSingle(),
       supabase.from('plans').select('data').eq('user_id', id).eq('active', true).limit(1).maybeSingle(),
       supabase.from('checkins').select('*').eq('user_id', id).order('checkin_date', { ascending: false }),
       supabase.from('photos').select('checkin_id,angle,path').eq('user_id', id),
@@ -41,6 +47,12 @@ export default function ClientDetail() {
     setProfile(p as any); setGoal(plain((pl?.data as any)?.goal_short || ''));
     const cs = (c as Checkin[]) || []; setCheckins(cs); setReviews((r as Review[]) || []);
     if (cs[0] && !week) setWeek(String(cs[0].week));
+    // Daily weigh-ins (needs 009): trend weight and weekly pace
+    const { data: ds } = await supabase.from('daily_stats').select('day,weight').eq('user_id', id).not('weight', 'is', null).order('day', { ascending: true }).limit(200);
+    const pts = [...cs.filter((c) => c.weight != null).map((c) => ({ date: c.checkin_date, w: Number(c.weight) })), ...((ds as any[]) || []).map((d) => ({ date: d.day, w: Number(d.weight) }))];
+    const byDay: Record<string, number> = {}; pts.forEach((p) => { byDay[p.date] = p.w; });
+    const series = trendSeries(Object.entries(byDay).map(([date, w]) => ({ date, w })));
+    setTrend(series.length ? { t: series[series.length - 1].t, rate: ratePerWeek(series, 21), n: series.length } : null);
     const rows = (ph as { checkin_id: string; angle: string; path: string }[]) || [];
     if (rows.length) {
       const { data: signed } = await supabase.storage.from('progress-photos').createSignedUrls(rows.map((x) => x.path), 3600);
@@ -54,10 +66,17 @@ export default function ClientDetail() {
   const send = async () => {
     if (!body.trim()) return Alert.alert('Write the review first');
     setBusy(true);
-    const { error } = await supabase.from('coach_reviews').insert({ user_id: id, week: week ? Number(week) : null, body: body.trim() });
+    const row: Record<string, any> = { user_id: id, week: week ? Number(week) : null, body: body.trim(), focus: focus.trim() || null };
+    let { error } = await supabase.from('coach_reviews').insert(row);
+    // Database without the focus column yet (009 not run): put the focus line in the review itself.
+    if (error && /focus/i.test(error.message || '')) {
+      delete row.focus; if (focus.trim()) row.body = `${row.body}\n\nOne thing this week: ${focus.trim()}`;
+      ({ error } = await supabase.from('coach_reviews').insert(row));
+    }
     setBusy(false);
     if (error) return Alert.alert('Didn\'t save', error.message);
-    setBody(''); load();
+    if (profile?.push_token) sendPush(profile.push_token, 'Boon reviewed your week', focus.trim() ? `Your one thing: ${focus.trim()}` : 'Open the app to read it.').catch(() => {});
+    setBody(''); setFocus(''); load();
     Alert.alert('Sent', 'It shows on their Boon tab now.');
   };
 
@@ -81,17 +100,43 @@ export default function ClientDetail() {
             <Stat label="Change" value={change != null ? `${change > 0 ? '+' : ''}${change.toFixed(1)}` : '–'} tone={change != null && change < 0 ? C.green : undefined} />
           </View>
 
+          {!!trend && (
+            <View style={st.card}>
+              <Text style={st.label}>Trend weight (daily weigh-ins)</Text>
+              <Text style={st.cardTitle}>{trend.t.toFixed(1)} lbs{trend.rate != null ? `  ·  ${trend.rate > 0 ? '+' : ''}${trend.rate.toFixed(1)} lbs/week` : ''}</Text>
+              <Text style={st.meta}>{trend.n} weigh-ins. Smoothed, so one salty dinner doesn't fool you.</Text>
+            </View>
+          )}
+
           <View style={st.card}>
             <Text style={st.cardTitle}>Write this week's review</Text>
-            <Text style={st.meta}>Shows on their Boon tab. What's working, the one thing to change, and their focus for next week.</Text>
+            <Text style={st.meta}>Shows on their coach home. What's working, the one thing to change, and their focus for next week.</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <Text style={st.label}>Week</Text>
               <TextInput value={week} onChangeText={(t) => setWeek(t.replace(/\D/g, ''))} keyboardType="number-pad" style={[st.input, { width: 70, textAlign: 'center' }]} accessibilityLabel="Review week" />
             </View>
             <TextInput value={body} onChangeText={setBody} multiline placeholder={`${name.split(' ')[0]}, big week…`} placeholderTextColor="#1b244066"
               style={[st.input, { minHeight: 140, textAlignVertical: 'top', paddingTop: 12 }]} accessibilityLabel="Review text" />
+            <Text style={st.label}>Their one thing this week</Text>
+            <TextInput value={focus} onChangeText={setFocus} placeholder="Ex. Protein at breakfast, every day" placeholderTextColor="#1b244066"
+              style={st.input} accessibilityLabel="Focus for this week" />
+            <Text style={st.meta}>Shows big on their coach home and in their next check-in.{profile?.push_token ? ' They get a notification when you send.' : ''}</Text>
             <Button title={busy ? 'Sending…' : 'Send review'} onPress={send} loading={busy} />
           </View>
+
+          {!!profile?.push_token && (
+            <View style={st.card}>
+              <Text style={st.cardTitle}>Send a nudge</Text>
+              <Text style={st.meta}>Goes straight to their phone as a notification from the app.</Text>
+              <TextInput value={nudge} onChangeText={setNudge} placeholder="Big day today. Hit your protein and send me a pic of dinner." placeholderTextColor="#1b244066"
+                style={[st.input, { height: 70, textAlignVertical: 'top', paddingTop: 10 }]} multiline accessibilityLabel="Nudge text" />
+              <Button title={nudged || 'Send nudge'} onPress={async () => {
+                if (!nudge.trim()) return;
+                const ok = await sendPush(profile.push_token!, 'Boon', nudge.trim());
+                setNudged(ok ? 'Sent' : "Didn't send"); if (ok) setNudge(''); setTimeout(() => setNudged(''), 2500);
+              }} />
+            </View>
+          )}
 
           <Text style={st.section}>Check-ins</Text>
           {checkins.length === 0 && <Text style={st.meta}>No check-ins yet.</Text>}
@@ -111,6 +156,7 @@ export default function ClientDetail() {
                 </View>
                 <Text style={st.meta}>Waist {c.waist ?? '–'} in · Steps {c.steps ?? '–'} · Hunger {c.hunger ?? '–'}/10</Text>
                 {!!c.win && <View style={st.win}><TrophyIcon color={C.green} size={15} /><Text style={st.body}>{c.win}{c.share_win ? '  (OK to share)' : ''}</Text></View>}
+                {!!c.stronger && <Text style={st.body}><Text style={st.bold}>Last week's focus: </Text>{c.stronger}</Text>}
                 {!!c.hardest && <Text style={st.body}><Text style={st.bold}>Hardest: </Text>{c.hardest}</Text>}
                 {!!c.questions && <Text style={st.body}><Text style={st.bold}>Asks: </Text>{c.questions}</Text>}
                 {!!photos[c.id]?.length && (

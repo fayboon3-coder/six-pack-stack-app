@@ -20,6 +20,12 @@ import PageTitle from '../src/components/PageTitle';
 import { isoDate, loggedDays } from '../src/lib/logs';
 import { readDay } from '../src/lib/daily';
 import { CoachCard } from '../src/components/Coach';
+import { focusOf, loadCoaching } from '../src/lib/coaching';
+import { LinearGradient } from 'expo-linear-gradient';
+import { allWeighIns } from '../src/lib/body';
+import { trendSeries } from '../src/lib/trend';
+
+const BOON = require('../assets/hero/boon_avatar.jpg');
 
 type Angle = 'front' | 'side' | 'back';
 
@@ -40,6 +46,20 @@ export default function CheckinScreen() {
   const [saved, setSaved] = useState(false);
   const [newNums, setNewNums] = useState<{ kcal: string; protein: string; before: string } | null>(null);
   const [auto, setAuto] = useState<{ workouts: number | null; steps: number | null }>({ workouts: null, steps: null });
+  const [focus, setFocus] = useState('');
+  const [focusHow, setFocusHow] = useState<string | null>(null);
+  const [hardest, setHardest] = useState('');
+  const [trend, setTrend] = useState<number | null>(null);
+
+  // 1:1 clients: last week's "one thing" from Boon, so the check-in answers it.
+  useEffect(() => { if (session && coached) loadCoaching(session.user.id).then(({ reviews }) => setFocus(focusOf(reviews[0]))); }, [session, coached]);
+  // Weight field starts at their 7-day trend when they've been weighing in.
+  useEffect(() => {
+    allWeighIns(process.env.EXPO_PUBLIC_DEMO === '1' ? undefined : session?.user.id).then((w) => {
+      const s = trendSeries(w); const last = s[s.length - 1];
+      if (last && (Date.now() - new Date(last.date + 'T12:00:00').getTime()) < 4 * 864e5) { setTrend(last.t); setWeight((cur) => cur || last.t.toFixed(1)); }
+    }).catch(() => {});
+  }, [session]);
 
   // Workouts and steps fill in from what they logged this week, so the check-in stays 2 minutes.
   useEffect(() => {
@@ -74,6 +94,7 @@ export default function CheckinScreen() {
     const row: Record<string, any> = {
       user_id: uid, week, weight: Number(weight), steps: auto.steps, workouts: auto.workouts,
       adherence: rating, win: win || null, questions: questions || null, share_win: shareWin,
+      ...(coached ? { hardest: hardest || null, stronger: focus && focusHow ? `${focusHow}: ${focus}` : null } : {}),
     };
     let res = await supabase.from('checkins').insert(row).select('id').single();
     // Older database without the adherence column: save everything else.
@@ -112,10 +133,31 @@ export default function CheckinScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <Page tabs={false} footer={footer} style={{ gap: 0 }}
-        header={<PageTitle back title="Sunday check-in" sub={`Week ${week} · about 2 minutes`} size={26} />}>
+        header={<PageTitle back title={coached ? 'Your week, for Boon' : 'Sunday check-in'} sub={`Week ${week} · about 2 minutes`} size={26} />}>
+        {coached && (
+          <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.boon}>
+            <Image source={BOON} style={st.boonAv} />
+            <Text style={st.boonT}>Talk to me like you'd text me. I read every word and send your adjustments within 24 hours.</Text>
+          </LinearGradient>
+        )}
+        {coached && !!focus && (
+          <View style={{ marginBottom: 22 }}>
+            <Text style={st.label}>Last week I asked you to:</Text>
+            <View style={st.focus}><Text style={st.focusT}>{focus}</Text></View>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+              {['Nailed it', 'Mostly', 'Not really'].map((o) => (
+                <Pressable key={o} accessibilityRole="radio" accessibilityState={{ selected: focusHow === o }} onPress={() => setFocusHow(o)}
+                  style={[st.opt, focusHow === o && { backgroundColor: C.navy, borderColor: C.navy }]}>
+                  <Text style={[st.optT, focusHow === o && { color: '#fff' }]}>{o}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
         <Text style={st.label}>Weight (lbs)</Text>
         <TextInput accessibilityLabel="Weight in pounds" value={weight} onChangeText={(t) => setWeight(t.replace(/[^\d.]/g, ''))} keyboardType="decimal-pad"
           placeholder="7-day average" placeholderTextColor={C.muted} style={st.input} />
+        {trend != null && <Text style={[st.hint, { marginTop: 8 }]}>Filled in from your trend weight ({trend.toFixed(1)}). Change it if you like.</Text>}
 
         {photoWeek ? (
           <>
@@ -157,6 +199,9 @@ export default function CheckinScreen() {
 
         {coached && (
           <>
+            <Text style={[st.label, st.gap]}>What was hardest this week?</Text>
+            <TextInput accessibilityLabel="What was hardest this week" value={hardest} onChangeText={setHardest} placeholder="Ex. Saturday night, a late shift, cravings after dinner" placeholderTextColor={C.muted}
+              style={st.input} multiline />
             <Text style={[st.label, st.gap]}>Anything you want me to answer?</Text>
             <TextInput accessibilityLabel="Questions for Boon" value={questions} onChangeText={setQuestions} placeholder="Food swaps, a sore joint, a supplement you saw…"
               placeholderTextColor={C.muted} style={[st.input, { minHeight: 80 }]} multiline />
@@ -198,5 +243,12 @@ const st = StyleSheet.create({
   end: { fontFamily: F.medium, fontSize: 12, color: C.ink },
   share: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10 },
   cta: { flex: 1, height: 54, borderRadius: 27, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  boon: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 20, marginBottom: 22 },
+  boonAv: { width: 48, height: 48, borderRadius: 24, borderWidth: 2, borderColor: '#e2433b' },
+  boonT: { flex: 1, fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: '#fff' },
+  focus: { backgroundColor: C.redTint, borderRadius: 14, padding: 14, borderLeftWidth: 4, borderLeftColor: C.red },
+  focusT: { fontFamily: F.xbold, fontSize: 16, lineHeight: 22, color: C.ink },
+  opt: { flex: 1, height: 46, borderRadius: 14, borderWidth: 1.5, borderColor: '#d9dde7', alignItems: 'center', justifyContent: 'center', backgroundColor: C.bg },
+  optT: { fontFamily: F.bold, fontSize: 14, color: C.ink },
   ctaT: { fontFamily: F.bold, fontSize: 18, color: C.onAccent },
 });

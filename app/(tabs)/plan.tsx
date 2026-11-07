@@ -13,6 +13,8 @@ import { isCoached } from '../../src/lib/access';
 import { CoachCard } from '../../src/components/Coach';
 
 import { readMeals, writeMeals, type MealDay } from '../../src/lib/mealsToday';
+import { readFood } from '../../src/lib/food';
+import { afterProtein } from '../../src/lib/reminders';
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
 /** Programs · Meals: today's meals from their foods (tick and swap), eating out, groceries. */
@@ -21,10 +23,12 @@ export default function Meals() {
   const router = useRouter();
   const [day, setDay] = useState<MealDay>({ pick: {}, eaten: {} });
   const [protein, setProtein] = useState(0);
+  const [logged, setLogged] = useState<{ kcal: number; n: number }>({ kcal: 0, n: 0 });
 
   const load = useCallback(async () => {
     setDay(await readMeals());
     setProtein((await readDay()).protein);
+    const f = await readFood(); setLogged({ kcal: f.reduce((n, x) => n + (x.kcal || 0), 0), n: f.length });
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
@@ -37,12 +41,12 @@ export default function Meals() {
     const on = !day.eaten[k];
     await save({ ...day, eaten: { ...day.eaten, [k]: on } });
     const g = num(opt(k).protein);
-    if (g) setProtein((await addProtein(on ? g : -g)).protein);
+    if (g) { const d = await addProtein(on ? g : -g); setProtein(d.protein); if (plan) afterProtein(d.protein, proteinGoal(plan)).catch(() => {}); }
   };
   const swap = (k: number) => { if (day.eaten[k] || meals[k].options.length < 2) return; save({ ...day, pick: { ...day.pick, [k]: ((day.pick[k] || 0) + 1) % meals[k].options.length } }); };
 
   const kcalGoal = num(plan.kcal) || 2000, pg = proteinGoal(plan);
-  const kcal = meals.reduce((n, _, k) => n + (day.eaten[k] ? num(opt(k).kcal) : 0), 0);
+  const kcal = meals.reduce((n, _, k) => n + (day.eaten[k] ? num(opt(k).kcal) : 0), 0) + logged.kcal;
   const groceries = (plan.grocery || []).reduce((n, g) => n + g.items.split(/,|·|\n/).filter((x) => x.trim()).length, 0);
   const own = !isCoached(profile) && profile?.role !== 'coach';
 
@@ -52,6 +56,15 @@ export default function Meals() {
         <Total label="Calories" v={fmt(kcal)} of={fmt(kcalGoal)} pct={kcal / kcalGoal} color="#ffb347" />
         <Total label="Protein" v={`${fmt(protein)} g`} of={`${fmt(pg)} g`} pct={protein / pg} color="#d22f26" />
       </View>
+
+      <Pressable accessibilityRole="button" onPress={() => router.push('/log-food')} style={st.log}>
+        <View style={st.logIco}><Svg width={22} height={22} viewBox="0 0 24 24"><Path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#fff" strokeWidth={2} fill="none" strokeLinejoin="round" /><Path d="M12 10a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" stroke="#fff" strokeWidth={2} fill="none" /></Svg></View>
+        <View style={{ flex: 1 }}>
+          <Text style={st.logT}>Log food</Text>
+          <Text style={st.logS}>{logged.n ? `${logged.n} logged today · ` : ''}Snap a meal, scan a barcode or a label</Text>
+        </View>
+        <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+      </Pressable>
 
       <Panel title="Today's meals" right={plan.food === 'picked' || isCoached(profile) ? 'From your foods' : 'Tap to swap'} bodyStyle={{ paddingVertical: 2 }}>
         {meals.map((m, k) => {
@@ -145,6 +158,10 @@ const st = StyleSheet.create({
   outO: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink, marginTop: 4 },
   outM: { fontFamily: F.medium, fontSize: 13, color: C.ink, marginTop: 6 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 18 },
+  log: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 22, backgroundColor: C.navy },
+  logIco: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
+  logT: { fontFamily: F.xbold, fontSize: 17, color: '#fff' },
+  logS: { fontFamily: F.medium, fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 1 },
   rowI: { width: 40, height: 40, borderRadius: 12, backgroundColor: C.redTint, alignItems: 'center', justifyContent: 'center' },
   rowT: { fontFamily: F.bold, fontSize: 16, color: C.ink },
   rowS: { fontFamily: F.medium, fontSize: 13, color: C.ink },

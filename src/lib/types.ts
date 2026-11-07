@@ -23,6 +23,9 @@ export type Plan = {
   before?: number;
   after?: number;
   audit?: { product: string; cost: number; verdict: string; why: string; instead?: string }[];
+  stack_short?: string;
+  start?: string;
+  end?: string;
   stack?: { product: string; why: string; dose: string; when: string; cost: string; buy?: string; buy_text?: string }[];
   meals?: { slot: string; target: string; options: { name: string; detail: string; kcal: string; protein: string; ids?: string[] }[] }[];
   meal_note?: string;
@@ -41,6 +44,8 @@ export type Plan = {
     c?: Record<string, string> };
   /** Weeks whose check-in already re-set the numbers (The Full Stack: 4 and 8). */
   resets?: number[];
+  /** Weekly calorie check history (adaptive calories). */
+  adapt?: { at: string; from: number; to: number }[];
   /** 'picked': meals were built from the foods they chose in the quiz. */
   food?: 'picked';
 };

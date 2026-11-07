@@ -10,13 +10,14 @@ import { BackIcon } from '../src/components/icons';
 import { twoTone } from '../src/components/TwoTone';
 import { WHATSAPP } from '../src/components/NoPlan';
 import { track } from '../src/lib/track';
-import { ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
+import { AI_CONSENT_KEY as CONSENT, AI_CONSENT_TEXT, ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
+import * as ImagePicker from 'expo-image-picker';
+import { prepImage } from '../src/lib/scan';
 import { isCoached, isFree } from '../src/lib/access';
 import { showCoaching } from '../src/components/Coach';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PRIVACY_URL } from '../src/lib/access';
 
-const CONSENT = 'sps:aiConsent:v1';
 
 const FACE = require('../assets/logo-b.png');
 
@@ -39,6 +40,17 @@ export default function Ask() {
   const [thinking, setThinking] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
   const [blocked, setBlocked] = useState<null | 'limit' | 'not_live'>(null);
+  const [photo, setPhoto] = useState<string | null>(null);
+  const attach = async () => {
+    const res = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7 });
+    if (!res.canceled && res.assets[0]) { setPhoto(res.assets[0].uri); track('ask_photo_attach'); }
+  };
+  const snap = async () => {
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) return attach();
+    const res = await ImagePicker.launchCameraAsync({ quality: 0.7 });
+    if (!res.canceled && res.assets[0]) { setPhoto(res.assets[0].uri); track('ask_photo_attach'); }
+  };
   const scroll = useRef<any>(null);
   // Apple 5.1.2(i): say plainly what goes to the AI provider and get a yes before the first question.
   const [consent, setConsent] = useState<boolean | null>(null);
@@ -59,16 +71,19 @@ export default function Ask() {
 
   const send = async (raw?: string) => {
     const question = (raw ?? text).trim();
-    if (!question || thinking || blocked) return;
+    const pic = raw ? null : photo;
+    if ((!question && !pic) || thinking || blocked) return;
     if (!consent) { setText(question); return; }
-    setText('');
-    setMsgs((m) => [...m, { id: 'u' + Date.now(), role: 'user', content: question }]);
+    setText(''); setPhoto(null);
+    setMsgs((m) => [...m, { id: 'u' + Date.now(), role: 'user', content: question || 'What do you think of this?', photo: pic || undefined } as any]);
     setThinking(true);
-    track('ask_sent');
-    const r = await ask(question, viewAs ? { plan, tier } : undefined);
+    track('ask_sent', { photo: !!pic });
+    const img = pic ? await prepImage(pic) : null;
+    const r = await ask(question || 'What do you think of this?', viewAs ? { plan, tier } : undefined, img || undefined);
     setThinking(false);
     if (r.ok) {
-      setMsgs((m) => [...m, { id: 'a' + Date.now(), role: 'assistant', content: r.answer }]);
+      setMsgs((m) => [...m, { id: 'a' + Date.now(), role: 'assistant', content: r.answer },
+        ...(pic && !r.sawImage ? [{ id: 'n' + Date.now(), role: 'assistant' as const, content: 'Heads up: photo questions switch on with the next update, so I only saw your text this time.' }] : [])]);
       if (r.left !== null) { setLeft(r.left); if (r.left === 0) setBlocked('limit'); }
       return;
     }
@@ -100,7 +115,7 @@ export default function Ask() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scroll} contentContainerStyle={st.list} keyboardShouldPersistTaps="handled">
           <Bubble role="assistant" content={`Hey${name ? ' ' + name : ''}. Ask me anything about your plan, food, training or a supplement you saw online. I know your numbers, so I'll answer for you, not for everyone.`} />
-          {msgs.map((m) => <Bubble key={m.id} role={m.role} content={m.content} />)}
+          {msgs.map((m) => <Bubble key={m.id} role={m.role} content={m.content} photo={(m as any).photo} />)}
           {thinking && <Typing />}
 
           {blocked === 'limit' && (
@@ -124,7 +139,7 @@ export default function Ask() {
         {consent === false && (
           <View style={st.consent} accessibilityLiveRegion="polite">
             <Text style={st.consentT}>Before you ask</Text>
-            <Text style={st.consentB}>Stack is an AI. To answer, it sends your question and the parts of your plan it needs (like your goal, calories and foods) to Anthropic, the company that makes the AI. It never gets your photos or payment details.</Text>
+            <Text style={st.consentB}>{AI_CONSENT_TEXT}</Text>
             <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
               <Pressable accessibilityRole="button" onPress={agree} style={st.consentBtn}><Text style={st.consentBtnT}>OK, turn on Stack</Text></Pressable>
               <Text accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} style={st.consentLink}>Privacy policy</Text>
@@ -144,12 +159,24 @@ export default function Ask() {
               ))}
             </ScrollView>
           )}
+          {!!photo && (
+            <View style={st.attached}>
+              <Image source={{ uri: photo }} style={st.attachedImg} />
+              <Text style={st.attachedT}>Photo attached. Ask anything about it, or just send.</Text>
+              <Pressable accessibilityRole="button" accessibilityLabel="Remove photo" onPress={() => setPhoto(null)} hitSlop={8} style={st.attachedX}>
+                <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M6 6l12 12M18 6L6 18" stroke={C.ink} strokeWidth={3} strokeLinecap="round" /></Svg>
+              </Pressable>
+            </View>
+          )}
           <View style={st.inputRow}>
-            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : 'Ask about food, training, supplements'} placeholderTextColor={C.muted}
+            <Pressable accessibilityRole="button" accessibilityLabel="Add a photo" onPress={Platform.OS === 'web' ? attach : snap} onLongPress={attach} disabled={!!blocked} hitSlop={4} style={[st.cam, !!blocked && { opacity: 0.4 }]}>
+              <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke={C.ink} strokeWidth={2} fill="none" strokeLinejoin="round" /><Path d="M12 10.5a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" stroke={C.ink} strokeWidth={2} fill="none" /></Svg>
+            </Pressable>
+            <TextInput value={text} onChangeText={setText} placeholder={blocked ? 'Back tomorrow' : photo ? 'Ask about this photo' : 'Ask, or snap a meal, label or menu'} placeholderTextColor={C.muted}
               style={st.input} multiline maxLength={1500} editable={!blocked} onSubmitEditing={() => send()} blurOnSubmit={false}
               accessibilityLabel="Your question" />
-            <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => send()} disabled={!text.trim() || thinking || !!blocked}
-              style={[st.send, (!text.trim() || thinking || !!blocked) && { opacity: 0.4 }]}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Send" onPress={() => send()} disabled={(!text.trim() && !photo) || thinking || !!blocked}
+              style={[st.send, ((!text.trim() && !photo) || thinking || !!blocked) && { opacity: 0.4 }]}>
               <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M12 19V5M6 11l6-6 6 6" stroke="#fff" strokeWidth={2.6} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
             </Pressable>
           </View>
@@ -172,12 +199,15 @@ function Rich({ text, style }: { text: string; style: any }) {
   );
 }
 
-function Bubble({ role, content }: { role: 'user' | 'assistant'; content: string }) {
+function Bubble({ role, content, photo }: { role: 'user' | 'assistant'; content: string; photo?: string }) {
   const me = role === 'user';
+  const saved = content.startsWith('[Photo] ');
   return (
     <View style={[st.row, me && { justifyContent: 'flex-end' }]}>
       <View style={[st.bubble, me ? st.me : st.ai]}>
-        <Rich text={content} style={[st.msg, me && { color: '#ffffff' }]} />
+        {!!photo && <Image source={{ uri: photo }} style={st.msgImg} accessibilityLabel="Your photo" />}
+        {saved && !photo && <Text style={st.photoTag}>PHOTO</Text>}
+        <Rich text={saved ? content.slice(8) : content} style={[st.msg, me && { color: '#ffffff' }]} />
       </View>
     </View>
   );
@@ -237,4 +267,11 @@ const st = StyleSheet.create({
   input: { flex: 1, minHeight: 42, maxHeight: 120, color: C.ink, fontFamily: F.medium, fontSize: 15, paddingHorizontal: 14, paddingTop: 11, paddingBottom: 11, outlineWidth: 0 } as any,
   send: { width: 42, height: 42, borderRadius: 21, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
   fine: { fontFamily: F.medium, fontSize: 11, color: C.muted, textAlign: 'center', marginTop: 6 },
+  cam: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: C.bg, borderWidth: 1, borderColor: C.line },
+  attached: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 8, marginBottom: 8, borderRadius: 16, backgroundColor: C.card, borderWidth: 1, borderColor: C.line },
+  attachedImg: { width: 44, height: 44, borderRadius: 10 },
+  attachedT: { flex: 1, fontFamily: F.semi, fontSize: 13, color: C.ink },
+  attachedX: { width: 28, height: 28, borderRadius: 14, backgroundColor: '#e8eaf0', alignItems: 'center', justifyContent: 'center' },
+  msgImg: { width: 200, height: 200, borderRadius: 12, marginBottom: 8 },
+  photoTag: { fontFamily: F.bold, fontSize: 10, letterSpacing: 1, color: 'rgba(255,255,255,0.7)', marginBottom: 4 },
 });

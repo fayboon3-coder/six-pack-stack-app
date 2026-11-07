@@ -5,6 +5,7 @@ import type { Plan } from './types';
 import { isoDate } from './logs';
 import { supabase } from './supabase';
 import { isPreviewing } from './preview';
+import { health } from './health';
 
 /** One day's numbers. Steps can come from the phone; protein is logged with quick adds. */
 export type Day = { steps: number; stepsManual?: boolean; protein: number; adds: number[] };
@@ -69,6 +70,13 @@ export async function phoneStepsAvailable() {
   try { return await Pedometer.isAvailableAsync(); } catch { return false; }
 }
 export async function syncPhoneSteps(d: Date = new Date()) {
+  // Apple Health connected: its count includes the watch, so it wins over the phone's own.
+  const hs = await health.steps(d).catch(() => null);
+  if (hs != null) {
+    const id = isoDate(d); const v = await readDay(id);
+    if (!v.stepsManual || hs > v.steps) await writeDay(id, { ...v, steps: hs, stepsManual: false });
+    return hs;
+  }
   if (!(await phoneStepsAvailable())) return null;
   try {
     const p = await Pedometer.getPermissionsAsync();

@@ -8,9 +8,14 @@ const EVENING_ID = 'sps:checkin-evening';
 const DONE_KEY = 'sps:checkin-done'; // the Sunday (YYYY-MM-DD) of the last week they checked in
 const ASKED_KEY = 'sps:remind-asked';
 
-/** on = workout-day reminders. checkin = Sunday check-in reminders (9am, plus 6pm if not done). */
-export type ReminderPrefs = { on: boolean; hour: number; minute: number; checkin: boolean };
-export const DEFAULT_PREFS: ReminderPrefs = { on: false, hour: 17, minute: 30, checkin: true };
+/**
+ * on = workout-day reminders. checkin = Sunday check-in reminders (9am, plus 6pm if not done).
+ * weigh = morning weigh-in (feeds the trend weight). protein = evening protein check (skipped once the goal is hit).
+ */
+export type ReminderPrefs = { on: boolean; hour: number; minute: number; checkin: boolean; weigh?: boolean; weighHour?: number; protein?: boolean; proteinHour?: number };
+export const DEFAULT_PREFS: ReminderPrefs = { on: false, hour: 17, minute: 30, checkin: true, weigh: false, weighHour: 7, protein: false, proteinHour: 19 };
+const PROTEIN_ID = (d: string) => 'sps:protein:' + d;
+const PROTEIN_HIT = 'sps:protein-hit';
 
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
@@ -80,6 +85,13 @@ export async function applyReminders(plan: Plan | null, prefs: ReminderPrefs, op
       });
     }
   }
+  if (prefs.weigh) {
+    await Notifications.scheduleNotificationAsync({
+      content: { title: 'Weigh-in', body: 'Before breakfast, after the bathroom. One number, and your trend does the rest.' },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DAILY, hour: prefs.weighHour ?? 7, minute: 0 },
+    });
+  }
+  if (prefs.protein) await scheduleProtein(plan, prefs.proteinHour ?? 19);
   if (prefs.checkin) {
     await Notifications.scheduleNotificationAsync({
       content: { title: 'Sunday check-in', body: opts.free ? '2 minutes: log your weight and your week, and watch your trend move.' : '2 minutes: your numbers and your week. I review it within 24 hours.' },
@@ -87,6 +99,33 @@ export async function applyReminders(plan: Plan | null, prefs: ReminderPrefs, op
     });
     await scheduleEvening(!!opts.free);
   }
+}
+
+const isoDay = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+/** Evening protein check for the next 7 days, minus any day they've already hit it. */
+async function scheduleProtein(plan: Plan, hour: number) {
+  const goal = Number(String(plan.protein).replace(/[^\d.]/g, '')) || 150;
+  const hitOn = await AsyncStorage.getItem(PROTEIN_HIT);
+  const now = new Date();
+  for (let k = 0; k < 7; k++) {
+    const d = new Date(now); d.setDate(now.getDate() + k); d.setHours(hour, 0, 0, 0);
+    if (d <= now || isoDay(d) === hitOn) continue;
+    await Notifications.scheduleNotificationAsync({
+      identifier: PROTEIN_ID(isoDay(d)),
+      content: { title: 'Protein check', body: `${goal} g today. Where are you at? Log it in 2 taps, or grab a shake to close the gap.` },
+      trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: d },
+    });
+  }
+}
+
+/** Call whenever protein changes: once today's goal is hit, tonight's reminder is cancelled. */
+export async function afterProtein(total: number, goal: number) {
+  if (Platform.OS === 'web' || total < goal) return;
+  const today = isoDay(new Date());
+  if ((await AsyncStorage.getItem(PROTEIN_HIT)) === today) return;
+  await AsyncStorage.setItem(PROTEIN_HIT, today);
+  await Notifications.cancelScheduledNotificationAsync(PROTEIN_ID(today)).catch(() => {});
 }
 
 /** Call after a check-in is saved: no 6pm nudge this week, next week's is set. */
