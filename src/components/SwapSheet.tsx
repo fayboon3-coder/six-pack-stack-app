@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import Thumb from '../components/Thumb';
 import { Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { C, F } from '../lib/theme';
@@ -56,7 +57,7 @@ export default function SwapSheet({ cfg, day, ex, onPick, onReset, onClose }: {
             return (
               <View key={id} style={st.opt}>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Watch form video for ${e.name}`} onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${e.video}`)}>
-                  <Image source={thumb(e.video)} style={st.thumb} resizeMode="cover" accessibilityIgnoresInvertColors />
+                  <Thumb video={e.video} style={st.thumb} />
                   <View style={st.play}><PlayIcon size={12} /></View>
                 </Pressable>
                 <View style={{ flex: 1, minWidth: 0, gap: 3 }}>

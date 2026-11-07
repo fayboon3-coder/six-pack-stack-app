@@ -1,4 +1,5 @@
 import React from 'react';
+import Thumb from './Thumb';
 import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { C, F } from '../lib/theme';
@@ -23,7 +24,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
     <Pressable accessibilityRole="button" accessibilityLabel={`${cta}: ${w.type}, ${w.items.length} exercises`}
       onPress={onPress} style={({ pressed }) => [st.card, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       <View style={{ width: cw, height: ih }}>
-        {!!coverItem?.video && <Image source={thumb(coverItem.video, 'hq')} style={{ width: cw, height: ih }} resizeMode="cover" accessibilityIgnoresInvertColors />}
+        {!!coverItem?.video && <Thumb video={coverItem.video} q="hq" style={{ width: cw, height: ih }} />}
         <LinearGradient colors={['rgba(245,246,249,0)', 'rgba(245,246,249,0.15)', 'rgba(245,246,249,0.92)', C.card]} locations={[0, 0.45, 0.8, 1]}
           style={{ position: 'absolute', left: 0, top: 0, width: cw, height: ih }} />
         <View style={[st.badge, done && { backgroundColor: C.green }]}><Text style={st.badgeText}>{badge}</Text></View>
@@ -46,7 +47,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
           {shown.map((x, k) => (
             <View key={k} style={[st.row, k > 0 && st.rowLine]}>
               <View style={st.thumbWrap}>
-                {!!x.video && <Image source={thumb(x.video, 'mq')} style={st.thumb} resizeMode="cover" accessibilityIgnoresInvertColors />}
+                {!!x.video && <Thumb video={x.video} style={st.thumb} />}
                 <View style={st.num}><Text style={st.numText}>{k + 1}</Text></View>
               </View>
               <View style={{ flex: 1, minWidth: 0, gap: 3 }}>

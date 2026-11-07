@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Thumb from '../components/Thumb';
 import { Animated, Image, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { F } from '../lib/theme';
 import { thumb } from '../lib/workoutMeta';
@@ -57,7 +58,7 @@ export default function FormVideo({ id, name, target, cues, height = 210 }: Prop
             : null
       ) : (
         <Pressable accessibilityRole="button" accessibilityLabel={`Play the form video for ${name}`} onPress={play} disabled={!id} style={StyleSheet.absoluteFill}>
-          {!!id && <Image source={thumb(id, 'hq')} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityIgnoresInvertColors />}
+          {!!id && <Thumb video={id} q="hq" style={StyleSheet.absoluteFill as any} />}
           <View style={st.shade} />
           <View style={st.play}><PlayIcon color="#fff" size={26} /></View>
           <View style={st.coverText}>

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import Thumb from '../src/components/Thumb';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -161,7 +162,7 @@ export default function Training() {
                 const swapped = !own && isSwapped(cfg, di, xi);
                 return (
                   <View key={id} style={st.ex}>
-                    <Image source={thumb(e?.video)} style={st.thumb} resizeMode="cover" accessibilityIgnoresInvertColors />
+                    <Thumb video={e?.video} style={st.thumb} />
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <Text style={st.exN} numberOfLines={2}>{e?.name || cfg.extras.find((x) => x.id === id)?.name || id}</Text>
                       <Text style={st.exT}>{target}{swapped ? ' · swapped' : own ? ' · your move' : ''}</Text>
