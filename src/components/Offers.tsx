@@ -31,9 +31,9 @@ const trialAdj = (t: string) => t.replace(/^(\d+) (\w+?)s?$/, '$1-$2');
  * full-page offer after the plan: plan choice, real prices, and the buy/restore actions.
  * iPhone: Apple's purchase sheet. Web: RevenueCat's secure checkout.
  */
-export function useSubscribe(source: string) {
+export function useSubscribe(source: string, initial: PlanId = 'yearly') {
   const { refresh, session } = useAuth();
-  const [plan, setPlan] = useState<PlanId>('yearly');
+  const [plan, setPlan] = useState<PlanId>(initial);
   const [offers, setOffers] = useState<Record<PlanId, Offer> | null>(null);
   const [busy, setBusy] = useState<'' | 'buy' | 'restore'>('');
   const [msg, setMsg] = useState('');
@@ -53,7 +53,7 @@ export function useSubscribe(source: string) {
     if (web && session) {
       track('purchase_tap', { plan, source, where, platform: 'web' });
       setBusy('buy');
-      const url = webCheckoutUrl(session.user.id, session.user.email);
+      const url = webCheckoutUrl(session.user.id, session.user.email, plan);
       if (typeof window !== 'undefined') window.location.href = url; else Linking.openURL(url);
       return;
     }
@@ -80,7 +80,7 @@ export function useSubscribe(source: string) {
     : trial(plan) ? `Start my ${trialAdj(trial(plan))} free trial` : plan === 'yearly' ? 'Start yearly' : 'Start monthly';
   const terms = trial(plan) ? `Free for ${trial(plan)}, then ${price(plan)} ${per(plan)}.` : `${price(plan)} ${per(plan)}.`;
   const legal = web
-    ? `${terms} Pick the same plan on the next screen. Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time before the trial ends and you pay nothing, from the link in your receipt email.`
+    ? `${terms} Secure checkout by card, Apple Pay or Google Pay. Your subscription renews automatically until you cancel. Cancel any time before the trial ends and you pay nothing, from the link in your receipt email.`
     : `${terms} Payment is charged to your Apple ID. Your subscription renews automatically unless you cancel at least 24 hours before the end of the current period. Manage or cancel any time in your App Store settings.`;
   return { plan, setPlan, price, trial, today, start, doRestore, busy, msg, can, label, live, web, legal };
 }

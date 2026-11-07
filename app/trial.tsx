@@ -76,8 +76,8 @@ function PlanPicker({ plan, setPlan, price, trial }: { plan: PlanId; setPlan: (p
   };
   return (
     <View style={{ flexDirection: 'row', gap: 10, alignSelf: 'stretch' }}>
-      <Opt id="yearly" title="Yearly" per="/yr" note="Just $1.90 a week" />
       <Opt id="monthly" title="Monthly" per="/mo" note="Cancel anytime" />
+      <Opt id="yearly" title="Yearly" per="/yr" note="Just $1.90 a week" />
     </View>
   );
 }
@@ -101,10 +101,16 @@ export default function TrialOffer() {
   const { width } = useWindowDimensions();
   const wide = width >= 820;
   const { plan, profile } = useAuth();
-  const sub = useSubscribe('after_plan');
+  const sub = useSubscribe('after_plan', 'monthly');
   const { plan: pick, setPlan, price, trial, today, start, doRestore, busy, msg, can, label, live, legal } = sub;
   const t = trial(pick);
   const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+  /** "7 days" / "2 weeks" from today, as "November 21". */
+  const endDate = (tr: string) => {
+    const n = parseInt(tr, 10) || 0; const d = new Date();
+    d.setDate(d.getDate() + (/week/.test(tr) ? n * 7 : /month/.test(tr) ? n * 30 : n));
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  };
 
   const depth = useRef(0);
   const skip = () => { track('trial_offer_skip', { depth: depth.current }); router.replace('/'); };
@@ -152,8 +158,15 @@ export default function TrialOffer() {
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 56 }]}>
             <Rise style={[{ alignItems: wide ? 'flex-start' : 'center', gap: 16 }, wide && { flex: 1.1 }]}>
               <View style={s.pill}><View style={s.pillDot} /><Text style={s.pillText}>{name ? `${name}, your plan is ready` : 'Your plan is ready'}</Text></View>
-              <Text style={[s.h1, !wide && { textAlign: 'center' }]}>Unlock all 12 weeks.{'\n'}<Text style={{ color: L.red }}>{t ? '$0 today.' : 'Start today.'}</Text></Text>
-              <Text style={[s.lede, !wide && { textAlign: 'center' }]}>Weeks 1–2 build the habits. Weeks 3–12 are where your body changes: heavier training, calorie re-sets, and the photos start to look different.</Text>
+              <Text style={[s.zero, !wide && { textAlign: 'center' }]}>{t ? '$0 today.' : `${price(pick)} today.`}</Text>
+              <Text style={[s.h1sub, !wide && { textAlign: 'center' }]}>Unlock all 12 weeks of your plan.</Text>
+              <View style={s.receipt}>
+                <View style={s.rRow}><Text style={s.rK}>Due today</Text><Text style={s.rToday}>{t ? '$0.00' : price(pick)}</Text></View>
+                <View style={s.rLine} />
+                <View style={s.rRow}><Text style={s.rK}>{t ? `After your ${t} free` : 'Then'}</Text><Text style={s.rV}>{price(pick)}<Text style={s.rPer}>{pick === 'yearly' ? '/yr' : '/mo'}</Text></Text></View>
+                {!!t && <View style={s.rRow}><Text style={s.rK}>Cancel before</Text><Text style={s.rV}>{endDate(t)}</Text></View>}
+                <Text style={s.rNote}>{t ? "Cancel any time before then and you pay nothing. I'll email you a reminder 2 days before." : 'Cancel anytime.'}</Text>
+              </View>
               <PlanPicker plan={pick} setPlan={setPlan} price={price} trial={trial} />
               <View style={{ alignSelf: 'stretch', gap: 8 }}>
                 <Cta big where="hero" />
@@ -243,7 +256,7 @@ export default function TrialOffer() {
         {/* PRICE RECAP */}
         <View style={s.wrap}>
           <LinearGradient colors={['#1d2a4d', L.navy]} style={s.recap}>
-            <Text style={[s.h2, { color: '#fff', textAlign: 'center' }]}>Less than one tub of <Text style={{ color: '#ff7a70' }}>pre-workout</Text> a month.</Text>
+            <Text style={[s.h2, { color: '#fff', textAlign: 'center' }]}>{t ? <><Text style={{ color: '#ff7a70' }}>$0 today.</Text> Then less than a tub of pre-workout.</> : <>Less than one tub of <Text style={{ color: '#ff7a70' }}>pre-workout</Text> a month.</>}</Text>
             <Text style={[s.body, { color: 'rgba(255,255,255,0.8)', textAlign: 'center' }]}>
               {t ? `${cap(t)} free, then ${price(pick)} ${pick === 'yearly' ? "a year. That's $1.90 a week." : 'a month. Cancel anytime.'}` : `${price(pick)} ${pick === 'yearly' ? 'a year' : 'a month'}. Cancel anytime.`}
             </Text>
@@ -286,8 +299,8 @@ export default function TrialOffer() {
       <View style={[s.sticky, { paddingBottom: 12 + insets.bottom }]}>
         <View style={[s.wrap, { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 0 }]}>
           <View style={{ flex: 1 }}>
-            <Text style={s.stickyT}>{t ? `${cap(t)} free` : `${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}`}</Text>
-            <Text style={s.stickyS}>{t ? `then ${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}. Cancel anytime.` : 'Cancel anytime'}</Text>
+            <Text style={s.stickyT}>{t ? <><Text style={{ color: L.red }}>$0</Text> today</> : `${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}`}</Text>
+            <Text style={s.stickyS}>{t ? `${cap(t)} free, then ${price(pick)}${pick === 'yearly' ? '/yr' : '/mo'}` : 'Cancel anytime'}</Text>
           </View>
           <Pressable accessibilityRole="button" onPress={() => start('sticky')} disabled={!can || !!busy}
             style={[s.stickyBtn, (!can || !!busy) && { opacity: 0.55 }]}>
@@ -306,6 +319,16 @@ const s = StyleSheet.create({
   pillDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: L.green },
   pillText: { fontFamily: F.bold, fontSize: 13, color: L.ink },
   h1: { fontFamily: F.black, fontSize: 40, lineHeight: 44, letterSpacing: -1.2, color: L.ink },
+  zero: { fontFamily: F.black, fontSize: 64, lineHeight: 66, letterSpacing: -2.5, color: L.red },
+  h1sub: { fontFamily: F.black, fontSize: 24, lineHeight: 29, letterSpacing: -0.5, color: L.ink, marginTop: -8 },
+  receipt: { alignSelf: 'stretch', backgroundColor: L.white, borderRadius: 18, borderWidth: 1.5, borderColor: L.line, borderStyle: 'dashed', padding: 16, gap: 10 },
+  rRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 },
+  rK: { fontFamily: F.semi, fontSize: 15, color: L.body },
+  rToday: { fontFamily: F.black, fontSize: 26, color: L.green },
+  rV: { fontFamily: F.black, fontSize: 17, color: L.ink },
+  rPer: { fontFamily: F.bold, fontSize: 13, color: L.muted },
+  rLine: { height: 1, backgroundColor: L.line },
+  rNote: { fontFamily: F.medium, fontSize: 12.5, lineHeight: 18, color: L.muted },
   h2: { fontFamily: F.black, fontSize: 28, lineHeight: 33, letterSpacing: -0.6, color: L.ink },
   lede: { fontFamily: F.medium, fontSize: 16, lineHeight: 24, color: L.body, maxWidth: 520 },
   body: { fontFamily: F.medium, fontSize: 16, lineHeight: 25, color: L.body },

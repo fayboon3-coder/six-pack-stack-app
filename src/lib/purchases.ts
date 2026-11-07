@@ -32,9 +32,13 @@ export const purchasesEnabled = () => !!KEY;
  */
 const WEB_CHECKOUT = 'https://pay.rev.cat/utmodkowwofcuown/';
 export const webCheckoutEnabled = () => Platform.OS === 'web';
-export function webCheckoutUrl(userId: string, email?: string | null) {
-  const q = email ? `?email=${encodeURIComponent(email)}` : '';
-  return `${WEB_CHECKOUT}${encodeURIComponent(userId)}${q}`;
+/** plan: goes straight to that plan's checkout (RevenueCat package_id), skipping the plan list. */
+export function webCheckoutUrl(userId: string, email?: string | null, plan?: 'yearly' | 'monthly') {
+  const q = new URLSearchParams();
+  if (email) q.set('email', email);
+  if (plan) q.set('package_id', plan === 'yearly' ? '$rc_annual' : '$rc_monthly');
+  const qs = q.toString();
+  return `${WEB_CHECKOUT}${encodeURIComponent(userId)}${qs ? `?${qs}` : ''}`;
 }
 export const PURCHASED_FLAG = 'purchased';
 
