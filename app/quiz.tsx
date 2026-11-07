@@ -7,7 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
-import { GOALS, projection, Quiz, savePendingQuiz } from '../src/lib/quiz';
+import { GOALS, projection, Quiz, savePendingQuiz, targets } from '../src/lib/quiz';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SPOTS } from '../src/lib/menu';
 import FoodPicker from '../src/components/FoodPicker';
 import { whatsMissing } from '../src/lib/mealplan';
@@ -198,9 +199,9 @@ export default function QuizScreen() {
       <Options opts={COACH_OPTS} value={a.ready_to_invest} onPick={(v) => set('ready_to_invest', v)} check /></>;
     cta = <Cta title="Build my plan" onPress={() => (a.ready_to_invest ? next() : setErr('Pick one to continue.'))} />;
   } else if (step === 'account') {
-    return <CreateAccount onEmail={() => go('email')} onBack={back} />;
+    return <SaveYourPlan a={a} set={set} onBack={back} onDone={() => { track('quiz_done', { foods: (a.foods || []).length }); router.replace('/ready'); }} />;
   } else if (step === 'email') {
-    return <EmailSignup a={a} set={set} onBack={() => go('account')} onDone={() => { track('quiz_done', { foods: (a.foods || []).length }); router.replace('/ready'); }} />;
+    return <SaveYourPlan a={a} set={set} onBack={back} onDone={() => { track('quiz_done', { foods: (a.foods || []).length }); router.replace('/ready'); }} />;
   }
 
   return (
@@ -539,6 +540,173 @@ function EmailSignup({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v: 
     </SafeAreaView>
   );
 }
+
+/**
+ * One screen after the plan is built: their real numbers up top, then a password to save it.
+ * Name and email are usually known already (Stack Score or the email screen), so it's often just one field.
+ */
+function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v: any) => void; onBack: () => void; onDone: () => void }) {
+  const [password, setPassword] = useState('');
+  const [show, setShow] = useState(false);
+  const [savePw, setSavePw] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [note, setNote] = useState('');
+  const known = useRef(a.first_name.trim().length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.email.trim())).current;
+  const [editing, setEditing] = useState(!known);
+  const { profile } = useAuth();
+  const router = useRouter();
+  const t = targets(a);
+  const p = projection(a);
+  const days = parseInt(a.days, 10) || 4;
+  const name = a.first_name.trim().split(' ')[0];
+  const line = p.build ? `12 weeks of training built to add muscle` : p.w > p.g ? `On pace for ${p.at12} lbs by ${p.end12}` : `12 weeks built to lean out and show your abs`;
+  useEffect(() => { track('account_view', { known }, { once: true }); }, []);
+  const oauth = async (provider: 'apple' | 'google') => {
+    setNote('');
+    const redirectTo = Platform.OS === 'web' ? `${window.location.origin}/app/` : Linking.createURL('/');
+    const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
+    if (error) setNote(`${provider === 'apple' ? 'Apple' : 'Google'} sign-in isn't switched on yet. Use a password for now.`);
+  };
+  const submit = async () => {
+    setErr(''); setNote('');
+    if (profile?.role === 'coach') return router.replace('/');
+    const email = a.email.trim().toLowerCase();
+    if (a.first_name.trim().length < 2) { setEditing(true); return setErr('Add your first name.'); }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEditing(true); return setErr('Enter a valid email.'); }
+    if (password.length < 8) return setErr('Use at least 8 characters for your password.');
+    setBusy(true);
+    const q: Q2 = { ...a, email, first_name: a.first_name.trim(), done_at: new Date().toISOString() };
+    await savePendingQuiz(q);
+    AsyncStorage.setItem('sps:save-password', savePw ? '1' : '0').catch(() => {});
+    const res = await supabase.auth.signUp({ email, password, options: { data: { first_name: q.first_name } } });
+    if (res.error) {
+      setBusy(false);
+      const m = res.error.message.toLowerCase();
+      if (m.includes('already')) return setErr('You already have an account with this email. Log in instead.');
+      return setErr(res.error.message);
+    }
+    kitTag(email, q.first_name, ['app-quiz-done', 'app-free', 'src-app'], {
+      quiz_goal: q.goal, quiz_budget: q.ready_to_invest, quiz_where_train: q.where_train, app_tier: 'free', current_weight: q.weight, lead_source: q.src ? `app:${q.src}` : 'app',
+    });
+    setBusy(false);
+    if (!res.data.session) return setNote('Check your email to confirm your account, then log in. Your plan will be waiting.');
+    onDone();
+  };
+  return (
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={{ paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
+          <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={sp.hero}>
+            <SafeAreaView edges={['top']}>
+              <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={onBack} hitSlop={10} style={sp.back}>
+                <Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M15 5l-7 7 7 7" stroke="#fff" strokeWidth={2.6} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+              </Pressable>
+              <View style={sp.pill}><View style={sp.dot} /><Text style={sp.pillT}>YOUR PLAN IS READY</Text></View>
+              <Text style={sp.h}>{name ? `${name}, your 12-week plan is built.` : 'Your 12-week plan is built.'}</Text>
+              <Text style={sp.line}>{line}</Text>
+              <View style={sp.stats}>
+                <View style={sp.stat}><Text style={sp.statV}>{t.kcal.toLocaleString('en-US')}</Text><Text style={sp.statL}>CALORIES</Text></View>
+                <View style={sp.stat}><Text style={sp.statV}>{t.protein}g</Text><Text style={sp.statL}>PROTEIN</Text></View>
+                <View style={sp.stat}><Text style={sp.statV}>{days}x</Text><Text style={sp.statL}>WORKOUTS</Text></View>
+              </View>
+            </SafeAreaView>
+          </LinearGradient>
+
+          <View style={sp.sheet}>
+            <Text style={sp.title}>Create a password to save it</Text>
+            <Text style={sp.sub}>Your first 2 weeks are free. No card needed.</Text>
+
+            {OAUTH && (
+              <View style={{ gap: 10 }}>
+                <Pressable accessibilityRole="button" onPress={() => oauth('apple')} style={[sp.social, { backgroundColor: '#000' }]}><Text style={[sp.socialT, { color: '#fff' }]}> Continue with Apple</Text></Pressable>
+                <Pressable accessibilityRole="button" onPress={() => oauth('google')} style={sp.social}><Text style={sp.socialT}>Continue with Google</Text></Pressable>
+                <View style={st.or}><View style={st.orLine} /><Text style={st.orT}>or</Text><View style={st.orLine} /></View>
+              </View>
+            )}
+
+            {editing ? (
+              <>
+                <TextInput accessibilityLabel="First name" value={a.first_name} onChangeText={(v) => set('first_name', v)} placeholder="First name" placeholderTextColor={C.muted} style={sp.input} autoComplete="given-name" textContentType="givenName" />
+                <TextInput accessibilityLabel="Email" value={a.email} onChangeText={(v) => set('email', v)} placeholder="Email" autoCapitalize="none" keyboardType="email-address" placeholderTextColor={C.muted} style={sp.input} autoComplete="email" textContentType="emailAddress" />
+              </>
+            ) : (
+              <View style={sp.who}>
+                <View style={sp.whoAv}><Text style={sp.whoAvT}>{(name || '?').charAt(0).toUpperCase()}</Text></View>
+                <View style={{ flex: 1, minWidth: 0 }}><Text style={sp.whoN} numberOfLines={1}>{a.first_name}</Text><Text style={sp.whoE} numberOfLines={1}>{a.email}</Text></View>
+                <Pressable accessibilityRole="button" onPress={() => setEditing(true)} hitSlop={8}><Text style={sp.change}>Change</Text></Pressable>
+              </View>
+            )}
+
+            <View style={sp.pwWrap}>
+              <TextInput accessibilityLabel="Password" value={password} onChangeText={setPassword} placeholder="Create a password" secureTextEntry={!show} placeholderTextColor={C.muted}
+                style={[sp.input, { flex: 1, minWidth: 0, borderWidth: 0, borderRadius: 0, backgroundColor: 'transparent', paddingRight: 70 }]} autoComplete={savePw ? 'new-password' : 'off'} textContentType={savePw ? 'newPassword' : 'none'} onSubmitEditing={submit} autoFocus={known && Platform.OS !== 'web'} />
+              <Pressable accessibilityRole="button" accessibilityLabel={show ? 'Hide password' : 'Show password'} onPress={() => setShow(!show)} style={sp.showBtn} hitSlop={8}><Text style={sp.showT}>{show ? 'Hide' : 'Show'}</Text></Pressable>
+            </View>
+            <View style={sp.meter}>
+              <View style={[sp.meterBar, password.length >= 8 && { backgroundColor: C.green, width: '100%' }, password.length > 0 && password.length < 8 && { width: `${(password.length / 8) * 100}%` as any }]} />
+            </View>
+            <Text style={[sp.hint, password.length >= 8 && { color: C.green }]}>{password.length >= 8 ? '✓ Good to go' : '8 or more characters'}</Text>
+
+            <View style={sp.saveRow}>
+              <View style={{ flex: 1 }}><Text style={sp.saveT}>Save password on this phone</Text><Text style={sp.saveS}>Log in with Face ID next time</Text></View>
+              <Switch value={savePw} onValueChange={setSavePw} trackColor={{ true: C.red, false: '#c3c8d4' }} thumbColor="#ffffff" accessibilityLabel="Save password on this phone" />
+            </View>
+            {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
+            {!!note && <Text style={[st.err, { color: C.green }]} accessibilityLiveRegion="polite">{note}</Text>}
+          </View>
+        </ScrollView>
+        <View style={sp.bottom}>
+          <Pressable accessibilityRole="button" onPress={submit} disabled={busy} style={[sp.cta, { opacity: busy ? 0.6 : 1 }]}>
+            <Text style={sp.ctaT}>{busy ? 'Saving your plan…' : 'Save my plan and start  →'}</Text>
+          </Pressable>
+          <Text style={sp.fine}>By continuing you agree to the{' '}
+            <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ textDecorationLine: 'underline' }}>Terms</Text> and{' '}
+            <Text accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_URL)} style={{ textDecorationLine: 'underline' }}>Privacy Policy</Text>.</Text>
+        </View>
+      </KeyboardAvoidingView>
+    </View>
+  );
+}
+
+const sp = StyleSheet.create({
+  hero: { paddingHorizontal: 20, paddingBottom: 46, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  back: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', marginTop: 8, marginBottom: 18 },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: 'rgba(47,209,127,0.14)', borderWidth: 1, borderColor: 'rgba(47,209,127,0.4)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2fd17f' },
+  pillT: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 1.4, color: '#7ff0b5' },
+  h: { fontFamily: F.black, fontSize: 30, lineHeight: 34, color: '#fff', letterSpacing: -0.5, marginTop: 14 },
+  line: { fontFamily: F.semi, fontSize: 15, color: '#c7cde0', marginTop: 8 },
+  stats: { flexDirection: 'row', gap: 10, marginTop: 20 },
+  stat: { flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 16, paddingVertical: 12, alignItems: 'center', gap: 2 },
+  statV: { fontFamily: F.black, fontSize: 22, color: '#fff' },
+  statL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, color: '#9aa3bd' },
+  sheet: { marginTop: -26, marginHorizontal: 12, backgroundColor: '#fff', borderRadius: 24, padding: 18, gap: 12, borderWidth: 1, borderColor: C.line, shadowColor: '#141c33', shadowOpacity: 0.12, shadowRadius: 24, shadowOffset: { width: 0, height: 10 }, elevation: 6 },
+  title: { fontFamily: F.black, fontSize: 22, color: C.ink },
+  sub: { fontFamily: F.medium, fontSize: 14, color: C.muted, marginTop: -6, marginBottom: 2 },
+  social: { height: 54, borderRadius: 27, borderWidth: 1.5, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center' },
+  socialT: { fontFamily: F.bold, fontSize: 17, color: C.ink },
+  input: { height: 56, borderRadius: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line, color: C.ink, fontFamily: F.semi, fontSize: 17, paddingHorizontal: 16, outlineWidth: 0 } as any,
+  who: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.line },
+  whoAv: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.navy, alignItems: 'center', justifyContent: 'center' },
+  whoAvT: { fontFamily: F.black, fontSize: 16, color: '#fff' },
+  whoN: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  whoE: { fontFamily: F.medium, fontSize: 13, color: C.muted },
+  change: { fontFamily: F.bold, fontSize: 14, color: C.red },
+  pwWrap: { flexDirection: 'row', alignItems: 'center', borderRadius: 14, backgroundColor: C.card, borderWidth: 1.5, borderColor: C.navy, overflow: 'hidden' },
+  showBtn: { position: 'absolute', right: 14, height: 56, justifyContent: 'center' },
+  showT: { fontFamily: F.bold, fontSize: 14, color: C.navy },
+  meter: { height: 4, borderRadius: 2, backgroundColor: '#e8eaf0', overflow: 'hidden', marginTop: -4 },
+  meterBar: { height: 4, width: '0%', backgroundColor: C.red },
+  hint: { fontFamily: F.semi, fontSize: 13, color: C.muted, marginTop: -6 },
+  saveRow: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 4 },
+  saveT: { fontFamily: F.bold, fontSize: 15, color: C.ink },
+  saveS: { fontFamily: F.medium, fontSize: 13, color: C.muted },
+  bottom: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: 18, backgroundColor: C.bg, borderTopWidth: 1, borderTopColor: C.line },
+  cta: { height: 58, borderRadius: 29, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', shadowColor: C.red, shadowOpacity: 0.35, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
+  ctaT: { fontFamily: F.black, fontSize: 18, color: '#fff' },
+  fine: { fontFamily: F.medium, fontSize: 12, lineHeight: 17, color: C.muted, textAlign: 'center', marginTop: 10 },
+});
 
 export const st = StyleSheet.create({
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingTop: 8 },
