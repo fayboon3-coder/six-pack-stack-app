@@ -17,7 +17,6 @@ import { track } from '../src/lib/track';
 
 const L = { bg: '#f3f4f8', ink: '#141c33', body: '#3b4664', muted: '#6d7894', line: '#e3e6ee', red: '#d0362f', redDeep: '#b92d27', green: '#1f9d5f', greenTint: '#e9f7f0' };
 const BOON = require('../assets/hero/boon_avatar.jpg');
-const BOON_BIG = require('../assets/img/pay/boon-red.jpg');
 const PAIRS = [
   [require('../assets/clients/robert-b.jpg'), require('../assets/clients/robert-a.jpg')],
   [require('../assets/clients/gerardo-b.jpg'), require('../assets/clients/gerardo-a.jpg')],
@@ -249,16 +248,6 @@ export default function Coaching() {
             ))}
           </View>
 
-          {/* BOON */}
-          <View style={s.boon}>
-            <Image source={BOON_BIG} style={StyleSheet.absoluteFill} resizeMode="cover" accessibilityLabel="Boon Fay" />
-            <LinearGradient colors={['transparent', 'rgba(20,28,51,0.95)']} locations={[0.35, 1]} style={StyleSheet.absoluteFill} />
-            <View style={s.boonTx}>
-              <Text style={s.kLight}>MEET YOUR COACH</Text>
-              <Text style={s.h2Light}>I did everything wrong first.</Text>
-              <Text style={s.pLight}>At 225 lbs I trained without a plan and bought every supplement with a good ad. I got to 175 once I fixed the basics and cut the junk. Now I coach a small number of guys 1:1 and read every check-in myself.</Text>
-            </View>
-          </View>
           <Pressable accessibilityRole="link" onPress={() => { track('coaching_page_tap'); Linking.openURL(COACHING_URL); }} style={s.ghost}>
             <Text style={s.ghostT}>See the full coaching page  ↗</Text>
           </Pressable>
