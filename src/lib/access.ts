@@ -9,13 +9,13 @@ export const isCoached = (p?: Profile | null) => !!p && p.role === 'client' && p
 export const isSubscriber = (p?: Profile | null) => !!p && p.role === 'client' && p.tier === 'self';
 export const isLocked = (p: Profile | null | undefined, week: number) => isFree(p) && week > FREE_WEEKS;
 
-export const TERMS_URL = 'https://six-pack-stack.vercel.app/terms';
-export const PRIVACY_URL = 'https://six-pack-stack.vercel.app/privacy';
+export const TERMS_URL = 'https://boonfay.com/terms';
+export const PRIVACY_URL = 'https://boonfay.com/privacy';
 /** The free 60-second Stack Score (website lead magnet: Kit report email, then Nurture). */
-export const STACK_SCORE_URL = 'https://six-pack-stack.vercel.app/stack-score?src=app';
-export const BTL_URL = 'https://six-pack-stack.vercel.app/beyond-the-label?src=app';
+export const STACK_SCORE_URL = 'https://boonfay.com/stack-score?src=app';
+export const BTL_URL = 'https://boonfay.com/beyond-the-label?src=app';
 /** Six-Pack Stack 1:1 coaching landing page (its Apply button goes to the same application form). */
-export const COACHING_URL = 'https://six-pack-stack.vercel.app/?src=app';
+export const COACHING_URL = 'https://boonfay.com/?src=app';
 
 /** Who should see coaching first (they told the quiz they're ready now). */
 export function coachingFirst(p?: Profile | null) {
