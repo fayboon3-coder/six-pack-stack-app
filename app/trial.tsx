@@ -145,7 +145,7 @@ export default function TrialOffer() {
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 56 }]}>
             <Rise style={[{ alignItems: wide ? 'flex-start' : 'center', gap: 16 }, wide && { flex: 1.1 }]}>
               <View style={s.pill}><View style={s.pillDot} /><Text style={s.pillText}>{name ? `${name}, your plan is ready` : 'Your plan is ready'}</Text></View>
-              <Text style={[s.h1, !wide && { textAlign: 'center' }]}>Get all 12 weeks.{'\n'}<Text style={{ color: L.red }}>{t ? `Free for ${t}.` : 'Unlock it today.'}</Text></Text>
+              <Text style={[s.h1, !wide && { textAlign: 'center' }]}>Unlock all 12 weeks.{'\n'}<Text style={{ color: L.red }}>{t ? '$0 today.' : 'Start today.'}</Text></Text>
               <Text style={[s.lede, !wide && { textAlign: 'center' }]}>Weeks 1–2 build the habits. Weeks 3–12 are where your body changes: heavier training, calorie re-sets, and the photos start to look different.</Text>
               <PlanPicker plan={pick} setPlan={setPlan} price={price} trial={trial} />
               <View style={{ alignSelf: 'stretch', gap: 8 }}>
