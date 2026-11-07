@@ -100,13 +100,17 @@ export default function QuizScreen() {
   }, [i]);
 
   const set = (k: keyof Q2, v: any) => { setErr(''); setA((x) => ({ ...x, [k]: v })); };
-  const next = () => { setErr(''); setI((x) => Math.min(STEP_IDS.length - 1, x + 1)); };
-  const back = () => { setErr(''); if (i === first) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(i - 1); };
+  // From the Stack Score, how long they've lifted is already known from how they train: don't ask again.
+  const skip = (k: number) => fromScore && STEP_IDS[k] === 'experience' && !!a.experience;
+  const next = () => { setErr(''); setI((x) => { let n = x + 1; if (skip(n)) n++; return Math.min(STEP_IDS.length - 1, n); }); };
+  const back = () => { setErr(''); if (i === first) router.back(); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(skip(i - 1) ? i - 2 : i - 1); };
   const go = (to: StepId) => { setErr(''); setI(STEP_IDS.indexOf(to)); };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
 
-  const n = Math.min(i + 1 - first, ASKED - first);
+  const skipped = skip(STEP_IDS.indexOf('experience')) ? 1 : 0;
+  const total = ASKED - first - skipped;
+  const n = Math.min(i + 1 - first - (skipped && i > STEP_IDS.indexOf('experience') ? 1 : 0), total);
   const showBar = i < ASKED;
   let body: React.ReactNode = null;
   let cta: React.ReactNode = <Cta title="Continue" onPress={next} />;
@@ -204,7 +208,7 @@ export default function QuizScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={st.top}>
           <BackBtn onPress={back} />
-          {showBar && <View style={st.barBg} accessibilityLabel={`Question ${n} of ${ASKED - first}`}><View style={[st.barFg, { width: `${Math.round((n / (ASKED - first)) * 100)}%` }]} /></View>}
+          {showBar && <View style={st.barBg} accessibilityLabel={`Question ${n} of ${total}`}><View style={[st.barFg, { width: `${Math.round((n / total) * 100)}%` }]} /></View>}
         </View>
         <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 22, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
           {body}
