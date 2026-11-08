@@ -31,7 +31,8 @@ import BackOffice from '../../src/components/BackOffice';
 import MealCard from '../../src/components/MealCard';
 import Pic from '../../src/components/Pic';
 import { CountUp, Drift, MotionScroll, Ping, Press, Reveal } from '../../src/components/motion';
-import { DayPlan, DotTrack, GoalPath, MiniRing, Rings, WeekLine } from '../../src/components/charts';
+import { DotTrack, GoalPath, MiniRing, WeekLine } from '../../src/components/charts';
+import { FuelCard } from '../../src/components/Fuel';
 import { plain } from '../../src/lib/program';
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
@@ -167,6 +168,13 @@ export default function Today() {
     if (g) { const d = await addProtein(g); setDay(d); afterProtein(d.protein, pGoal).catch(() => {}); }
     setKcal(await kcalToday(plan));
     track('meal_tick', { where: 'today' });
+  };
+  // After anything is logged from the box: the gauge, protein and stack move right away.
+  const refreshFuel = async () => {
+    if (!plan) return;
+    const [k, d, f] = await Promise.all([kcalToday(plan), readDay(), readFood()]);
+    setKcal(k); setDay(d); setFood(f);
+    afterProtein(d.protein, pGoal).catch(() => {});
   };
   const quickProtein = async () => { const d = await addProtein(25); setDay(d); afterProtein(d.protein, pGoal).catch(() => {}); track('protein_add', { where: 'today', g: 25 }); };
   const openWorkout = () => (locked ? router.push('/unlock') : router.push({ pathname: '/day', params: { d: String(t.index) } }));
@@ -311,35 +319,10 @@ export default function Today() {
         </Reveal>
 
         {/* ---------- Numbers ---------- */}
-        <Section label="Your numbers today" right="Plan" onRight={go('/plan', 'plan')} />
+        <Section label="Your numbers today" right="Food log" onRight={go('/log-food', 'food_list')} />
         <Reveal style={st.gutter}>
-          <View style={st.grid}>
-            <View style={st.ringRow}>
-              <Rings size={132} stroke={12} gap={3}
-                label={`Calories ${fmt(kcal)} of ${fmt(kGoal)}. Protein ${fmt(day.protein)} of ${pGoal} grams. Steps ${fmt(day.steps)} of ${fmt(sGoal)}.`}
-                rings={[{ pct: kcal / kGoal, color: E.red }, { pct: day.protein / pGoal, color: E.ink }, { pct: day.steps / sGoal, color: E.green }]}>
-                <CountUp value={Math.abs(kGoal - kcal)} style={st.ringV} duration={1200} />
-                <Text style={st.ringU}>{kcal <= kGoal ? 'CAL LEFT' : 'CAL OVER'}</Text>
-              </Rings>
-              <View style={{ flex: 1, minWidth: 0, gap: 14 }}>
-                <Legend color={E.red} label="Calories" value={fmt(kcal)} of={fmt(kGoal)} warn={kcal > kGoal + 150} onPress={go('/log-food', 'kcal')} />
-                <Legend color={E.ink} label="Protein" value={fmt(day.protein)} of={`${pGoal} g`} good={day.protein >= pGoal}
-                  action={day.protein < pGoal ? { label: '+25 g', onPress: quickProtein } : undefined} onPress={go('/plan', 'protein')} />
-                <Legend color={E.green} label="Steps" value={fmt(day.steps)} of={fmt(sGoal)} good={day.steps >= sGoal} onPress={go('/you', 'steps')} />
-              </View>
-            </View>
-            {mealParts.length > 1 && (
-              <>
-                <View style={st.hHair} />
-                <Pressable accessibilityRole="button" onPress={go('/plan', 'day_plan')} style={st.dayPlan}>
-                  <View style={st.mHead}>
-                    <Text style={[st.mK, { flex: 1 }]}>TODAY'S MEALS</Text>
-                    <Text style={st.mKr}>{mealParts.filter((p) => p.done).length} of {mealParts.length} eaten</Text>
-                  </View>
-                  <View style={{ marginTop: 8 }}><DayPlan parts={mealParts} /></View>
-                </Pressable>
-              </>
-            )}
+          <FuelCard kcal={kcal} kGoal={kGoal} protein={day.protein} pGoal={pGoal} onProtein={quickProtein}
+            onLogged={refreshFuel} where="today" parts={mealParts} onParts={go('/plan', 'day_plan')}>
             <View style={st.hHair} />
             <View style={st.gridRow}>
               <Pressable accessibilityRole="button" onPress={go('/train', 'week')} style={st.mini}>
@@ -382,19 +365,14 @@ export default function Today() {
                 </Pressable>
               )}
             </View>
-          </View>
+          </FuelCard>
         </Reveal>
 
         {/* ---------- Food ---------- */}
-        <Section label="Food" right={food.length ? `${food.length} logged` : undefined} onRight={go('/log-food', 'food_list')} />
+        <Section label="Next meal" right="All meals" onRight={go('/plan', 'meals')} />
         <Reveal style={st.gutter}>
-          <View style={st.actions}>
-            <Action label="Snap a meal" onPress={go('/log-food?go=meal', 'snap_meal')} icon={<Path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.6-2.5h5.4l1.6 2.5h2.2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinejoin="round" />} extra={<Circle cx={12} cy={13} r={3.6} stroke={E.ink} strokeWidth={1.8} fill="none" />} />
-            <Action label="Scan barcode" onPress={go('/scan', 'scan')} icon={<Path d="M4 6v12M7.5 6v12M10 6v12M13.5 6v12M16 6v12M20 6v12" stroke={E.ink} strokeWidth={1.8} strokeLinecap="round" />} />
-            <Action label="Quick add" onPress={go('/log-food', 'quick_add')} icon={<Path d="M12 5v14M5 12h14" stroke={E.ink} strokeWidth={1.9} strokeLinecap="round" />} />
-          </View>
           {meal && opt ? (
-            <View style={{ marginTop: 12 }}>
+            <View>
               <MealCard compact slot={`Next up · ${meal.slot}`} opt={opt} eaten={false} onToggle={tickMeal} onOpen={go('/plan', 'meal')} />
             </View>
           ) : mealList.length ? (

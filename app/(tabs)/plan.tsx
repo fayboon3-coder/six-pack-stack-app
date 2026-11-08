@@ -19,7 +19,7 @@ import MealCard from '../../src/components/MealCard';
 import Pic from '../../src/components/Pic';
 import { FoodThumb } from '../../src/components/FoodTiles';
 import { Bar, CountUp, Drift, Marquee, MotionScroll, Press, Reveal } from '../../src/components/motion';
-import { FuelCard } from '../../src/components/charts';
+import { FuelCard } from '../../src/components/Fuel';
 import { track } from '../../src/lib/track';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -72,7 +72,7 @@ export default function Meals() {
       <MotionScroll contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         {/* Today's numbers */}
         <Reveal style={[st.gutter, { marginTop: 18 }]}>
-          <FuelCard kcal={kcal} kGoal={kcalGoal} protein={protein} pGoal={pg}
+          <FuelCard kcal={kcal} kGoal={kcalGoal} protein={protein} pGoal={pg} onLogged={load} where="meals"
             parts={meals.map((m, k) => ({ label: m.slot, kcal: num(opt(k).kcal), done: !!day.eaten[k] })).filter((x) => x.kcal > 0)} />
         </Reveal>
 

@@ -60,6 +60,24 @@ export async function kcalToday(plan: Plan, d = isoDate()) {
   return kcalEaten(plan, meals) + food.reduce((n, f) => n + (f.kcal || 0), 0);
 }
 
+/** What they've logged lately (newest first, one of each), so a repeat is one tap. */
+export async function recentFoods(n = 8, days = 14): Promise<Omit<FoodEntry, 'id' | 'at' | 'source'>[]> {
+  const out: Omit<FoodEntry, 'id' | 'at' | 'source'>[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; i < days && out.length < n; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const list = (await readFood(isoDate(d))).slice().reverse();
+    for (const f of list) {
+      const k = f.name.toLowerCase().trim();
+      if (!k || seen.has(k) || (!f.kcal && !f.protein)) continue;
+      seen.add(k);
+      out.push({ name: f.name, kcal: f.kcal, protein: f.protein, carbs: f.carbs ?? null, fat: f.fat ?? null, img: f.img ?? null });
+      if (out.length >= n) break;
+    }
+  }
+  return out;
+}
+
 /** A few common quick adds, so logging a snack is two taps. */
 export const QUICK = [
   { name: 'Protein shake', kcal: 160, protein: 30 },

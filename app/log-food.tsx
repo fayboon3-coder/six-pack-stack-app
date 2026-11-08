@@ -1,4 +1,4 @@
-import { FuelCard } from '../src/components/charts';
+import { FuelCard } from '../src/components/Fuel';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
@@ -100,7 +100,7 @@ export default function LogFood() {
   return (
     <Page tabs={false} paper header={<PageTitle paper back title="Log food" sub="Counts toward today's calories and protein" size={28} />}>
       <Reveal>
-        <FuelCard kcal={kcal} kGoal={kGoal} protein={protein} pGoal={pGoal} />
+        <FuelCard kcal={kcal} kGoal={kGoal} protein={protein} pGoal={pGoal} onLogged={load} where="log_food" />
       </Reveal>
 
       {pending && (
