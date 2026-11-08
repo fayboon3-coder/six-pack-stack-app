@@ -40,3 +40,4 @@ yarn-error.*
 /ios
 /android
 asc-key.p8
+distd4/

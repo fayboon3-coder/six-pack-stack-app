@@ -13,7 +13,8 @@ const BOON = require('../../assets/hero/boon_avatar.jpg');
 
 const CORNER = { key: 'corner', path: '/corner', also: ['boon'], label: 'Coach', d: '' };
 const TABS = [
-  { key: 'index', path: '/', also: ['train', 'plan'], label: 'Programs', d: 'M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12' },
+  { key: 'index', path: '/', also: [], label: 'Today', d: 'M4 10.5L12 4l8 6.5V20h-5.5v-6h-5v6H4z' },
+  { key: 'train', path: '/train', also: ['plan'], label: 'Programs', d: 'M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12' },
   { key: 'progress', path: '/progress', also: [], label: 'Progress', d: 'M4 19h16M6 15l4-4 3 3 5-6' },
   { key: 'stack', path: '/stack', also: [], label: 'Stack', d: 'M4 5h16v11H9l-5 4z' },
   { key: 'you', path: '/you', also: [], label: 'You', d: '' },
@@ -36,7 +37,7 @@ export default function TabBar({ state, navigation }: any) {
           const color = on ? C.onAccent : C.ink;
           return (
             <Pressable key={t.key} accessibilityRole="tab" accessibilityLabel={t.label} accessibilityState={{ selected: on }}
-              onPress={() => { if (on && t.key !== 'index') return; if (navigation?.navigate) navigation.navigate(t.key as never); else router.navigate(t.path as any); }} style={[st.btn, on && { backgroundColor: C.navy }]}>
+              onPress={() => { if (on && t.key !== 'train') return; if (navigation?.navigate) navigation.navigate(t.key as never); else router.navigate(t.path as any); }} style={[st.btn, on && { backgroundColor: C.navy }]}>
               {t.key === 'corner' ? (
                 <View style={[st.boon, on && { borderColor: '#e2433b' }]}><Image source={BOON} style={st.boonImg} /></View>
               ) : <Svg width={27} height={27} viewBox="0 0 24 24">

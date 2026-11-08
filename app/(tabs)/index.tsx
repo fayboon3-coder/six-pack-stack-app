@@ -1,1 +1,701 @@
-export { default } from './train';
+import React, { useCallback, useState } from 'react';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, type ImageSourcePropType } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle, Path, Polyline, Rect } from 'react-native-svg';
+import { useAuth } from '../../src/lib/auth';
+import { E, F } from '../../src/lib/theme';
+import NoPlan from '../../src/components/NoPlan';
+import { daysToSunday, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
+import { dayMeta, type Muscle } from '../../src/lib/workoutMeta';
+import { THUMBS } from '../../src/lib/thumbs';
+import { isoDate, lastSession, loggedDays } from '../../src/lib/logs';
+import { isCoached, isFree, isLocked } from '../../src/lib/access';
+import { addProtein, num, proteinGoal, readDay, stepGoal, syncPhoneSteps, type Day } from '../../src/lib/daily';
+import { kcalToday, readFood, type FoodEntry } from '../../src/lib/food';
+import { readMeals, writeMeals, type MealDay } from '../../src/lib/mealsToday';
+import { mealTiles } from '../../src/lib/foodPhotos';
+import { mealImage } from '../../src/lib/meals';
+import { allWeighIns } from '../../src/lib/body';
+import { goalDate, ratePerWeek, suggestNext, trendSeries, type SetRec, type TrendPoint } from '../../src/lib/trend';
+import { adaptFor } from '../../src/lib/adaptive';
+import { health } from '../../src/lib/health';
+import { checkinState, focusOf, loadCoaching, type ClientCheckin, type Review } from '../../src/lib/coaching';
+import { afterProtein } from '../../src/lib/reminders';
+import { mondayOf } from '../../src/lib/recap';
+import { track } from '../../src/lib/track';
+import { showCoaching } from '../../src/components/Coach';
+import BackOffice from '../../src/components/BackOffice';
+
+const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const BOON = require('../../assets/hero/boon_avatar.jpg');
+const BOON_WIDE = require('../../assets/hero/boon_wide.jpg');
+const SCALE = require('../../assets/hero/checkin.jpg');
+const LOGO = require('../../assets/logo-b.png');
+const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
+const DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const DAY_NAME = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const LETTER = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const EQUIP: Record<string, string> = { gym: 'Gym', db: 'Home', bw: 'No equipment' };
+const LOWER = /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/;
+const greet = () => { const h = new Date().getHours(); return h < 5 ? 'Late night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; };
+const dowOf = (t: string) => DOW.indexOf(t.trim().slice(0, 3).toLowerCase());
+const hm = (min: number) => `${Math.floor(min / 60)}h ${String(Math.round(min % 60)).padStart(2, '0')}m`;
+const shortDate = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+/**
+ * Today: the home screen. One place for the whole day: the workout and its target, calories,
+ * protein, steps and sleep, food logging, trend weight and the weekly calorie check, the Sunday
+ * check-in, Boon (for 1:1 clients) and every tool in the app.
+ */
+export default function Today() {
+  const { plan, profile, session, viewAs, isCoachAccount } = useAuth();
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const uid = session?.user.id;
+  const coached = isCoached(profile) && (!isCoachAccount || viewAs === 'coached');
+
+  const [done, setDone] = useState<Set<string>>(new Set());
+  const [day, setDay] = useState<Day>({ steps: 0, protein: 0, adds: [] });
+  const [kcal, setKcal] = useState(0);
+  const [food, setFood] = useState<FoodEntry[]>([]);
+  const [meals, setMeals] = useState<MealDay>({ pick: {}, eaten: {} });
+  const [series, setSeries] = useState<TrendPoint[]>([]);
+  const [healthOn, setHealthOn] = useState(false);
+  const [sleep, setSleep] = useState<number | null>(null);
+  const [prev, setPrev] = useState<SetRec[] | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [checkins, setCheckins] = useState<ClientCheckin[]>([]);
+
+  const t = plan ? todayIndex(plan) : null;
+  const firstEx = plan && t ? plan.train.d[t.index]?.x[0]?.[0] : undefined;
+
+  const load = useCallback(() => {
+    if (!plan) return;
+    readDay().then(setDay);
+    kcalToday(plan).then(setKcal);
+    readFood().then(setFood);
+    readMeals().then(setMeals);
+    allWeighIns(DEMO ? undefined : uid).then((w) => setSeries(trendSeries(w))).catch(() => {});
+    health.isOn().then(async (on) => {
+      setHealthOn(on);
+      if (on) { const h = await health.today().catch(() => null); setSleep(h?.sleepMin ?? null); }
+    }).catch(() => {});
+    syncPhoneSteps().then((s) => { if (s != null) readDay().then(setDay); }).catch(() => {});
+    if (DEMO) {
+      const today = (new Date().getDay() + 6) % 7;
+      setDone(new Set(plan.train.d.filter((d) => { const w = dowOf(d.t); return w >= 0 && (w + 6) % 7 < today; }).map((d) => d.t)));
+      setPrev([{ weight: 135, reps: 10 }, { weight: 135, reps: 10 }, { weight: 135, reps: 10 }]);
+    } else if (uid) {
+      loggedDays(uid, isoDate(mondayOf())).then((r: any[]) => setDone(new Set(r.map((x) => x.day_label)))).catch(() => {});
+      if (firstEx) lastSession(uid, [firstEx], isoDate()).then((p) => setPrev(p[firstEx] || [])).catch(() => setPrev([]));
+    }
+    if (coached && uid) loadCoaching(uid).then(({ reviews: r, checkins: c }) => { setReviews(r); setCheckins(c); }).catch(() => {});
+  }, [plan, uid, coached, firstEx]);
+  useFocusEffect(useCallback(() => { load(); }, [load]));
+
+  // Boon's own account opens on the back office ("View the app as" switches to a client's Today).
+  if (isCoachAccount && !viewAs) return <BackOffice />;
+  if (!plan || !t) return <NoPlan name={profile?.first_name} />;
+
+  /* ---------- the numbers ---------- */
+  const name = (plan.name && plan.name !== 'You' ? plan.name : profile?.first_name) || '';
+  const week = weekOf(plan.train.s);
+  const phase = phaseOf(week);
+  const days = plan.train.d;
+  const meta = dayMeta(days[t.index], plan.train.c);
+  const locked = isLocked(profile, week);
+  const free = isFree(profile);
+  const doneToday = t.isToday && done.has(days[t.index].t);
+  const restDay = !t.isToday;
+  const nextDow = dowOf(days[t.index].t);
+  const equip = plan.train.cfg?.equip ? EQUIP[plan.train.cfg.equip] : undefined;
+  const hero = heroPhoto(meta.muscles[0], plan.train.cfg?.equip);
+  const sug = firstEx && prev ? suggestNext(days[t.index].x[0][1], prev, week, LOWER.test(firstEx)) : null;
+
+  const kGoal = num(plan.kcal) || 2000, pGoal = proteinGoal(plan), sGoal = stepGoal(plan);
+  const planned = days.length;
+  const doneN = days.filter((d) => done.has(d.t)).length;
+
+  const last = series.length ? series[series.length - 1] : null;
+  const rate = ratePerWeek(series, 21);
+  const goalW = Number((plan.goal_short || '').match(/(\d{2,3})\s*lbs/i)?.[1]) || Number((profile?.quiz as any)?.goal_weight) || null;
+  const eta = last ? goalDate(last.t, rate, goalW) : null;
+  const weighedToday = series.some((p) => p.date === isoDate());
+  const spark = series.slice(-30);
+  const adapt = adaptFor(plan, profile, series);
+
+  const toSun = daysToSunday();
+  const photoWeek = PHOTO_WEEKS.includes(week);
+  const cs = coached ? checkinState(reviews, checkins) : null;
+  const focus = coached ? focusOf(reviews[0]) : null;
+  const monday = new Date().getDay() === 1 || new Date().getDay() === 2;
+
+  // Today's stack: workout (or rest), protein, steps.
+  const stack = [
+    { label: restDay ? 'Rest day' : 'Workout', ok: restDay || doneToday },
+    { label: `${pGoal} g protein`, ok: day.protein >= pGoal },
+    { label: `${fmt(sGoal)} steps`, ok: day.steps >= sGoal },
+  ];
+  const stackedN = stack.filter((s) => s.ok).length;
+
+  // Next meal on the plan that isn't ticked off.
+  const mealList = plan.meals || [];
+  const mk = mealList.findIndex((_, k) => !meals.eaten[k]);
+  const meal = mk >= 0 ? mealList[mk] : null;
+  const opt = meal && meal.options.length ? meal.options[(meals.pick[mk] || 0) % meal.options.length] : null;
+  const mealPic = opt ? (mealTiles(opt.name, opt.ids)[0]?.source || mealImage(opt.name, opt.detail)) : null;
+  const tickMeal = async () => {
+    if (mk < 0 || !opt) return;
+    const next = { ...meals, eaten: { ...meals.eaten, [mk]: true } };
+    setMeals(next); await writeMeals(next);
+    const g = num(opt.protein);
+    if (g) { const d = await addProtein(g); setDay(d); afterProtein(d.protein, pGoal).catch(() => {}); }
+    setKcal(await kcalToday(plan));
+    track('meal_tick', { where: 'today' });
+  };
+  const quickProtein = async () => { const d = await addProtein(25); setDay(d); afterProtein(d.protein, pGoal).catch(() => {}); track('protein_add', { where: 'today', g: 25 }); };
+  const openWorkout = () => (locked ? router.push('/unlock') : router.push({ pathname: '/day', params: { d: String(t.index) } }));
+  const go = (path: string, ev?: string) => () => { if (ev) track('today_tap', { to: ev }); router.push(path as any); };
+
+  const now = new Date();
+  const dateLine = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }).toUpperCase();
+
+  return (
+    <View style={{ flex: 1, backgroundColor: E.paper }}>
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+        {/* ---------- Masthead ---------- */}
+        <View style={st.gutter}>
+          <View style={st.mastRow}>
+            <Image source={LOGO} style={st.logo} accessibilityIgnoresInvertColors />
+            <Text style={st.dateLine} numberOfLines={1}>{dateLine}</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel="You and settings" onPress={go('/you')} hitSlop={8} style={st.me}>
+              <Text style={st.meT}>{(name || 'Y').slice(0, 1).toUpperCase()}</Text>
+            </Pressable>
+          </View>
+          <Text style={st.display} accessibilityRole="header">{greet()}{name ? `,\n${name}.` : '.'}</Text>
+          <View style={st.weekBar} accessibilityLabel={`Week ${week} of 12, ${phase.name}`}>
+            {Array.from({ length: 12 }, (_, k) => <View key={k} style={[st.seg, k + 1 < week && { backgroundColor: E.ink }, k + 1 === week && { backgroundColor: E.red }]} />)}
+          </View>
+          <View style={st.weekMeta}>
+            <Text style={st.weekT}>Week {week} of 12</Text>
+            <Text style={st.weekT}>{phase.name} phase</Text>
+          </View>
+
+          {/* Today's stack */}
+          <View style={st.stack}>
+            <Text style={st.stackK}>TODAY'S STACK · {stackedN} OF 3</Text>
+            <View style={st.stackRow}>
+              {stack.map((s) => (
+                <View key={s.label} style={st.stackItem}>
+                  <View style={[st.tick, s.ok && { backgroundColor: E.ink, borderColor: E.ink }]}>
+                    {s.ok && <Svg width={11} height={11} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>}
+                  </View>
+                  <Text style={[st.stackT, s.ok && { color: E.ink }]} numberOfLines={1}>{s.label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        {/* ---------- 1:1: Boon's note ---------- */}
+        {coached && (
+          <Pressable accessibilityRole="button" onPress={go('/corner', 'corner')} style={({ pressed }) => [st.gutter, { marginTop: 22 }, pressed && { opacity: 0.9 }]}>
+            <View style={st.note}>
+              <View style={st.noteHead}>
+                <Image source={BOON} style={st.noteAv} />
+                <View style={{ flex: 1 }}>
+                  <Text style={st.noteK}>FROM BOON{reviews[0]?.week ? ` · WEEK ${reviews[0].week}` : ''}</Text>
+                  <Text style={st.noteS}>{cs?.state === 'sent' ? 'Reviewing your check-in now' : cs?.state === 'reviewed' ? 'Your review is in' : 'Your coach'}</Text>
+                </View>
+                <Arrow color="#fff" />
+              </View>
+              <Text style={st.noteQ}>{focus ? `“${focus}”` : 'Your first note from me lands after your first Sunday check-in.'}</Text>
+              {!!focus && <Text style={st.noteF}>YOUR ONE THING THIS WEEK</Text>}
+            </View>
+          </Pressable>
+        )}
+
+        {/* ---------- Free plan: what unlocks ---------- */}
+        {free && (
+          <Pressable accessibilityRole="button" onPress={go('/unlock', 'unlock')} style={[st.gutter, { marginTop: 22 }]}>
+            <View style={st.freeBand}>
+              <View style={{ flex: 1 }}>
+                <Text style={st.freeK}>FREE STACK · WEEK {Math.min(week, 2)} OF 2</Text>
+                <Text style={st.freeT}>{locked ? 'Week 3 starts with The Full Stack.' : 'Weeks 3–12 are where your body changes.'}</Text>
+              </View>
+              <View style={st.freeBtn}><Text style={st.freeBtnT}>Unlock</Text></View>
+            </View>
+          </Pressable>
+        )}
+
+        {/* ---------- Training ---------- */}
+        <Section label={restDay ? `Up next · ${DAY_NAME[nextDow] || 'Next'}` : 'Today’s training'} right={`Day ${t.index + 1} of ${days.length}`} />
+        <View style={st.gutter}>
+          <Pressable accessibilityRole="button" accessibilityLabel={`${meta.type}, ${meta.items.length} exercises`} onPress={openWorkout} style={({ pressed }) => [st.heroCard, pressed && { transform: [{ scale: 0.995 }] }]}>
+            <View style={st.heroImg}>
+              {hero ? <Image source={hero} style={[st.fill, restDay && { opacity: 0.85 }]} resizeMode="cover" /> : <View style={[st.fill, { backgroundColor: E.ink }]} />}
+              <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,0.25)', 'rgba(16,23,42,0.92)']} locations={[0, 0.45, 1]} style={st.fill} />
+              <View style={st.heroTop}>
+                <View style={[st.chip, doneToday && { backgroundColor: E.green }]}><Text style={st.chipT}>{locked ? 'LOCKED' : doneToday ? 'DONE TODAY' : restDay ? 'REST DAY TODAY' : `WEEK ${week} · ${phase.name.toUpperCase()}`}</Text></View>
+              </View>
+              <View style={st.heroBottom}>
+                <Text style={st.heroTitle} numberOfLines={2}>{meta.type}</Text>
+                <Text style={st.heroMeta}>{meta.items.length} exercises  ·  About {meta.minutes} min{equip ? `  ·  ${equip}` : ''}</Text>
+              </View>
+            </View>
+            <View style={st.heroBody}>
+              {locked ? (
+                <Text style={st.target}>Your Free Stack covered weeks 1 and 2. Unlock The Full Stack to keep going with week {week}.</Text>
+              ) : sug && !doneToday ? (
+                <View style={st.targetRow}>
+                  <View style={st.targetIcon}><Svg width={16} height={16} viewBox="0 0 24 24"><Circle cx={12} cy={12} r={8} stroke={E.red} strokeWidth={2} fill="none" /><Circle cx={12} cy={12} r={3} fill={E.red} /></Svg></View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={st.targetK}>{restDay ? 'NEXT TARGET' : 'TODAY’S TARGET'}</Text>
+                    <Text style={st.target}><Text style={{ fontFamily: F.bold }}>{meta.items[0]?.name}: </Text>{sug.weight ? `${sug.weight} lbs × ${sug.reps}` : `${sug.reps} reps`}. <Text style={{ color: E.sub }}>{sug.note}</Text></Text>
+                  </View>
+                </View>
+              ) : doneToday ? (
+                <Text style={st.target}>Workout logged. Now stack the day: hit your protein and your steps.</Text>
+              ) : null}
+              <View style={st.heroBtns}>
+                <View style={[st.btnInk, { flex: 1 }]}>
+                  {!locked && !doneToday && !restDay && <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M7 4.5v15l12.5-7.5z" fill="#fff" /></Svg>}
+                  <Text style={st.btnInkT}>{locked ? 'Unlock all 12 weeks' : doneToday ? 'See today’s workout' : restDay ? 'Preview workout' : 'Start workout'}</Text>
+                </View>
+              </View>
+            </View>
+          </Pressable>
+
+          {/* Week strip */}
+          <View style={st.strip}>
+            {[1, 2, 3, 4, 5, 6, 0].map((dow, k) => {
+              const di = days.findIndex((d) => dowOf(d.t) === dow);
+              const isT = dow === now.getDay();
+              const ok = di >= 0 && done.has(days[di].t);
+              return (
+                <Pressable key={dow} disabled={di < 0 && dow !== 0} accessibilityRole="button"
+                  accessibilityLabel={`${DAY_NAME[dow]}: ${di >= 0 ? `day ${di + 1}${ok ? ', done' : ''}` : dow === 0 ? 'check-in' : 'rest'}`}
+                  onPress={() => (di >= 0 ? (locked ? router.push('/unlock') : router.push({ pathname: '/day', params: { d: String(di) } })) : router.push('/checkin'))} style={st.stripCol}>
+                  <Text style={[st.stripL, isT && { color: E.ink, fontFamily: F.bold }]}>{LETTER[k]}</Text>
+                  <View style={[st.stripDot, di >= 0 && st.stripTrain, ok && st.stripDone, isT && !ok && st.stripToday]}>
+                    {ok ? <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+                      : di >= 0 ? <Text style={[st.stripN, isT && { color: E.red }]}>{di + 1}</Text>
+                        : dow === 0 ? <Svg width={12} height={12} viewBox="0 0 24 24"><Rect x={3} y={7} width={18} height={13} rx={2.5} stroke={E.sub} strokeWidth={2.2} fill="none" /><Circle cx={12} cy={13.5} r={3.2} stroke={E.sub} strokeWidth={2.2} fill="none" /></Svg>
+                          : <View style={st.restDot} />}
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
+          <Text style={st.stripCap}>{doneN} of {planned} workouts this week{toSun === 0 ? ' · Check-in today' : ''}</Text>
+        </View>
+
+        {/* ---------- Numbers ---------- */}
+        <Section label="Your numbers today" right="Plan" onRight={go('/plan', 'plan')} />
+        <View style={st.gutter}>
+          <View style={st.grid}>
+            <View style={st.gridRow}>
+              <Metric label="CALORIES" value={fmt(kcal)} of={`of ${fmt(kGoal)}`} pct={kcal / kGoal}
+                foot={kcal <= kGoal ? `${fmt(kGoal - kcal)} left` : `${fmt(kcal - kGoal)} over`} warn={kcal > kGoal + 150} onPress={go('/log-food', 'kcal')} />
+              <View style={st.vHair} />
+              <Metric label="PROTEIN" value={`${fmt(day.protein)}`} unit="g" of={`of ${pGoal} g`} pct={day.protein / pGoal}
+                foot={day.protein >= pGoal ? 'Goal hit' : `${fmt(pGoal - day.protein)} g to go`} good={day.protein >= pGoal}
+                action={day.protein < pGoal ? { label: '+25 g', onPress: quickProtein } : undefined} onPress={go('/plan', 'protein')} />
+            </View>
+            <View style={st.hHair} />
+            <View style={st.gridRow}>
+              <Metric label="STEPS" value={fmt(day.steps)} of={`of ${fmt(sGoal)}`} pct={day.steps / sGoal}
+                foot={day.steps >= sGoal ? 'Goal hit' : healthOn ? 'From Apple Health' : `${fmt(sGoal - day.steps)} to go`} good={day.steps >= sGoal} onPress={go('/you', 'steps')} />
+              <View style={st.vHair} />
+              {healthOn && sleep != null ? (
+                <Metric label="SLEEP" value={hm(sleep)} of="last night" pct={sleep / 480} foot={sleep >= 420 ? 'Well rested' : 'Aim for 7 hours'} good={sleep >= 420} onPress={go('/you', 'sleep')} />
+              ) : health.available() && !healthOn ? (
+                <Pressable accessibilityRole="button" onPress={async () => { const ok = await health.connect(); setHealthOn(ok); if (ok) load(); track('health_connect', { where: 'today' }); }} style={st.metric}>
+                  <View style={st.mHead}><Text style={st.mK}>APPLE HEALTH</Text></View>
+                  <Svg width={26} height={26} viewBox="0 0 24 24" style={{ marginTop: 10 }}><Path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z" fill={E.red} /></Svg>
+                  <Text style={[st.mFoot, { color: E.ink, fontFamily: F.semi, marginTop: 10 }]}>Connect for steps, sleep and weight</Text>
+                </Pressable>
+              ) : (
+                <Metric label="THIS WEEK" value={`${doneN}`} unit={`/${planned}`} of="workouts" pct={doneN / Math.max(1, planned)} foot={doneN >= planned ? 'Week done' : `${planned - doneN} to go`} good={doneN >= planned} onPress={go('/train', 'week')} />
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* ---------- Food ---------- */}
+        <Section label="Food" right={food.length ? `${food.length} logged` : undefined} onRight={go('/log-food', 'food_list')} />
+        <View style={st.gutter}>
+          <View style={st.actions}>
+            <Action label="Snap a meal" onPress={go('/log-food?go=meal', 'snap_meal')} icon={<Path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.6-2.5h5.4l1.6 2.5h2.2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinejoin="round" />} extra={<Circle cx={12} cy={13} r={3.6} stroke={E.ink} strokeWidth={1.8} fill="none" />} />
+            <Action label="Scan barcode" onPress={go('/scan', 'scan')} icon={<Path d="M4 6v12M7.5 6v12M10 6v12M13.5 6v12M16 6v12M20 6v12" stroke={E.ink} strokeWidth={1.8} strokeLinecap="round" />} />
+            <Action label="Quick add" onPress={go('/log-food', 'quick_add')} icon={<Path d="M12 5v14M5 12h14" stroke={E.ink} strokeWidth={1.9} strokeLinecap="round" />} />
+          </View>
+          {meal && opt ? (
+            <View style={st.meal}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`${meal.slot}: ${opt.name}`} onPress={go('/plan', 'meal')} style={st.mealMain}>
+                {mealPic ? <Image source={mealPic} style={st.mealPic} /> : <View style={[st.mealPic, { backgroundColor: E.soft }]} />}
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <Text style={st.mealK}>NEXT UP · {meal.slot.toUpperCase()}</Text>
+                  <Text style={st.mealT} numberOfLines={2}>{opt.name}</Text>
+                  <Text style={st.mealS}>{num(opt.kcal) ? `${fmt(num(opt.kcal))} cal` : opt.kcal} · {num(opt.protein)} g protein</Text>
+                </View>
+              </Pressable>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Mark ${meal.slot} eaten`} onPress={tickMeal} hitSlop={8} style={st.eat}>
+                <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={E.ink} strokeWidth={2.8} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+                <Text style={st.eatT}>Ate it</Text>
+              </Pressable>
+            </View>
+          ) : mealList.length ? (
+            <View style={[st.meal, { paddingVertical: 16 }]}><Text style={st.mealT}>Every meal on today's plan is ticked off.</Text></View>
+          ) : null}
+        </View>
+
+        {/* ---------- Body ---------- */}
+        <Section label="Body" right="Progress" onRight={go('/progress', 'progress')} />
+        <View style={st.gutter}>
+          <View style={st.surface}>
+            <Pressable accessibilityRole="button" onPress={go('/progress', 'trend')} style={st.bodyTop}>
+              <View style={{ flex: 1 }}>
+                <Text style={st.mK}>TREND WEIGHT</Text>
+                {last ? (
+                  <View style={st.bigRow}>
+                    <Text style={st.big}>{last.t.toFixed(1)}</Text>
+                    <Text style={st.bigU}>lbs</Text>
+                  </View>
+                ) : <Text style={[st.big, { color: E.faint }]}>—</Text>}
+                <Text style={st.bodyS}>
+                  {rate == null ? (last ? 'A few more weigh-ins and your pace shows here.' : 'Weigh in tomorrow morning to start your trend.')
+                    : rate < -0.05 ? `Down ${Math.abs(rate).toFixed(1)} lbs a week` : rate > 0.05 ? `Up ${rate.toFixed(1)} lbs a week` : 'Holding steady'}
+                </Text>
+                {!!eta && !!goalW && <Text style={st.bodyGoal}>{goalW} lbs by {shortDate(eta)}</Text>}
+              </View>
+              {spark.length >= 3 && <Spark pts={spark.map((p) => p.t)} />}
+            </Pressable>
+            <View style={st.hHair} />
+            <View style={st.bodyRow}>
+              <Pressable accessibilityRole="button" onPress={go('/weigh-in', 'weigh')} style={[st.weighBtn, weighedToday && st.weighDone]}>
+                {weighedToday
+                  ? <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={E.green} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
+                  : <View style={st.redDot} />}
+                <Text style={[st.weighT, weighedToday && { color: E.ink }]}>{weighedToday ? 'Weighed in today' : 'Weigh in now'}</Text>
+              </Pressable>
+              <Pressable accessibilityRole="button" onPress={go('/photos', 'photos')} style={st.ghostBtn}><Text style={st.ghostT}>Photos</Text></Pressable>
+            </View>
+            {adapt.who !== 'none' && (
+              <Pressable accessibilityRole="button" onPress={go('/progress', 'calorie_check')} style={[st.check, adapt.kind === 'adjust' && adapt.who !== 'coached' && { backgroundColor: '#fdeceb' }]}>
+                <Text style={st.checkK}>WEEKLY CALORIE CHECK</Text>
+                <Text style={st.checkT}>
+                  {adapt.who === 'coached' ? 'Boon sets your calories at your Sunday check-in.'
+                    : adapt.kind === 'adjust' ? `New number ready: ${fmt(adapt.from)} → ${fmt(adapt.to)} a day. Tap to review.`
+                      : adapt.kind === 'on_track' ? `On track at ${fmt(kGoal)} a day. Same calories this week.`
+                        : adapt.kind === 'wait' ? `Calories just changed. Next check in ${adapt.days} day${adapt.days === 1 ? '' : 's'}.`
+                          : `Starts after 2 weeks of weigh-ins (${Math.min(adapt.have, 8)} of 8 so far).`}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+
+        {/* ---------- Check-in ---------- */}
+        <Section label="Sunday check-in" />
+        <View style={st.gutter}>
+          <Pressable accessibilityRole="button" onPress={go(coached && cs?.state !== 'due' ? '/corner' : '/checkin', 'checkin')} style={({ pressed }) => [st.checkin, pressed && { opacity: 0.92 }]}>
+            <Image source={SCALE} style={st.checkinPic} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={st.mealK}>{toSun === 0 ? 'TODAY' : `IN ${toSun} DAY${toSun > 1 ? 'S' : ''}`}{photoWeek ? ' · PHOTO WEEK' : ''}</Text>
+              <Text style={st.mealT}>{cs?.state === 'sent' ? 'Sent. Boon is reviewing it.' : cs?.state === 'reviewed' ? 'Reviewed. Read Boon’s notes.' : toSun === 0 ? 'Check in now. Takes 2 minutes.' : `${DAY_NAME[0]} ${shortDate(new Date(now.getTime() + toSun * 864e5))}`}</Text>
+              <Text style={st.mealS}>{coached ? 'Your weight, your week and your photos. Boon reads every one.' : 'Your weight and your week. That’s how you know it’s working.'}</Text>
+            </View>
+            <Arrow />
+          </Pressable>
+        </View>
+
+        {/* ---------- Stack (AI) ---------- */}
+        <Section label="Ask Stack" right="Open" onRight={go('/stack', 'stack')} />
+        <View style={st.gutter}>
+          <Pressable accessibilityRole="button" onPress={go('/stack', 'stack_box')} style={st.ask}>
+            <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M4 5.5h16v10.5H9.5L4 20z" stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinejoin="round" /></Svg>
+            <Text style={st.askT}>Ask anything, or snap your plate</Text>
+          </Pressable>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingTop: 10, paddingHorizontal: 20 }}>
+            {['What should I eat tonight?', 'Swap an exercise for me', 'Is creatine worth it?', 'I missed a workout. Now what?'].map((q) => (
+              <Pressable key={q} accessibilityRole="button" onPress={() => { track('today_tap', { to: 'stack_prompt' }); router.push({ pathname: '/stack', params: { q } }); }} style={st.prompt}>
+                <Text style={st.promptT}>{q}</Text>
+              </Pressable>
+            ))}
+        </ScrollView>
+
+        {/* ---------- Everything else ---------- */}
+        <Section label="Your tools" />
+        <View style={st.gutter}>
+          <View style={st.surface}>
+            {[
+              { t: 'Stack Check', s: 'Scan a supplement, get my verdict.', to: '/stack-check', d: 'M12 3l7.5 3v6c0 4.3-3.2 8-7.5 9-4.3-1-7.5-4.7-7.5-9V6z|M8.7 12.2l2.3 2.3 4.4-4.6' },
+              { t: monday ? 'Last week, recapped' : 'Weekly recap', s: monday ? 'Your week in one card, ready to share.' : 'Your week in one card.', to: '/recap', d: 'M4 5.5h16v14H4z|M4 9.5h16M8.5 3.5v4M15.5 3.5v4', hot: monday },
+              { t: 'Progress photos', s: photoWeek ? 'Photo week: week 1 next to today.' : 'Week 1 next to today.', to: '/photos', d: 'M4 5.5h16v13H4z|M4 16l4.5-4.5 3.5 3.5 2.5-2.5L20 17.5', hot: photoWeek && toSun === 0 },
+              { t: 'Meal plan & groceries', s: 'Meals, eating out, shopping list.', to: '/plan-details?tab=Groceries', d: 'M8.5 6.5H20M8.5 12H20M8.5 17.5H20|M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01' },
+              { t: 'Training plan', s: `${days.length} days a week${equip ? ` · ${equip}` : ''}`, to: '/train', d: 'M6.5 7v10M17.5 7v10M3.5 10v4M20.5 10v4M6.5 12h11' },
+              { t: 'Reminders & Apple Health', s: 'Nudges, steps, sleep and weight.', to: '/you', d: 'M6.5 16v-5a5.5 5.5 0 0 1 11 0v5l1.8 1.8H4.7z|M10 20.2a2 2 0 0 0 4 0' },
+            ].map((r, k, arr) => (
+              <Pressable key={r.t} accessibilityRole="button" onPress={go(r.to, r.to.slice(1))} style={({ pressed }) => [st.tool, k < arr.length - 1 && st.toolLine, pressed && { backgroundColor: '#faf9f6' }]}>
+                <View style={st.toolIc}>
+                  <Svg width={19} height={19} viewBox="0 0 24 24">{r.d.split('|').map((d, i) => <Path key={i} d={d} stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinecap="round" strokeLinejoin="round" />)}</Svg>
+                </View>
+                <View style={{ flex: 1, minWidth: 0 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={st.toolT}>{r.t}</Text>
+                    {r.hot && <View style={st.hot}><Text style={st.hotT}>NEW</Text></View>}
+                  </View>
+                  <Text style={st.toolS} numberOfLines={1}>{r.s}</Text>
+                </View>
+                <Arrow />
+              </Pressable>
+            ))}
+          </View>
+        </View>
+
+        {/* ---------- Coaching (not yet coached) ---------- */}
+        {showCoaching(profile) && !isCoachAccount && (
+          <View style={[st.gutter, { marginTop: 34 }]}>
+            <Pressable accessibilityRole="button" onPress={() => { track('coaching_tap', { where: 'today' }); router.push('/coaching'); }} style={st.coach}>
+              <View style={st.coachPic}>
+                <Image source={BOON_WIDE} style={st.fill} resizeMode="cover" />
+                <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,1)']} locations={[0.55, 1]} style={st.fill} />
+              </View>
+              <View style={st.coachBody}>
+                <Text style={st.coachK}>1:1 COACHING WITH BOON</Text>
+                <Text style={st.coachT}>Want me in your corner?</Text>
+                <Text style={st.coachS}>I review your week every Sunday and change one thing at a time. Abs in 12 weeks, or I keep coaching you free.</Text>
+                <View style={st.coachBtn}><Text style={st.coachBtnT}>See if you qualify</Text></View>
+              </View>
+            </Pressable>
+          </View>
+        )}
+
+        <Text style={st.colophon}>SIX-PACK STACK · BY BOON FAY</Text>
+      </ScrollView>
+    </View>
+  );
+}
+
+/* ---------- pieces ---------- */
+
+/** A real gym photo for the day's main muscle (bundled, so it shows instantly and offline). */
+const HERO: Partial<Record<Muscle, string>> = {
+  Chest: 'rT7DgCr-3pg', Back: 'KE2A7G_nDc8', Shoulders: 'Anu8s_nkNpM', Quads: 'nfX7IFK9UNI', Glutes: 'hQgFixeXdZo',
+  Hamstrings: 'hQgFixeXdZo', Biceps: '93R8V6uvwHc', Triceps: 'O7e8j8K3cJo', Calves: 'Q2k3kYbtOcl', Abs: 'mwlp75MS6Rg',
+};
+function heroPhoto(m: Muscle | undefined, equip?: string): ImageSourcePropType {
+  if (equip === 'bw' && (m === 'Chest' || m === 'Triceps')) return THUMBS['rG-rAMxA9Lo'];
+  if (equip === 'db' && m === 'Chest') return THUMBS['5Y3VZsLb1Ys'];
+  if (equip !== 'gym' && m === 'Back') return THUMBS['vbechsUCn24'];
+  return THUMBS[(m && HERO[m]) || 'rT7DgCr-3pg'];
+}
+
+function Section({ label, right, onRight }: { label: string; right?: string; onRight?: () => void }) {
+  return (
+    <View style={[st.gutter, st.section]}>
+      <Text style={st.sectionL} accessibilityRole="header">{label}</Text>
+      {!!right && (onRight
+        ? <Pressable accessibilityRole="button" onPress={onRight} hitSlop={8} style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}><Text style={st.sectionR}>{right}</Text><Arrow size={12} /></Pressable>
+        : <Text style={[st.sectionR, { color: E.sub }]}>{right}</Text>)}
+    </View>
+  );
+}
+
+function Metric({ label, value, unit, of, pct, foot, good, warn, action, onPress }: {
+  label: string; value: string; unit?: string; of: string; pct: number; foot: string; good?: boolean; warn?: boolean;
+  action?: { label: string; onPress: () => void }; onPress?: () => void;
+}) {
+  const w = Math.max(0, Math.min(1, pct || 0));
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={`${label.toLowerCase()} ${value}${unit || ''} ${of}`} onPress={onPress} style={st.metric}>
+      <View style={st.mHead}>
+        <Text style={[st.mK, { flex: 1 }]}>{label}</Text>
+        {!!action && (
+          <Pressable accessibilityRole="button" accessibilityLabel={`Add ${action.label} protein`} onPress={action.onPress} hitSlop={8} style={st.mAdd}>
+            <Text style={st.mAddT}>{action.label}</Text>
+          </Pressable>
+        )}
+      </View>
+      <View style={st.bigRow}>
+        <Text style={st.mV} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>
+        {!!unit && <Text style={st.mU}>{unit}</Text>}
+      </View>
+      <Text style={st.mOf}>{of}</Text>
+      <View style={st.bar}><View style={[st.barFill, { width: `${w * 100}%` }, good && { backgroundColor: E.green }, warn && { backgroundColor: E.red }]} /></View>
+      <Text style={[st.mFoot, good && { color: E.green, fontFamily: F.semi }, warn && { color: E.red }]}>{foot}</Text>
+    </Pressable>
+  );
+}
+
+function Action({ label, icon, extra, onPress }: { label: string; icon: React.ReactNode; extra?: React.ReactNode; onPress: () => void }) {
+  return (
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [st.action, pressed && { backgroundColor: '#faf9f6' }]}>
+      <Svg width={24} height={24} viewBox="0 0 24 24">{icon}{extra}</Svg>
+      <Text style={st.actionT}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function Spark({ pts }: { pts: number[] }) {
+  const W = 118, H = 54, P = 4;
+  const lo = Math.min(...pts), hi = Math.max(...pts), span = Math.max(0.5, hi - lo);
+  const xy = pts.map((v, i) => [P + (i * (W - 2 * P)) / Math.max(1, pts.length - 1), P + ((hi - v) * (H - 2 * P)) / span]);
+  const [lx, ly] = xy[xy.length - 1];
+  return (
+    <Svg width={W} height={H} accessibilityLabel="Trend over the last 30 days">
+      <Polyline points={xy.map((p) => p.join(',')).join(' ')} stroke={E.ink} strokeWidth={2} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      <Circle cx={lx} cy={ly} r={4} fill={E.red} stroke="#fff" strokeWidth={2} />
+    </Svg>
+  );
+}
+
+function Arrow({ color = E.ink, size = 14 }: { color?: string; size?: number }) {
+  return <Svg width={size} height={size} viewBox="0 0 24 24"><Path d="M9 5.5l6.5 6.5L9 18.5" stroke={color} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>;
+}
+
+const st = StyleSheet.create({
+  gutter: { paddingHorizontal: 20 },
+  fill: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+
+  mastRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  logo: { width: 26, height: 26 },
+  dateLine: { flex: 1, fontFamily: F.bold, fontSize: 11, letterSpacing: 1.6, color: E.sub },
+  me: { width: 34, height: 34, borderRadius: 17, backgroundColor: E.ink, alignItems: 'center', justifyContent: 'center' },
+  meT: { fontFamily: F.bold, fontSize: 14, color: '#fff' },
+  display: { fontFamily: F.black, fontSize: 40, lineHeight: 43, letterSpacing: -1.6, color: E.ink, marginTop: 22 },
+  weekBar: { flexDirection: 'row', gap: 3, marginTop: 20 },
+  seg: { flex: 1, height: 3, borderRadius: 2, backgroundColor: '#dcd9d1' },
+  weekMeta: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 },
+  weekT: { fontFamily: F.semi, fontSize: 12, color: E.sub },
+
+  stack: { marginTop: 20, paddingVertical: 14, borderTopWidth: 1, borderBottomWidth: 1, borderColor: E.hair },
+  stackK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1.4, color: E.sub },
+  stackRow: { flexDirection: 'row', gap: 10, marginTop: 10 },
+  stackItem: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 7, minWidth: 0 },
+  tick: { width: 20, height: 20, borderRadius: 10, borderWidth: 1.5, borderColor: '#cfcbc2', alignItems: 'center', justifyContent: 'center' },
+  stackT: { flexShrink: 1, fontFamily: F.semi, fontSize: 13, color: E.sub },
+
+  note: { borderRadius: 22, backgroundColor: E.ink, padding: 18, gap: 14 },
+  noteHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  noteAv: { width: 40, height: 40, borderRadius: 20, borderWidth: 2, borderColor: E.red },
+  noteK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1.4, color: '#ff8a80' },
+  noteS: { fontFamily: F.semi, fontSize: 14, color: '#fff', marginTop: 2 },
+  noteQ: { fontFamily: F.xbold, fontSize: 21, lineHeight: 27, letterSpacing: -0.4, color: '#fff' },
+  noteF: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: 'rgba(255,255,255,0.55)', marginTop: -6 },
+
+  freeBand: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 18, borderWidth: 1, borderColor: E.hair, backgroundColor: E.surface },
+  freeK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1.4, color: E.red },
+  freeT: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: E.ink, marginTop: 3 },
+  freeBtn: { height: 38, paddingHorizontal: 16, borderRadius: 19, backgroundColor: E.red, alignItems: 'center', justifyContent: 'center' },
+  freeBtnT: { fontFamily: F.bold, fontSize: 14, color: '#fff' },
+
+  section: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 34, marginBottom: 12 },
+  sectionL: { fontFamily: F.xbold, fontSize: 22, letterSpacing: -0.6, color: E.ink },
+  sectionR: { fontFamily: F.semi, fontSize: 14, color: E.ink },
+
+  heroCard: { borderRadius: 24, overflow: 'hidden', backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  heroImg: { height: 236, backgroundColor: E.ink, justifyContent: 'space-between' },
+  heroTop: { padding: 16, flexDirection: 'row' },
+  chip: { paddingHorizontal: 10, height: 26, borderRadius: 13, backgroundColor: 'rgba(16,23,42,0.72)', justifyContent: 'center' },
+  chipT: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.3, color: '#fff' },
+  heroBottom: { padding: 18, paddingTop: 0 },
+  heroTitle: { fontFamily: F.black, fontSize: 32, lineHeight: 35, letterSpacing: -1, color: '#fff' },
+  heroMeta: { fontFamily: F.semi, fontSize: 13.5, color: 'rgba(255,255,255,0.86)', marginTop: 6 },
+  heroBody: { padding: 16, gap: 14 },
+  targetRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
+  targetIcon: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#fdeceb', alignItems: 'center', justifyContent: 'center' },
+  targetK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: E.red, marginBottom: 2 },
+  target: { fontFamily: F.medium, fontSize: 15, lineHeight: 21, color: E.ink },
+  heroBtns: { flexDirection: 'row', gap: 10 },
+  btnInk: { height: 52, borderRadius: 26, backgroundColor: E.ink, flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center' },
+  btnInkT: { fontFamily: F.bold, fontSize: 16, color: '#fff' },
+
+  strip: { flexDirection: 'row', marginTop: 16 },
+  stripCol: { flex: 1, alignItems: 'center', gap: 7 },
+  stripL: { fontFamily: F.semi, fontSize: 11.5, color: E.faint },
+  stripDot: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  stripTrain: { backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  stripDone: { backgroundColor: E.ink, borderColor: E.ink },
+  stripToday: { borderWidth: 2, borderColor: E.red },
+  stripN: { fontFamily: F.bold, fontSize: 13, color: E.ink },
+  restDot: { width: 4, height: 4, borderRadius: 2, backgroundColor: '#cfcbc2' },
+  stripCap: { fontFamily: F.medium, fontSize: 12.5, color: E.sub, textAlign: 'center', marginTop: 12 },
+
+  grid: { borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  gridRow: { flexDirection: 'row' },
+  vHair: { width: 1, backgroundColor: E.hair },
+  hHair: { height: 1, backgroundColor: E.hair },
+  metric: { flex: 1, padding: 16, minWidth: 0 },
+  mK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: E.sub },
+  mHead: { flexDirection: 'row', alignItems: 'center', height: 26 },
+  bigRow: { flexDirection: 'row', alignItems: 'baseline', gap: 3, marginTop: 4 },
+  mV: { fontFamily: F.black, fontSize: 30, letterSpacing: -1.2, color: E.ink, fontVariant: ['tabular-nums'] },
+  mU: { fontFamily: F.bold, fontSize: 15, color: E.ink },
+  mOf: { fontFamily: F.medium, fontSize: 12.5, color: E.sub, marginTop: 1 },
+  bar: { height: 3, borderRadius: 2, backgroundColor: E.soft, marginTop: 12, overflow: 'hidden' },
+  barFill: { height: 3, borderRadius: 2, backgroundColor: E.ink },
+  mFoot: { fontFamily: F.medium, fontSize: 12.5, color: E.sub, marginTop: 8 },
+  mAdd: { height: 26, paddingHorizontal: 10, borderRadius: 13, backgroundColor: E.ink, justifyContent: 'center' },
+  mAddT: { fontFamily: F.bold, fontSize: 12, color: '#fff' },
+
+  actions: { flexDirection: 'row', gap: 10 },
+  action: { flex: 1, height: 92, borderRadius: 20, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair, alignItems: 'center', justifyContent: 'center', gap: 9 },
+  actionT: { fontFamily: F.semi, fontSize: 13, color: E.ink },
+  meal: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 10, padding: 12, borderRadius: 20, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  mealMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12, minWidth: 0 },
+  mealPic: { width: 64, height: 64, borderRadius: 14 },
+  mealK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.3, color: E.sub },
+  mealT: { fontFamily: F.bold, fontSize: 15, lineHeight: 20, color: E.ink, marginTop: 2 },
+  mealS: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: E.sub, marginTop: 2 },
+  eat: { height: 36, paddingHorizontal: 12, borderRadius: 18, borderWidth: 1, borderColor: E.hair, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  eatT: { fontFamily: F.bold, fontSize: 13, color: E.ink },
+
+  surface: { borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair, overflow: 'hidden' },
+  bodyTop: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
+  big: { fontFamily: F.black, fontSize: 44, letterSpacing: -2, color: E.ink, fontVariant: ['tabular-nums'] },
+  bigU: { fontFamily: F.bold, fontSize: 16, color: E.ink },
+  bodyS: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: E.sub, marginTop: 2 },
+  bodyGoal: { fontFamily: F.bold, fontSize: 13, lineHeight: 18, color: E.ink, marginTop: 2 },
+  bodyRow: { flexDirection: 'row', gap: 10, padding: 12 },
+  weighBtn: { flex: 1, height: 46, borderRadius: 23, backgroundColor: E.ink, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  weighT: { fontFamily: F.bold, fontSize: 15, color: '#fff' },
+  weighDone: { backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  redDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#ff6b61' },
+  ghostBtn: { height: 46, paddingHorizontal: 22, borderRadius: 23, borderWidth: 1, borderColor: E.hair, alignItems: 'center', justifyContent: 'center' },
+  ghostT: { fontFamily: F.bold, fontSize: 15, color: E.ink },
+  check: { marginHorizontal: 12, marginBottom: 12, padding: 14, borderRadius: 16, backgroundColor: E.paper },
+  checkK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: E.sub },
+  checkT: { fontFamily: F.semi, fontSize: 14, lineHeight: 20, color: E.ink, marginTop: 4 },
+
+  checkin: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 12, paddingRight: 16, borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  checkinPic: { width: 76, height: 76, borderRadius: 16 },
+
+  ask: { height: 54, borderRadius: 27, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18 },
+  askT: { flex: 1, fontFamily: F.medium, fontSize: 15, color: E.sub },
+  prompt: { height: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: E.soft, justifyContent: 'center' },
+  promptT: { fontFamily: F.semi, fontSize: 13, color: E.ink },
+
+  tool: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16 },
+  toolLine: { borderBottomWidth: 1, borderBottomColor: E.hair },
+  toolIc: { width: 40, height: 40, borderRadius: 12, backgroundColor: E.paper, alignItems: 'center', justifyContent: 'center' },
+  toolT: { fontFamily: F.bold, fontSize: 15.5, color: E.ink },
+  toolS: { fontFamily: F.medium, fontSize: 13, color: E.sub, marginTop: 2 },
+  hot: { paddingHorizontal: 6, height: 18, borderRadius: 5, backgroundColor: E.red, justifyContent: 'center' },
+  hotT: { fontFamily: F.bold, fontSize: 9.5, letterSpacing: 0.8, color: '#fff' },
+
+  coach: { borderRadius: 24, overflow: 'hidden', backgroundColor: E.ink },
+  coachPic: { height: 210 },
+  coachBody: { padding: 20, paddingTop: 4, gap: 8 },
+  coachK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1.4, color: '#ff8a80' },
+  coachT: { fontFamily: F.black, fontSize: 28, lineHeight: 31, letterSpacing: -0.8, color: '#fff' },
+  coachS: { fontFamily: F.medium, fontSize: 14.5, lineHeight: 21, color: 'rgba(255,255,255,0.88)' },
+  coachBtn: { alignSelf: 'flex-start', height: 44, paddingHorizontal: 20, borderRadius: 22, backgroundColor: '#fff', justifyContent: 'center', marginTop: 6 },
+  coachBtnT: { fontFamily: F.bold, fontSize: 15, color: E.ink },
+
+  colophon: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 2, color: E.faint, textAlign: 'center', marginTop: 40 },
+});

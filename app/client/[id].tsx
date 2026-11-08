@@ -91,7 +91,7 @@ export default function ClientDetail() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
           <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/coach')} style={st.back}><BackIcon /></Pressable>
-          <Text style={st.kicker}>{profile?.tier === 'coached' ? 'Coaching client' : profile?.tier || ''}</Text>
+          <Text style={st.kicker}>{profile?.tier === 'coached' ? 'Coaching client' : profile?.tier === 'self' ? 'The Full Stack' : profile?.tier === 'free' ? 'Free Stack' : ''}</Text>
           <Text style={st.title}>{name}</Text>
           {!!profile?.email && <Text style={st.meta}>{profile.email}</Text>}
           {!!goal && <Text style={st.goal}>{goal}</Text>}
@@ -109,7 +109,7 @@ export default function ClientDetail() {
             </View>
           )}
 
-          <View style={st.card}>
+          {profile?.tier === 'coached' && <View style={st.card}>
             <Text style={st.cardTitle}>Write this week's review</Text>
             <Text style={st.meta}>Shows on their coach home. What's working, the one thing to change, and their focus for next week.</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -123,7 +123,7 @@ export default function ClientDetail() {
               style={st.input} accessibilityLabel="Focus for this week" />
             <Text style={st.meta}>Shows big on their coach home and in their next check-in.{profile?.push_token ? ' They get a notification when you send.' : ''}</Text>
             <Button title={busy ? 'Sending…' : 'Send review'} onPress={send} loading={busy} />
-          </View>
+          </View>}
 
           {!!profile?.push_token && (
             <View style={st.card}>

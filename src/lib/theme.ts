@@ -21,3 +21,17 @@ export const F = {
 };
 
 export const R = { card: 22, btn: 27 };
+
+/** Editorial palette for the Today home: warm paper, white surfaces, near-black ink, hairlines. */
+export const E = {
+  paper: '#f5f4f0',
+  surface: '#ffffff',
+  ink: '#10172a',
+  sub: '#666d82',
+  faint: '#9aa0b0',
+  hair: '#e6e3dc',
+  soft: '#eeece6',
+  red: '#d93a31',
+  green: '#12804f',
+  greenTint: '#e5f3ec',
+};

@@ -14,7 +14,7 @@ export default function ProgramsHeader({ active }: { active: 'train' | 'meals'; 
           const on = k === active;
           return (
             <Pressable key={k} accessibilityRole="tab" accessibilityState={{ selected: on }}
-              onPress={() => !on && router.replace(k === 'train' ? '/' : '/plan')} style={[st.btn, on && { backgroundColor: C.navy }]}>
+              onPress={() => !on && router.replace(k === 'train' ? '/train' : '/plan')} style={[st.btn, on && { backgroundColor: C.navy }]}>
               <Text style={[st.btnT, on && { color: C.onAccent, fontFamily: F.bold }]}>{l}</Text>
             </Pressable>
           );
