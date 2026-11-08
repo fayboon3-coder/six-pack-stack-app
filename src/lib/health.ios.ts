@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as HK from '@kingstinct/react-native-healthkit';
 import type { HealthApi, HealthToday, HealthWorkout } from './health';
 import type { WeighIn } from './trend';
 
@@ -11,7 +10,10 @@ const ENERGY = 'HKQuantityTypeIdentifierActiveEnergyBurned';
 const SLEEP = 'HKCategoryTypeIdentifierSleepAnalysis';
 const WORKOUT = 'HKWorkoutTypeIdentifier';
 
-const K: any = HK;
+// Loaded lazily: Apple Health's native module isn't in Expo Go (or any build without it), and
+// importing it there throws at startup and takes the whole app down. Without it, Health is just off.
+let K: any = {};
+try { K = require('@kingstinct/react-native-healthkit'); } catch { K = {}; }
 const iso = (d: Date) => { const z = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return z.toISOString().slice(0, 10); };
 const dayBounds = (d: Date) => { const s = new Date(d); s.setHours(0, 0, 0, 0); const e = new Date(s); e.setDate(e.getDate() + 1); return { s, e }; };
 
