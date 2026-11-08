@@ -1,33 +1,15 @@
 import type { ImageSourcePropType } from 'react-native';
 
-/** Food photos for meals and eat-out orders. Brand photos for brand orders, real food photos for the rest. */
-export const MEAL_IMG = {
-  starbucks: require('../../assets/meals/starbucks.jpg'),
-  latte: require('../../assets/meals/latte.jpg'),
-  chipotle: require('../../assets/meals/chipotle.jpg'),
-  eggs: require('../../assets/meals/eggs.jpg'),
-  yogurt_bowl: require('../../assets/meals/yogurt_bowl.jpg'),
-  yogurt: require('../../assets/meals/yogurt.jpg'),
-  oats: require('../../assets/meals/oats.jpg'),
-  teriyaki: require('../../assets/meals/teriyaki.jpg'),
-  sandwich: require('../../assets/meals/sandwich.jpg'),
-  shake: require('../../assets/meals/shake.jpg'),
-  jerky: require('../../assets/meals/jerky.jpg'),
-  steak: require('../../assets/meals/steak.jpg'),
-  salmon: require('../../assets/meals/salmon.jpg'),
-  chicken_rice: require('../../assets/meals/chicken_rice.jpg'),
-  salad: require('../../assets/meals/salad.jpg'),
-  pizza: require('../../assets/meals/pizza.jpg'),
-  burger: require('../../assets/meals/burger.jpg'),
-  beer: require('../../assets/meals/beer.jpg'),
-  subway: require('../../assets/meals/subway.jpg'),
-  chickfila: require('../../assets/meals/chickfila.jpg'),
-  mcdonalds: require('../../assets/meals/mcdonalds.jpg'),
-  panda: require('../../assets/meals/panda.jpg'),
-} as const;
+import { MEAL_HD, hdUrl } from './hd';
 
-const RULES: [RegExp, keyof typeof MEAL_IMG][] = [
-  [/starbucks|egg bites/i, 'starbucks'],
+/**
+ * Photos for meals and eat-out orders: iconic, ad-style dishes from the photo CDN (see hd.ts).
+ * Restaurant orders get the dish they're known for, never the chain's own photos or logos.
+ */
+type MealKey = keyof typeof MEAL_HD;
+const RULES: [RegExp, MealKey][] = [
+  [/egg bites/i, 'egg_bites'],
+  [/starbucks/i, 'starbucks'],
   [/chipotle|burrito/i, 'chipotle'],
   [/subway/i, 'subway'],
   [/chick-?fil-?a/i, 'chickfila'],
@@ -37,7 +19,8 @@ const RULES: [RegExp, keyof typeof MEAL_IMG][] = [
   [/burger/i, 'burger'],
   [/beer|drinks|\bat the bar\b|\bbar tab\b/i, 'beer'],
   [/latte|cold brew|coffee/i, 'latte'],
-  [/shake|smoothie/i, 'shake'],
+  [/smoothie/i, 'smoothie'],
+  [/shake/i, 'shake'],
   [/jerky/i, 'jerky'],
   [/sandwich|sub\b|wrap|deli/i, 'sandwich'],
   [/salmon|fish|tuna|shrimp/i, 'salmon'],
@@ -53,10 +36,16 @@ const RULES: [RegExp, keyof typeof MEAL_IMG][] = [
 ];
 
 /** Photo for a meal: matches on the name first, then the details. */
-export function mealImage(name: string, detail = ''): ImageSourcePropType | null {
+export function mealHD(name: string, detail = ''): string | null {
   for (const text of [name, detail]) {
     const hit = RULES.find(([re]) => re.test(text));
-    if (hit) return MEAL_IMG[hit[1]];
+    if (hit) return MEAL_HD[hit[1]];
   }
   return null;
+}
+
+/** The same photo as an image source (sized for a full-width card). */
+export function mealImage(name: string, detail = '', w = 1000): ImageSourcePropType | null {
+  const id = mealHD(name, detail);
+  return id ? { uri: hdUrl(id, w) } : null;
 }

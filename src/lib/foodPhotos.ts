@@ -4,7 +4,6 @@
  */
 import type { ImageSourcePropType } from 'react-native';
 import { foodById } from '../data/foods';
-import { MEAL_IMG } from './meals';
 
 const PHOTO: Record<string, ImageSourcePropType> = {
   almond_milk: require('../../assets/food/almond_milk.jpg'),
@@ -149,13 +148,22 @@ const SAME_AS: Record<string, string> = {
 const SKIP_CATS = new Set(['fat', 'sauce']);
 const KEEP = new Set(['avocado', 'peanut_butter', 'almond_butter', 'hummus', 'salsa', 'almonds', 'mixed_nuts', 'feta']);
 
-import { FOOD_HD, hdUrl } from './hd';
+import { FOOD_HD, MEAL_HD, hdUrl } from './hd';
 
 /** Foods whose new high-res photo isn't the bundled one, so the bundled copy never flashes first. */
-const NEW_PHOTO = new Set(['almond_butter', 'black_beans', 'bread_white', 'bread_ww', 'burger_bun', 'canned_chicken', 'cheddar', 'coleslaw_mix',
-  'egg_whites', 'english_muffin', 'fairlife', 'feta', 'greek_yogurt_2', 'ground_beef_85', 'ground_beef_93', 'lentils', 'light_ice_cream',
-  'lowcarb_tortilla', 'milk_2', 'milk_skim', 'mozzarella', 'pancake_mix', 'parmesan', 'pita', 'plant_protein', 'protein_bar', 'protein_pasta',
-  'skyr', 'turkey_bacon', 'ww_pasta']);
+const NEW_PHOTO = new Set([
+  'almond_butter', 'almonds', 'apple', 'asparagus', 'avocado', 'banana', 'beef_jerky', 'bell_peppers', 'berries', 'beyond_burger',
+  'black_beans', 'blueberries', 'bread', 'bread_white', 'bread_ww', 'broccoli', 'brussels', 'burger_bun', 'burrito', 'canned_chicken',
+  'carrots', 'cauliflower', 'cereal', 'cheddar', 'cherries', 'chia', 'chicken_breast', 'chicken_sausage', 'chicken_thigh', 'chickpeas',
+  'coleslaw', 'coleslaw_mix', 'corn', 'corn_tortilla', 'couscous', 'cream_of_rice', 'cucumber', 'dark_chocolate', 'egg_whites', 'eggs',
+  'english_muffin', 'fairlife', 'feta', 'flank_steak', 'granola', 'grapes', 'greek_yogurt', 'greek_yogurt_2', 'ground_beef_85',
+  'ground_beef_93', 'ground_turkey', 'ham', 'hummus', 'ice_cream', 'kale', 'kiwi', 'lentils', 'light_ice_cream', 'lowcarb_tortilla',
+  'mango', 'milk', 'milk_2', 'milk_skim', 'mixed_nuts', 'mozzarella', 'mushrooms', 'onions', 'orange', 'pancake', 'pancake_mix',
+  'parmesan', 'pasta', 'pasta_meat', 'peach', 'pear', 'peas', 'pineapple', 'pita', 'plant_protein', 'popcorn', 'pork_chop',
+  'pork_tenderloin', 'potato', 'pretzels', 'protein_bar', 'protein_pasta', 'protein_shake_rtd', 'quinoa', 'ramen_noodles',
+  'rotisserie_chicken', 'salad_greens', 'skyr', 'sourdough', 'spinach', 'stir_fry', 'stir_fry_veg', 'strawberries', 'sweet_potato', 'tofu',
+  'tomatoes', 'tuna_can', 'turkey_bacon', 'turkey_deli', 'watermelon', 'white_fish', 'white_rice', 'wrap', 'ww_pasta', 'zucchini'
+]);
 
 /** The bundled photo (instant, offline), or the food's own high-res photo when nothing matching is bundled. */
 export const foodPhoto = (id: string): ImageSourcePropType | undefined =>
@@ -164,12 +172,12 @@ export const foodPhoto = (id: string): ImageSourcePropType | undefined =>
 export type Tile = { source: ImageSourcePropType; label: string; hd?: string };
 
 const DISH: [RegExp, (ids: string[]) => ImageSourcePropType, string][] = [
-  [/\bburrito\b/i, () => PHOTO.burrito, 'Burrito'],
-  [/\btacos\b/i, () => PHOTO.tacos, 'Tacos'],
-  [/\bwrap\b/i, () => PHOTO.wrap, 'Wrap'],
-  [/\bburger\b/i, (ids) => (ids.includes('beyond_burger') ? PHOTO.beyond_burger : MEAL_IMG.burger), 'Burger'],
-  [/\bpita\b/i, () => PHOTO.pita, 'Pita'],
-  [/\bsandwich\b/i, () => PHOTO.sandwich, 'Sandwich'],
+  [/\bburrito\b/i, () => foodPhoto('burrito')!, 'Burrito'],
+  [/\btacos\b/i, () => foodPhoto('tacos')!, 'Tacos'],
+  [/\bwrap\b/i, () => foodPhoto('wrap')!, 'Wrap'],
+  [/\bburger\b/i, (ids) => (ids.includes('beyond_burger') ? foodPhoto('beyond_burger')! : { uri: hdUrl(MEAL_HD.burger, 900) }), 'Burger'],
+  [/\bpita\b/i, () => foodPhoto('pita')!, 'Pita'],
+  [/\bsandwich\b/i, () => foodPhoto('sandwich')!, 'Sandwich'],
 ];
 
 const short = (id: string) => {

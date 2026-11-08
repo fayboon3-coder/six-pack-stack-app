@@ -20,6 +20,7 @@ import { afterProtein } from '../../src/lib/reminders';
 import HealthCard from '../../src/components/HealthCard';
 import { registerPush } from '../../src/lib/push';
 
+import { CREDITS } from '../../src/lib/hd';
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
 const LOGO = require('../../assets/logo-b.png');
@@ -167,6 +168,7 @@ export default function You() {
         <RemindersCard />
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
         {profile?.role !== 'coach' && <Text accessibilityRole="link" onPress={() => router.push('/delete-account')} style={st.legal}>Delete my account</Text>}
+        <Text style={st.credits}>{CREDITS}</Text>
       </ScrollView>
     </View>
   );
@@ -240,4 +242,5 @@ const st = StyleSheet.create({
   ghost: { height: 52, borderRadius: 26, borderWidth: 1.5, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center', marginTop: 8 },
   ghostT: { fontFamily: F.bold, fontSize: 17, color: C.ink },
   legal: { fontFamily: F.medium, fontSize: 13, color: C.ink, textAlign: 'center', textDecorationLine: 'underline', marginTop: 6 },
+  credits: { fontFamily: F.medium, fontSize: 11.5, lineHeight: 16, color: C.muted, textAlign: 'center', marginTop: 14, paddingHorizontal: 10 },
 });

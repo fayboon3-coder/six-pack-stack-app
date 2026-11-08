@@ -15,8 +15,9 @@ import PageHeader from '../src/components/PageHeader';
 import Pills from '../src/components/Pills';
 import FullHero from '../src/components/FullHero';
 
-const PLAN_IMG = require('../assets/hero/plan_full.jpg');
-const STACK_IMG = require('../assets/hero/stack_full.jpg');
+import { CREDITS, HEADER_HD, hdUrl } from '../src/lib/hd';
+const PLAN_IMG = { uri: hdUrl(HEADER_HD.plan, 1200) };
+const STACK_IMG = { uri: hdUrl(HEADER_HD.stack, 1200) };
 import { productImage } from '../src/lib/images';
 import { mealImage } from '../src/lib/meals';
 import FoodTiles, { FoodThumb } from '../src/components/FoodTiles';
@@ -168,6 +169,8 @@ export default function PlanDetails() {
         </Card>
       ))}
 
+      {tab === 'Eating out' && !!plan.eat_out?.length && <Text style={st.credit}>{CREDITS}</Text>}
+
       {tab === 'Groceries' && (plan.grocery || []).map((g, k) => {
         const items = g.items.split(/,|·|\n/).map((x) => x.trim()).filter(Boolean);
         return (
@@ -221,6 +224,7 @@ const st = StyleSheet.create({
   tileTag: { position: 'absolute', left: 6, bottom: 6, maxWidth: '90%', backgroundColor: 'rgba(9,20,42,0.82)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3 },
   tileTagT: { fontFamily: F.xbold, fontSize: 11, color: '#ffffff' },
   tiles: { borderRadius: 14, marginBottom: 8 },
+  credit: { fontFamily: F.medium, fontSize: 11.5, lineHeight: 16, color: C.muted },
   groc: { gap: 2 },
   grocItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: E.hair },
   grocT: { flex: 1, fontFamily: F.semi, fontSize: 15, lineHeight: 20, color: C.ink },

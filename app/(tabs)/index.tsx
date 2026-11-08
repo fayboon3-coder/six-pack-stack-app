@@ -10,7 +10,7 @@ import NoPlan from '../../src/components/NoPlan';
 import { daysToSunday, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
 import { dayMeta } from '../../src/lib/workoutMeta';
 import { heroPhoto } from '../../src/lib/heroPhotos';
-import { workoutHD } from '../../src/lib/hd';
+import { HEADER_HD, hdUrl, workoutHD } from '../../src/lib/hd';
 import { isoDate, lastSession, loggedDays } from '../../src/lib/logs';
 import { isCoached, isFree, isLocked } from '../../src/lib/access';
 import { addProtein, num, proteinGoal, readDay, stepGoal, syncPhoneSteps, type Day } from '../../src/lib/daily';
@@ -29,12 +29,13 @@ import { track } from '../../src/lib/track';
 import { showCoaching } from '../../src/components/Coach';
 import BackOffice from '../../src/components/BackOffice';
 import MealCard from '../../src/components/MealCard';
+import Pic from '../../src/components/Pic';
 import { Bar, CountUp, Drift, MotionScroll, Ping, Press, Reveal } from '../../src/components/motion';
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
 const BOON = require('../../assets/hero/boon_avatar.jpg');
 const BOON_WIDE = require('../../assets/hero/boon_wide.jpg');
-const SCALE = require('../../assets/hero/checkin.jpg');
+const SCALE = { uri: hdUrl(HEADER_HD.scale, 300) };
 const LOGO = require('../../assets/logo-b.png');
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 const DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -400,7 +401,7 @@ export default function Today() {
         <Reveal style={st.gutter}>
           <Press accessibilityRole="button" onPress={go(coached && cs?.state !== 'due' ? '/corner' : '/checkin', 'checkin')} scale={0.985} style={st.checkin}>
             <View>
-              <Image source={SCALE} style={st.checkinPic} />
+              <Pic source={SCALE} style={st.checkinPic} />
               {toSun === 0 && cs?.state !== 'sent' && cs?.state !== 'reviewed' && <View style={st.checkinPing}><Ping color={E.red} size={8} /></View>}
             </View>
             <View style={{ flex: 1, minWidth: 0 }}>

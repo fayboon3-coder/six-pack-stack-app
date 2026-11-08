@@ -158,6 +158,7 @@ export default function Meals() {
                 </Reveal>
               ))}
             </ScrollView>
+            <Text style={[st.gutter, st.credit]}>Example dishes, not the restaurants' own photos. Six-Pack Stack isn't affiliated with any restaurant.</Text>
           </>
         )}
 
@@ -209,6 +210,7 @@ export default function Meals() {
 const Arrow = () => <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M9 5.5l6.5 6.5L9 18.5" stroke={E.ink} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>;
 
 const st = StyleSheet.create({
+  credit: { fontFamily: F.medium, fontSize: 11, lineHeight: 15, color: E.faint, marginTop: 8 },
   fill: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
   gutter: { paddingHorizontal: 20 },
   totals: { flexDirection: 'row', gap: 16, marginTop: 18, padding: 18, borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
@@ -231,7 +233,7 @@ const st = StyleSheet.create({
   logS: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: 'rgba(255,255,255,0.86)', marginTop: 3 },
   cam: { position: 'absolute', right: 18, bottom: 18, width: 50, height: 50, borderRadius: 25, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
   out: { width: 230, borderRadius: 20, overflow: 'hidden', backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
-  outPic: { height: 120, backgroundColor: E.soft, justifyContent: 'flex-end' },
+  outPic: { height: 120, backgroundColor: E.ink, justifyContent: 'flex-end' },
   outW: { fontFamily: F.black, fontSize: 19, letterSpacing: -0.4, color: '#fff', padding: 12 },
   outO: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: E.ink },
   outM: { fontFamily: F.bold, fontSize: 12.5, color: E.sub },
