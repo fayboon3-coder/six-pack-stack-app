@@ -143,16 +143,25 @@ const SAME_AS: Record<string, string> = {
   pancake_mix: 'pancake',
   light_ice_cream: 'ice_cream',
   coleslaw_mix: 'coleslaw',
-  bacon: 'turkey_bacon',
 };
 
 /** Cooking fats and sauces aren't worth a tile (salsa is). */
 const SKIP_CATS = new Set(['fat', 'sauce']);
 const KEEP = new Set(['avocado', 'peanut_butter', 'almond_butter', 'hummus', 'salsa', 'almonds', 'mixed_nuts', 'feta']);
 
-export const foodPhoto = (id: string): ImageSourcePropType | undefined => PHOTO[SAME_AS[id] || id];
+import { FOOD_HD, hdUrl } from './hd';
 
-export type Tile = { source: ImageSourcePropType; label: string };
+/** Foods whose new high-res photo isn't the bundled one, so the bundled copy never flashes first. */
+const NEW_PHOTO = new Set(['almond_butter', 'black_beans', 'bread_white', 'bread_ww', 'burger_bun', 'canned_chicken', 'cheddar', 'coleslaw_mix',
+  'egg_whites', 'english_muffin', 'fairlife', 'feta', 'greek_yogurt_2', 'ground_beef_85', 'ground_beef_93', 'lentils', 'light_ice_cream',
+  'lowcarb_tortilla', 'milk_2', 'milk_skim', 'mozzarella', 'pancake_mix', 'parmesan', 'pita', 'plant_protein', 'protein_bar', 'protein_pasta',
+  'skyr', 'turkey_bacon', 'ww_pasta']);
+
+/** The bundled photo (instant, offline), or the food's own high-res photo when nothing matching is bundled. */
+export const foodPhoto = (id: string): ImageSourcePropType | undefined =>
+  (NEW_PHOTO.has(id) ? undefined : PHOTO[id] || PHOTO[SAME_AS[id]]) || (FOOD_HD[id] ? { uri: hdUrl(FOOD_HD[id], 600) } : undefined);
+
+export type Tile = { source: ImageSourcePropType; label: string; hd?: string };
 
 const DISH: [RegExp, (ids: string[]) => ImageSourcePropType, string][] = [
   [/\bburrito\b/i, () => PHOTO.burrito, 'Burrito'],
@@ -181,8 +190,8 @@ export function mealTiles(name: string, ids?: string[]): Tile[] {
     const side = foods.find((id) => ['veg', 'fruit'].includes(foodById(id)!.cat));
     const label = name.split(' & ')[0];
     const out: Tile[] = [{ source: dish[1](ids), label }];
-    if (side) out.push({ source: foodPhoto(side)!, label: short(side) });
+    if (side) out.push({ source: foodPhoto(side)!, label: short(side), hd: FOOD_HD[side] });
     return out;
   }
-  return foods.slice(0, 3).map((id) => ({ source: foodPhoto(id)!, label: short(id) }));
+  return foods.slice(0, 3).map((id) => ({ source: foodPhoto(id)!, label: short(id), hd: FOOD_HD[id] }));
 }

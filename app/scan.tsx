@@ -40,7 +40,7 @@ export default function Scan() {
   };
 
   const add = async (n: Nutrition) => {
-    await addFood({ name: n.brand ? `${n.name} (${n.brand})` : n.name, kcal: n.kcal, protein: n.protein, carbs: n.carbs, fat: n.fat, source: 'barcode' });
+    await addFood({ name: n.brand ? `${n.name} (${n.brand})` : n.name, kcal: n.kcal, protein: n.protein, carbs: n.carbs, fat: n.fat, source: 'barcode', img: found?.image || null });
     track('food_logged', { source: 'barcode' });
     if (plan) { const d = await readDay(); afterProtein(d.protein, proteinGoal(plan)).catch(() => {}); }
     setDone(`${n.name} added. ${n.kcal} cal · ${n.protein} g protein.`);

@@ -1,23 +1,29 @@
-import React, { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Image, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
-import Svg, { Path } from 'react-native-svg';
+import { LinearGradient } from 'expo-linear-gradient';
+import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../../src/lib/auth';
-import { C, F } from '../../src/lib/theme';
-import Page from '../../src/components/Page';
-import Panel from '../../src/components/Panel';
+import { E, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import ProgramsHeader from '../../src/components/ProgramsHeader';
 import { addProtein, num, proteinGoal, readDay } from '../../src/lib/daily';
 import { isCoached } from '../../src/lib/access';
 import { CoachCard } from '../../src/components/Coach';
-
 import { readMeals, writeMeals, type MealDay } from '../../src/lib/mealsToday';
 import { readFood } from '../../src/lib/food';
 import { afterProtein } from '../../src/lib/reminders';
+import { mealImage } from '../../src/lib/meals';
+import { foodsWithPhotos, picFor } from '../../src/lib/foodMatch';
+import MealCard from '../../src/components/MealCard';
+import Pic from '../../src/components/Pic';
+import { FoodThumb } from '../../src/components/FoodTiles';
+import { Bar, CountUp, Drift, Marquee, MotionScroll, Press, Reveal } from '../../src/components/motion';
+import { track } from '../../src/lib/track';
+
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
-/** Programs · Meals: today's meals from their foods (tick and swap), eating out, groceries. */
+/** Programs · Meals: today's meals as photos of their foods (tick, swap), food logging, eating out, groceries. */
 export default function Meals() {
   const { plan, profile } = useAuth();
   const router = useRouter();
@@ -32,6 +38,13 @@ export default function Meals() {
   }, []);
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  // Every food the plan is built from, each with its photo (for the moving strip).
+  const pantry = useMemo(() => {
+    const seen = new Map<string, { label: string; source: any; hd?: string }>();
+    (plan?.meals || []).forEach((m) => m.options.forEach((o) => foodsWithPhotos(o.name, o.detail, o.ids).forEach((f) => { if (!seen.has(f.id)) seen.set(f.id, f); })));
+    return [...seen.values()];
+  }, [plan?.meals]);
+
   if (!plan) return <NoPlan name={profile?.first_name} />;
   const meals = plan.meals || [];
   const save = async (next: MealDay) => { setDay(next); await writeMeals(next); };
@@ -42,127 +55,189 @@ export default function Meals() {
     await save({ ...day, eaten: { ...day.eaten, [k]: on } });
     const g = num(opt(k).protein);
     if (g) { const d = await addProtein(on ? g : -g); setProtein(d.protein); if (plan) afterProtein(d.protein, proteinGoal(plan)).catch(() => {}); }
+    track('meal_tick', { where: 'meals', on });
   };
   const swap = (k: number) => { if (day.eaten[k] || meals[k].options.length < 2) return; save({ ...day, pick: { ...day.pick, [k]: ((day.pick[k] || 0) + 1) % meals[k].options.length } }); };
 
   const kcalGoal = num(plan.kcal) || 2000, pg = proteinGoal(plan);
   const kcal = meals.reduce((n, _, k) => n + (day.eaten[k] ? num(opt(k).kcal) : 0), 0) + logged.kcal;
-  const groceries = (plan.grocery || []).reduce((n, g) => n + g.items.split(/,|·|\n/).filter((x) => x.trim()).length, 0);
+  const groceryItems = (plan.grocery || []).flatMap((g) => g.items.split(/,|·|\n/).map((x) => x.trim()).filter(Boolean));
   const own = !isCoached(profile) && profile?.role !== 'coach';
+  const eatenN = meals.filter((_, k) => day.eaten[k]).length;
 
   return (
-    <Page header={<ProgramsHeader active="meals" />}>
-      <View style={[st.card, st.totals]}>
-        <Total label="Calories" v={fmt(kcal)} of={fmt(kcalGoal)} pct={kcal / kcalGoal} color="#ffb347" />
-        <Total label="Protein" v={`${fmt(protein)} g`} of={`${fmt(pg)} g`} pct={protein / pg} color="#d22f26" />
-      </View>
-
-      <Pressable accessibilityRole="button" onPress={() => router.push('/log-food')} style={st.log}>
-        <View style={st.logIco}><Svg width={22} height={22} viewBox="0 0 24 24"><Path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="#fff" strokeWidth={2} fill="none" strokeLinejoin="round" /><Path d="M12 10a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" stroke="#fff" strokeWidth={2} fill="none" /></Svg></View>
-        <View style={{ flex: 1 }}>
-          <Text style={st.logT}>Log food</Text>
-          <Text style={st.logS}>{logged.n ? `${logged.n} logged today · ` : ''}Snap a meal, scan a barcode or a label</Text>
-        </View>
-        <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-      </Pressable>
-
-      <Panel title="Today's meals" right={plan.food === 'picked' || isCoached(profile) ? 'From your foods' : 'Tap to swap'} bodyStyle={{ paddingVertical: 2 }}>
-        {meals.map((m, k) => {
-          const o = opt(k); const on = !!day.eaten[k];
-          return (
-            <View key={k} style={[st.meal, k < meals.length - 1 && st.line]}>
-              <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={`Mark ${m.slot} eaten`} hitSlop={10} onPress={() => toggle(k)}
-                style={[st.check, on ? { backgroundColor: C.red, borderWidth: 0 } : null]}>
-                {on && <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>}
-              </Pressable>
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={st.when}>{m.slot.toUpperCase()}</Text>
-                <Text style={st.name}>{o.name}</Text>
-                <Text style={st.macros}>{o.kcal} cal · {String(o.protein).replace(/\s*g?$/, '')} g protein</Text>
-              </View>
-              {m.options.length > 1 && (
-                <Pressable accessibilityRole="button" accessibilityLabel={`Swap ${m.slot}`} onPress={() => swap(k)} hitSlop={6} style={[st.swap, on && { opacity: 0.4 }]}>
-                  <Svg width={15} height={15} viewBox="0 0 24 24"><Path d="M7 7h11l-3-3M17 17H6l3 3" stroke={C.ink} strokeWidth={2.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-                </Pressable>
-              )}
+    <View style={{ flex: 1, backgroundColor: E.paper }}>
+      <ProgramsHeader active="meals" />
+      <MotionScroll contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+        {/* Today's numbers */}
+        <Reveal style={st.gutter}>
+          <View style={st.totals}>
+            <View style={{ flex: 1 }}>
+              <Text style={st.k}>CALORIES</Text>
+              <View style={st.bigRow}><CountUp value={kcal} style={st.big} /><Text style={st.of}>/ {fmt(kcalGoal)}</Text></View>
+              <Bar pct={kcal / kcalGoal} color={kcal > kcalGoal + 150 ? E.red : E.ink} track={E.soft} />
             </View>
-          );
-        })}
-      </Panel>
+            <View style={st.vHair} />
+            <View style={{ flex: 1 }}>
+              <Text style={st.k}>PROTEIN</Text>
+              <View style={st.bigRow}><CountUp value={protein} style={st.big} /><Text style={st.of}>/ {pg} g</Text></View>
+              <Bar pct={protein / pg} color={protein >= pg ? E.green : E.red} track={E.soft} />
+            </View>
+          </View>
+        </Reveal>
 
-      {!!plan.eat_out?.length && (
-        <Panel title="Eating out" bodyStyle={{ paddingHorizontal: 0 }}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingHorizontal: 18 }}>
-            {plan.eat_out.map((e, k) => (
-              <Pressable key={k} onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Eating out' } })} style={st.out} accessibilityLabel={`${e.where}: ${e.order}`}>
-                <Text style={st.outW}>{e.where}</Text>
-                <Text style={st.outO} numberOfLines={3}>{e.order}</Text>
-                <Text style={st.outM}>{num(e.kcal)} · {num(e.protein)} g</Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </Panel>
-      )}
+        {/* The foods it's built from, gliding by */}
+        {pantry.length >= 5 && (
+          <Reveal delay={80} style={{ marginTop: 26 }}>
+            <Text style={[st.k, st.gutter, { marginBottom: 12 }]}>{plan.food === 'picked' ? 'BUILT FROM THE FOODS YOU PICKED' : 'BUILT FROM FOODS YOU LIKE'}</Text>
+            <Marquee speed={26} gap={14}>
+              {pantry.map((f) => (
+                <View key={f.label} style={st.pantry}>
+                  <FoodThumb source={f.source} hd={f.hd} size={64} round />
+                  <Text style={st.pantryT} numberOfLines={1}>{f.label}</Text>
+                </View>
+              ))}
+            </Marquee>
+          </Reveal>
+        )}
 
-      <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M3 4h2l2.5 11h11L21 7H6.5M9 20h.01M17 20h.01" stroke="#d22f26" strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>}
-        title="Grocery list" sub={`This week · ${groceries} items`} onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Groceries' } })} />
-      {!!plan.stack?.length && (
-        <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M9 3h6v4l3 3v11H6V10l3-3z" stroke="#d22f26" strokeWidth={2} fill="none" strokeLinejoin="round" /></Svg>}
-          title="Your stack" sub={`${plan.stack.length} products that work`} onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Stack' } })} />
-      )}
-      <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h4" stroke="#d22f26" strokeWidth={2} fill="none" strokeLinecap="round" /></Svg>}
-        title="All meal options" sub="Every option, your numbers and rules" onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Meals' } })} />
-      <CoachCard where="meals" title="Meals built around your actual week"
-        body="Late shifts, date nights, weekends away. With 1:1 coaching I build your meals around your life and adjust them every Sunday. Text me from any restaurant." />
-      {own && (
-        <Row icon={<Svg width={20} height={20} viewBox="0 0 24 24"><Path d="M12 5v14M5 12h14" stroke="#d22f26" strokeWidth={2.2} fill="none" strokeLinecap="round" /></Svg>}
-          title="Your foods" sub="Add or swap foods and rebuild your meals" onPress={() => router.push('/foods')} />
-      )}
-    </Page>
+        {/* Today's meals */}
+        <View style={[st.gutter, st.head]}>
+          <Text style={st.h} accessibilityRole="header">Today’s meals</Text>
+          <Text style={st.hR}>{eatenN} of {meals.length} eaten</Text>
+        </View>
+        <View style={[st.gutter, { gap: 14 }]}>
+          {meals.map((m, k) => (
+            <Reveal key={k} delay={k * 60}>
+              <MealCard slot={m.slot} opt={opt(k)} eaten={!!day.eaten[k]} onToggle={() => toggle(k)} onSwap={() => swap(k)} canSwap={m.options.length > 1}
+                count={m.options.length} index={(day.pick[k] || 0) % m.options.length}
+                onOpen={() => router.push({ pathname: '/plan-details', params: { tab: 'Meals' } })} />
+            </Reveal>
+          ))}
+        </View>
+
+        {/* Log anything else */}
+        <Reveal style={[st.gutter, { marginTop: 22 }]}>
+          <Press accessibilityRole="button" onPress={() => router.push('/log-food')} style={st.log}>
+            <View style={st.logPic}>
+              <Drift source={mealImage('chicken rice bowl')!} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={['rgba(16,23,42,0.1)', 'rgba(16,23,42,0.85)']} style={StyleSheet.absoluteFill} />
+              <View style={st.logIn}>
+                <Text style={st.logK}>LOG FOOD{logged.n ? ` · ${logged.n} LOGGED TODAY` : ''}</Text>
+                <Text style={st.logT}>Snap it, scan it, done.</Text>
+                <Text style={st.logS}>Photo, barcode or label. It counts toward today in seconds.</Text>
+              </View>
+              <View style={st.cam}>
+                <Svg width={22} height={22} viewBox="0 0 24 24"><Path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.6-2.5h5.4l1.6 2.5h2.2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" stroke={E.ink} strokeWidth={2} fill="none" strokeLinejoin="round" /><Circle cx={12} cy={13} r={3.6} stroke={E.ink} strokeWidth={2} fill="none" /></Svg>
+              </View>
+            </View>
+          </Press>
+        </Reveal>
+
+        {/* Eating out */}
+        {!!plan.eat_out?.length && (
+          <>
+            <View style={[st.gutter, st.head]}>
+              <Text style={st.h} accessibilityRole="header">Eating out</Text>
+              <Press accessibilityRole="button" onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Eating out' } })}><Text style={st.hLink}>All orders</Text></Press>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 20 }}>
+              {plan.eat_out.map((e, k) => (
+                <Reveal key={k} delay={k * 70}>
+                  <Press accessibilityRole="button" accessibilityLabel={`${e.where}: ${e.order}`} onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Eating out' } })} style={st.out}>
+                    <View style={st.outPic}>
+                      {mealImage(e.where, e.order) ? <Pic source={mealImage(e.where, e.order)} style={st.fill} /> : null}
+                      <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,0.75)']} style={StyleSheet.absoluteFill} />
+                      <Text style={st.outW}>{e.where}</Text>
+                    </View>
+                    <View style={{ padding: 12, gap: 6 }}>
+                      <Text style={st.outO} numberOfLines={3}>{e.order}</Text>
+                      <Text style={st.outM}>{fmt(num(e.kcal))} cal · {num(e.protein)} g protein</Text>
+                    </View>
+                  </Press>
+                </Reveal>
+              ))}
+            </ScrollView>
+          </>
+        )}
+
+        {/* Groceries */}
+        <View style={[st.gutter, st.head]}><Text style={st.h} accessibilityRole="header">Your list</Text></View>
+        <View style={[st.gutter, { gap: 10 }]}>
+          {!!groceryItems.length && (
+            <Reveal>
+              <Press accessibilityRole="button" onPress={() => router.push({ pathname: '/plan-details', params: { tab: 'Groceries' } })} style={st.row}>
+                <View style={st.stackPics}>
+                  {groceryItems.slice(0, 4).map((g, k) => (
+                    <View key={g} style={[st.stackPic, { marginLeft: k ? -14 : 0, zIndex: 10 - k }]}><FoodThumb {...picFor(g)} size={40} round /></View>
+                  ))}
+                </View>
+                <View style={{ flex: 1 }}><Text style={st.rowT}>Grocery list</Text><Text style={st.rowS}>{groceryItems.length} items, every one pictured</Text></View>
+                <Arrow />
+              </Press>
+            </Reveal>
+          )}
+          {[
+            ...(plan.stack?.length ? [{ t: 'Your stack', s: `${plan.stack.length} products that work`, tab: 'Stack' }] : []),
+            { t: 'Every meal option', s: 'All your options, your numbers and the rules', tab: 'Meals' },
+          ].map((r, k) => (
+            <Reveal key={r.t} delay={(k + 1) * 50}>
+              <Press accessibilityRole="button" onPress={() => router.push({ pathname: '/plan-details', params: { tab: r.tab } })} style={st.row}>
+                <View style={{ flex: 1 }}><Text style={st.rowT}>{r.t}</Text><Text style={st.rowS}>{r.s}</Text></View>
+                <Arrow />
+              </Press>
+            </Reveal>
+          ))}
+          {own && (
+            <Reveal delay={150}>
+              <Press accessibilityRole="button" onPress={() => router.push('/foods')} style={st.row}>
+                <View style={{ flex: 1 }}><Text style={st.rowT}>Your foods</Text><Text style={st.rowS}>Add or swap foods and rebuild your meals</Text></View>
+                <Arrow />
+              </Press>
+            </Reveal>
+          )}
+          <View style={{ marginTop: 10 }}>
+            <CoachCard where="meals" title="Meals built around your actual week"
+              body="Late shifts, date nights, weekends away. With 1:1 coaching I build your meals around your life and adjust them every Sunday. Text me from any restaurant." />
+          </View>
+        </View>
+      </MotionScroll>
+    </View>
   );
 }
 
-const Total = ({ label, v, of, pct, color }: { label: string; v: string; of: string; pct: number; color: string }) => (
-  <View style={{ flex: 1 }}>
-    <Text style={st.tL}>{label}</Text>
-    <Text style={st.tV}>{v} <Text style={st.tOf}>/ {of}</Text></Text>
-    <View style={st.track}><View style={[st.fill, { width: `${Math.min(100, Math.max(0, pct * 100))}%`, backgroundColor: color }]} /></View>
-  </View>
-);
-
-const Row = ({ icon, title, sub, onPress }: { icon: React.ReactNode; title: string; sub: string; onPress: () => void }) => (
-  <Pressable accessibilityRole="button" onPress={onPress} style={[st.card, st.row]}>
-    <View style={st.rowI}>{icon}</View>
-    <View style={{ flex: 1 }}><Text style={st.rowT}>{title}</Text><Text style={st.rowS}>{sub}</Text></View>
-    <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke={C.ink} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-  </Pressable>
-);
+const Arrow = () => <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M9 5.5l6.5 6.5L9 18.5" stroke={E.ink} strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>;
 
 const st = StyleSheet.create({
-  card: { backgroundColor: C.card, borderWidth: 1, borderColor: C.line, borderRadius: 22 },
-  totals: { flexDirection: 'row', gap: 16, paddingVertical: 14, paddingHorizontal: 18 },
-  tL: { fontFamily: F.semi, fontSize: 13, color: C.ink },
-  tV: { fontFamily: F.xbold, fontSize: 20, color: C.ink, marginTop: 3 },
-  tOf: { fontFamily: F.semi, fontSize: 14, color: C.ink },
-  track: { height: 6, borderRadius: 3, backgroundColor: '#e8eaf0', marginTop: 8, overflow: 'hidden' },
-  fill: { height: 6, borderRadius: 3 },
-  meal: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11 },
-  line: { borderBottomWidth: 1, borderBottomColor: '#e9ebf1' },
-  check: { width: 24, height: 24, borderRadius: 12, borderWidth: 1.5, borderColor: '#c3c8d4', alignItems: 'center', justifyContent: 'center', backgroundColor: C.bg },
-  when: { fontFamily: F.bold, fontSize: 12, letterSpacing: 0.5, color: C.ink },
-  name: { fontFamily: F.semi, fontSize: 15, color: C.ink, marginTop: 2 },
-  macros: { fontFamily: F.medium, fontSize: 13, color: C.ink, marginTop: 1 },
-  swap: { width: 36, height: 36, borderRadius: 18, borderWidth: 1, borderColor: '#d5d9e3', alignItems: 'center', justifyContent: 'center' },
-  out: { width: 150, padding: 12, borderRadius: 14, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line },
-  outW: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
-  outO: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink, marginTop: 4 },
-  outM: { fontFamily: F.medium, fontSize: 13, color: C.ink, marginTop: 6 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 18 },
-  log: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 22, backgroundColor: C.navy },
-  logIco: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
-  logT: { fontFamily: F.xbold, fontSize: 17, color: '#fff' },
-  logS: { fontFamily: F.medium, fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 1 },
-  rowI: { width: 40, height: 40, borderRadius: 12, backgroundColor: C.redTint, alignItems: 'center', justifyContent: 'center' },
-  rowT: { fontFamily: F.bold, fontSize: 16, color: C.ink },
-  rowS: { fontFamily: F.medium, fontSize: 13, color: C.ink },
+  fill: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  gutter: { paddingHorizontal: 20 },
+  totals: { flexDirection: 'row', gap: 16, marginTop: 18, padding: 18, borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  vHair: { width: 1, backgroundColor: E.hair },
+  k: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: E.sub },
+  bigRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginTop: 6, marginBottom: 12 },
+  big: { fontFamily: F.black, fontSize: 32, letterSpacing: -1.2, color: E.ink, fontVariant: ['tabular-nums'] },
+  of: { fontFamily: F.semi, fontSize: 13, color: E.sub },
+  pantry: { width: 76, alignItems: 'center', gap: 7 },
+  pantryT: { fontFamily: F.semi, fontSize: 11.5, color: E.ink, textAlign: 'center' },
+  head: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 32, marginBottom: 14 },
+  h: { fontFamily: F.xbold, fontSize: 24, letterSpacing: -0.7, color: E.ink },
+  hR: { fontFamily: F.semi, fontSize: 13, color: E.sub },
+  hLink: { fontFamily: F.semi, fontSize: 14, color: E.ink },
+  log: { borderRadius: 24, overflow: 'hidden' },
+  logPic: { height: 180, backgroundColor: E.ink, justifyContent: 'flex-end' },
+  logIn: { padding: 18, paddingRight: 80 },
+  logK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: '#ff8a80' },
+  logT: { fontFamily: F.black, fontSize: 24, letterSpacing: -0.6, color: '#fff', marginTop: 4 },
+  logS: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: 'rgba(255,255,255,0.86)', marginTop: 3 },
+  cam: { position: 'absolute', right: 18, bottom: 18, width: 50, height: 50, borderRadius: 25, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  out: { width: 230, borderRadius: 20, overflow: 'hidden', backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  outPic: { height: 120, backgroundColor: E.soft, justifyContent: 'flex-end' },
+  outW: { fontFamily: F.black, fontSize: 19, letterSpacing: -0.4, color: '#fff', padding: 12 },
+  outO: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: E.ink },
+  outM: { fontFamily: F.bold, fontSize: 12.5, color: E.sub },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 15, paddingHorizontal: 16, borderRadius: 20, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
+  rowT: { fontFamily: F.bold, fontSize: 16, color: E.ink },
+  rowS: { fontFamily: F.medium, fontSize: 13, color: E.sub, marginTop: 2 },
+  stackPics: { flexDirection: 'row' },
+  stackPic: { borderRadius: 22, borderWidth: 2, borderColor: E.surface },
 });

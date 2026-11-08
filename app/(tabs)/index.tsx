@@ -8,8 +8,9 @@ import { useAuth } from '../../src/lib/auth';
 import { E, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import { daysToSunday, phaseOf, PHOTO_WEEKS, todayIndex, weekOf } from '../../src/lib/program';
-import { dayMeta, type Muscle } from '../../src/lib/workoutMeta';
-import { THUMBS } from '../../src/lib/thumbs';
+import { dayMeta } from '../../src/lib/workoutMeta';
+import { heroPhoto } from '../../src/lib/heroPhotos';
+import { workoutHD } from '../../src/lib/hd';
 import { isoDate, lastSession, loggedDays } from '../../src/lib/logs';
 import { isCoached, isFree, isLocked } from '../../src/lib/access';
 import { addProtein, num, proteinGoal, readDay, stepGoal, syncPhoneSteps, type Day } from '../../src/lib/daily';
@@ -27,6 +28,8 @@ import { mondayOf } from '../../src/lib/recap';
 import { track } from '../../src/lib/track';
 import { showCoaching } from '../../src/components/Coach';
 import BackOffice from '../../src/components/BackOffice';
+import MealCard from '../../src/components/MealCard';
+import { Bar, CountUp, Drift, MotionScroll, Ping, Press, Reveal } from '../../src/components/motion';
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
 const BOON = require('../../assets/hero/boon_avatar.jpg');
@@ -164,9 +167,9 @@ export default function Today() {
 
   return (
     <View style={{ flex: 1, backgroundColor: E.paper }}>
-      <ScrollView contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+      <MotionScroll contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         {/* ---------- Masthead ---------- */}
-        <View style={st.gutter}>
+        <Reveal style={st.gutter} y={10}>
           <View style={st.mastRow}>
             <Image source={LOGO} style={st.logo} accessibilityIgnoresInvertColors />
             <Text style={st.dateLine} numberOfLines={1}>{dateLine}</Text>
@@ -197,11 +200,12 @@ export default function Today() {
               ))}
             </View>
           </View>
-        </View>
+        </Reveal>
 
         {/* ---------- 1:1: Boon's note ---------- */}
         {coached && (
-          <Pressable accessibilityRole="button" onPress={go('/corner', 'corner')} style={({ pressed }) => [st.gutter, { marginTop: 22 }, pressed && { opacity: 0.9 }]}>
+          <Reveal delay={120} style={[st.gutter, { marginTop: 22 }]}>
+          <Press accessibilityRole="button" onPress={go('/corner', 'corner')} scale={0.985}>
             <View style={st.note}>
               <View style={st.noteHead}>
                 <Image source={BOON} style={st.noteAv} />
@@ -214,12 +218,14 @@ export default function Today() {
               <Text style={st.noteQ}>{focus ? `“${focus}”` : 'Your first note from me lands after your first Sunday check-in.'}</Text>
               {!!focus && <Text style={st.noteF}>YOUR ONE THING THIS WEEK</Text>}
             </View>
-          </Pressable>
+          </Press>
+          </Reveal>
         )}
 
         {/* ---------- Free plan: what unlocks ---------- */}
         {free && (
-          <Pressable accessibilityRole="button" onPress={go('/unlock', 'unlock')} style={[st.gutter, { marginTop: 22 }]}>
+          <Reveal delay={120} style={[st.gutter, { marginTop: 22 }]}>
+          <Press accessibilityRole="button" onPress={go('/unlock', 'unlock')} scale={0.985}>
             <View style={st.freeBand}>
               <View style={{ flex: 1 }}>
                 <Text style={st.freeK}>FREE STACK · WEEK {Math.min(week, 2)} OF 2</Text>
@@ -227,18 +233,19 @@ export default function Today() {
               </View>
               <View style={st.freeBtn}><Text style={st.freeBtnT}>Unlock</Text></View>
             </View>
-          </Pressable>
+          </Press>
+          </Reveal>
         )}
 
         {/* ---------- Training ---------- */}
         <Section label={restDay ? `Up next · ${DAY_NAME[nextDow] || 'Next'}` : 'Today’s training'} right={`Day ${t.index + 1} of ${days.length}`} />
-        <View style={st.gutter}>
-          <Pressable accessibilityRole="button" accessibilityLabel={`${meta.type}, ${meta.items.length} exercises`} onPress={openWorkout} style={({ pressed }) => [st.heroCard, pressed && { transform: [{ scale: 0.995 }] }]}>
+        <Reveal style={st.gutter}>
+          <Press accessibilityRole="button" accessibilityLabel={`${meta.type}, ${meta.items.length} exercises`} onPress={openWorkout} scale={0.985} style={st.heroCard}>
             <View style={st.heroImg}>
-              {hero ? <Image source={hero} style={[st.fill, restDay && { opacity: 0.85 }]} resizeMode="cover" /> : <View style={[st.fill, { backgroundColor: E.ink }]} />}
+              <Drift source={hero} hd={workoutHD(meta.muscles[0], plan.train.cfg?.equip)} style={st.fill} />
               <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,0.25)', 'rgba(16,23,42,0.92)']} locations={[0, 0.45, 1]} style={st.fill} />
               <View style={st.heroTop}>
-                <View style={[st.chip, doneToday && { backgroundColor: E.green }]}><Text style={st.chipT}>{locked ? 'LOCKED' : doneToday ? 'DONE TODAY' : restDay ? 'REST DAY TODAY' : `WEEK ${week} · ${phase.name.toUpperCase()}`}</Text></View>
+                <View style={[st.chip, doneToday && { backgroundColor: E.green }]}>{!restDay && !doneToday && !locked && <Ping color="#ff6b61" size={6} />}<Text style={st.chipT}>{locked ? 'LOCKED' : doneToday ? 'DONE TODAY' : restDay ? 'REST DAY TODAY' : `WEEK ${week} · ${phase.name.toUpperCase()}`}</Text></View>
               </View>
               <View style={st.heroBottom}>
                 <Text style={st.heroTitle} numberOfLines={2}>{meta.type}</Text>
@@ -266,7 +273,7 @@ export default function Today() {
                 </View>
               </View>
             </View>
-          </Pressable>
+          </Press>
 
           {/* Week strip */}
           <View style={st.strip}>
@@ -279,6 +286,7 @@ export default function Today() {
                   accessibilityLabel={`${DAY_NAME[dow]}: ${di >= 0 ? `day ${di + 1}${ok ? ', done' : ''}` : dow === 0 ? 'check-in' : 'rest'}`}
                   onPress={() => (di >= 0 ? (locked ? router.push('/unlock') : router.push({ pathname: '/day', params: { d: String(di) } })) : router.push('/checkin'))} style={st.stripCol}>
                   <Text style={[st.stripL, isT && { color: E.ink, fontFamily: F.bold }]}>{LETTER[k]}</Text>
+                  {isT && !ok && di >= 0 && <View style={st.stripPing}><Ping color={E.red} size={6} /></View>}
                   <View style={[st.stripDot, di >= 0 && st.stripTrain, ok && st.stripDone, isT && !ok && st.stripToday]}>
                     {ok ? <Svg width={12} height={12} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#fff" strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
                       : di >= 0 ? <Text style={[st.stripN, isT && { color: E.red }]}>{di + 1}</Text>
@@ -290,11 +298,11 @@ export default function Today() {
             })}
           </View>
           <Text style={st.stripCap}>{doneN} of {planned} workouts this week{toSun === 0 ? ' · Check-in today' : ''}</Text>
-        </View>
+        </Reveal>
 
         {/* ---------- Numbers ---------- */}
         <Section label="Your numbers today" right="Plan" onRight={go('/plan', 'plan')} />
-        <View style={st.gutter}>
+        <Reveal style={st.gutter}>
           <View style={st.grid}>
             <View style={st.gridRow}>
               <Metric label="CALORIES" value={fmt(kcal)} of={`of ${fmt(kGoal)}`} pct={kcal / kGoal}
@@ -322,46 +330,35 @@ export default function Today() {
               )}
             </View>
           </View>
-        </View>
+        </Reveal>
 
         {/* ---------- Food ---------- */}
         <Section label="Food" right={food.length ? `${food.length} logged` : undefined} onRight={go('/log-food', 'food_list')} />
-        <View style={st.gutter}>
+        <Reveal style={st.gutter}>
           <View style={st.actions}>
             <Action label="Snap a meal" onPress={go('/log-food?go=meal', 'snap_meal')} icon={<Path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.6-2.5h5.4l1.6 2.5h2.2a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinejoin="round" />} extra={<Circle cx={12} cy={13} r={3.6} stroke={E.ink} strokeWidth={1.8} fill="none" />} />
             <Action label="Scan barcode" onPress={go('/scan', 'scan')} icon={<Path d="M4 6v12M7.5 6v12M10 6v12M13.5 6v12M16 6v12M20 6v12" stroke={E.ink} strokeWidth={1.8} strokeLinecap="round" />} />
             <Action label="Quick add" onPress={go('/log-food', 'quick_add')} icon={<Path d="M12 5v14M5 12h14" stroke={E.ink} strokeWidth={1.9} strokeLinecap="round" />} />
           </View>
           {meal && opt ? (
-            <View style={st.meal}>
-              <Pressable accessibilityRole="button" accessibilityLabel={`${meal.slot}: ${opt.name}`} onPress={go('/plan', 'meal')} style={st.mealMain}>
-                {mealPic ? <Image source={mealPic} style={st.mealPic} /> : <View style={[st.mealPic, { backgroundColor: E.soft }]} />}
-                <View style={{ flex: 1, minWidth: 0 }}>
-                  <Text style={st.mealK}>NEXT UP · {meal.slot.toUpperCase()}</Text>
-                  <Text style={st.mealT} numberOfLines={2}>{opt.name}</Text>
-                  <Text style={st.mealS}>{num(opt.kcal) ? `${fmt(num(opt.kcal))} cal` : opt.kcal} · {num(opt.protein)} g protein</Text>
-                </View>
-              </Pressable>
-              <Pressable accessibilityRole="button" accessibilityLabel={`Mark ${meal.slot} eaten`} onPress={tickMeal} hitSlop={8} style={st.eat}>
-                <Svg width={14} height={14} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={E.ink} strokeWidth={2.8} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-                <Text style={st.eatT}>Ate it</Text>
-              </Pressable>
+            <View style={{ marginTop: 12 }}>
+              <MealCard compact slot={`Next up · ${meal.slot}`} opt={opt} eaten={false} onToggle={tickMeal} onOpen={go('/plan', 'meal')} />
             </View>
           ) : mealList.length ? (
             <View style={[st.meal, { paddingVertical: 16 }]}><Text style={st.mealT}>Every meal on today's plan is ticked off.</Text></View>
           ) : null}
-        </View>
+        </Reveal>
 
         {/* ---------- Body ---------- */}
         <Section label="Body" right="Progress" onRight={go('/progress', 'progress')} />
-        <View style={st.gutter}>
+        <Reveal style={st.gutter}>
           <View style={st.surface}>
             <Pressable accessibilityRole="button" onPress={go('/progress', 'trend')} style={st.bodyTop}>
               <View style={{ flex: 1 }}>
                 <Text style={st.mK}>TREND WEIGHT</Text>
                 {last ? (
                   <View style={st.bigRow}>
-                    <Text style={st.big}>{last.t.toFixed(1)}</Text>
+                    <CountUp value={last.t} format={(n) => n.toFixed(1)} style={st.big} duration={1100} />
                     <Text style={st.bigU}>lbs</Text>
                   </View>
                 ) : <Text style={[st.big, { color: E.faint }]}>—</Text>}
@@ -396,30 +393,34 @@ export default function Today() {
               </Pressable>
             )}
           </View>
-        </View>
+        </Reveal>
 
         {/* ---------- Check-in ---------- */}
         <Section label="Sunday check-in" />
-        <View style={st.gutter}>
-          <Pressable accessibilityRole="button" onPress={go(coached && cs?.state !== 'due' ? '/corner' : '/checkin', 'checkin')} style={({ pressed }) => [st.checkin, pressed && { opacity: 0.92 }]}>
-            <Image source={SCALE} style={st.checkinPic} />
+        <Reveal style={st.gutter}>
+          <Press accessibilityRole="button" onPress={go(coached && cs?.state !== 'due' ? '/corner' : '/checkin', 'checkin')} scale={0.985} style={st.checkin}>
+            <View>
+              <Image source={SCALE} style={st.checkinPic} />
+              {toSun === 0 && cs?.state !== 'sent' && cs?.state !== 'reviewed' && <View style={st.checkinPing}><Ping color={E.red} size={8} /></View>}
+            </View>
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={st.mealK}>{toSun === 0 ? 'TODAY' : `IN ${toSun} DAY${toSun > 1 ? 'S' : ''}`}{photoWeek ? ' · PHOTO WEEK' : ''}</Text>
               <Text style={st.mealT}>{cs?.state === 'sent' ? 'Sent. Boon is reviewing it.' : cs?.state === 'reviewed' ? 'Reviewed. Read Boon’s notes.' : toSun === 0 ? 'Check in now. Takes 2 minutes.' : `${DAY_NAME[0]} ${shortDate(new Date(now.getTime() + toSun * 864e5))}`}</Text>
               <Text style={st.mealS}>{coached ? 'Your weight, your week and your photos. Boon reads every one.' : 'Your weight and your week. That’s how you know it’s working.'}</Text>
             </View>
             <Arrow />
-          </Pressable>
-        </View>
+          </Press>
+        </Reveal>
 
         {/* ---------- Stack (AI) ---------- */}
         <Section label="Ask Stack" right="Open" onRight={go('/stack', 'stack')} />
-        <View style={st.gutter}>
-          <Pressable accessibilityRole="button" onPress={go('/stack', 'stack_box')} style={st.ask}>
+        <Reveal style={st.gutter}>
+          <Press accessibilityRole="button" onPress={go('/stack', 'stack_box')} scale={0.985} style={st.ask}>
             <Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M4 5.5h16v10.5H9.5L4 20z" stroke={E.ink} strokeWidth={1.8} fill="none" strokeLinejoin="round" /></Svg>
             <Text style={st.askT}>Ask anything, or snap your plate</Text>
-          </Pressable>
-        </View>
+            <View style={st.typing}>{[0, 1, 2].map((i) => <View key={i} style={[st.typeDot, { opacity: 0.35 + i * 0.25 }]} />)}</View>
+          </Press>
+        </Reveal>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingTop: 10, paddingHorizontal: 20 }}>
             {['What should I eat tonight?', 'Swap an exercise for me', 'Is creatine worth it?', 'I missed a workout. Now what?'].map((q) => (
               <Pressable key={q} accessibilityRole="button" onPress={() => { track('today_tap', { to: 'stack_prompt' }); router.push({ pathname: '/stack', params: { q } }); }} style={st.prompt}>
@@ -430,7 +431,7 @@ export default function Today() {
 
         {/* ---------- Everything else ---------- */}
         <Section label="Your tools" />
-        <View style={st.gutter}>
+        <Reveal style={st.gutter}>
           <View style={st.surface}>
             {[
               { t: 'Stack Check', s: 'Scan a supplement, get my verdict.', to: '/stack-check', d: 'M12 3l7.5 3v6c0 4.3-3.2 8-7.5 9-4.3-1-7.5-4.7-7.5-9V6z|M8.7 12.2l2.3 2.3 4.4-4.6' },
@@ -455,14 +456,14 @@ export default function Today() {
               </Pressable>
             ))}
           </View>
-        </View>
+        </Reveal>
 
         {/* ---------- Coaching (not yet coached) ---------- */}
         {showCoaching(profile) && !isCoachAccount && (
-          <View style={[st.gutter, { marginTop: 34 }]}>
-            <Pressable accessibilityRole="button" onPress={() => { track('coaching_tap', { where: 'today' }); router.push('/coaching'); }} style={st.coach}>
+          <Reveal style={[st.gutter, { marginTop: 34 }]}>
+            <Press accessibilityRole="button" onPress={() => { track('coaching_tap', { where: 'today' }); router.push('/coaching'); }} scale={0.985} style={st.coach}>
               <View style={st.coachPic}>
-                <Image source={BOON_WIDE} style={st.fill} resizeMode="cover" />
+                <Drift source={BOON_WIDE} style={st.fill} range={0.05} />
                 <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,1)']} locations={[0.55, 1]} style={st.fill} />
               </View>
               <View style={st.coachBody}>
@@ -471,29 +472,17 @@ export default function Today() {
                 <Text style={st.coachS}>I review your week every Sunday and change one thing at a time. Abs in 12 weeks, or I keep coaching you free.</Text>
                 <View style={st.coachBtn}><Text style={st.coachBtnT}>See if you qualify</Text></View>
               </View>
-            </Pressable>
-          </View>
+            </Press>
+          </Reveal>
         )}
 
         <Text style={st.colophon}>SIX-PACK STACK · BY BOON FAY</Text>
-      </ScrollView>
+      </MotionScroll>
     </View>
   );
 }
 
 /* ---------- pieces ---------- */
-
-/** A real gym photo for the day's main muscle (bundled, so it shows instantly and offline). */
-const HERO: Partial<Record<Muscle, string>> = {
-  Chest: 'rT7DgCr-3pg', Back: 'KE2A7G_nDc8', Shoulders: 'Anu8s_nkNpM', Quads: 'nfX7IFK9UNI', Glutes: 'hQgFixeXdZo',
-  Hamstrings: 'hQgFixeXdZo', Biceps: '93R8V6uvwHc', Triceps: 'O7e8j8K3cJo', Calves: 'Q2k3kYbtOcl', Abs: 'mwlp75MS6Rg',
-};
-function heroPhoto(m: Muscle | undefined, equip?: string): ImageSourcePropType {
-  if (equip === 'bw' && (m === 'Chest' || m === 'Triceps')) return THUMBS['rG-rAMxA9Lo'];
-  if (equip === 'db' && m === 'Chest') return THUMBS['5Y3VZsLb1Ys'];
-  if (equip !== 'gym' && m === 'Back') return THUMBS['vbechsUCn24'];
-  return THUMBS[(m && HERO[m]) || 'rT7DgCr-3pg'];
-}
 
 function Section({ label, right, onRight }: { label: string; right?: string; onRight?: () => void }) {
   return (
@@ -522,11 +511,13 @@ function Metric({ label, value, unit, of, pct, foot, good, warn, action, onPress
         )}
       </View>
       <View style={st.bigRow}>
-        <Text style={st.mV} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>
+        {/^[\d,]+$/.test(value)
+          ? <CountUp value={Number(value.replace(/,/g, ''))} style={st.mV} />
+          : <Text style={st.mV} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>}
         {!!unit && <Text style={st.mU}>{unit}</Text>}
       </View>
       <Text style={st.mOf}>{of}</Text>
-      <View style={st.bar}><View style={[st.barFill, { width: `${w * 100}%` }, good && { backgroundColor: E.green }, warn && { backgroundColor: E.red }]} /></View>
+      <View style={{ marginTop: 12 }}><Bar pct={w} height={3} track={E.soft} color={warn ? E.red : good ? E.green : E.ink} /></View>
       <Text style={[st.mFoot, good && { color: E.green, fontFamily: F.semi }, warn && { color: E.red }]}>{foot}</Text>
     </Pressable>
   );
@@ -674,6 +665,10 @@ const st = StyleSheet.create({
 
   checkin: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 12, paddingRight: 16, borderRadius: 22, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair },
   checkinPic: { width: 76, height: 76, borderRadius: 16 },
+  checkinPing: { position: 'absolute', top: 6, right: 6 },
+  stripPing: { position: 'absolute', top: 18, right: 4, zIndex: 2 },
+  typing: { flexDirection: 'row', gap: 4 },
+  typeDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: E.ink },
 
   ask: { height: 54, borderRadius: 27, backgroundColor: E.surface, borderWidth: 1, borderColor: E.hair, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 18 },
   askT: { flex: 1, fontFamily: F.medium, fontSize: 15, color: E.sub },

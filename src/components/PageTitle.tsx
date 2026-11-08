@@ -2,20 +2,20 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Svg, { Path } from 'react-native-svg';
-import { C, F } from '../lib/theme';
+import { C, E, F } from '../lib/theme';
 
 /** Big page title on a white bar with a hairline under it, optional round back button and right slot. */
-export default function PageTitle({ title, sub, back, close, right, size = 34 }: {
-  title: string; sub?: string; back?: boolean; close?: boolean; right?: React.ReactNode; size?: number;
+export default function PageTitle({ title, sub, back, close, right, size = 34, paper }: {
+  title: string; sub?: string; back?: boolean; close?: boolean; right?: React.ReactNode; size?: number; paper?: boolean;
 }) {
   const router = useRouter();
   return (
-    <View style={st.wrap}>
+    <View style={[st.wrap, paper && { backgroundColor: E.paper, borderBottomColor: E.hair, paddingHorizontal: 20 }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
         {(back || close) && <RoundBtn kind={close ? 'close' : 'back'} onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} />}
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={[st.title, { fontSize: size }]} accessibilityRole="header">{title}</Text>
-          {!!sub && <Text style={st.sub}>{sub}</Text>}
+          <Text style={[st.title, { fontSize: size }, paper && { letterSpacing: -1, color: E.ink }]} accessibilityRole="header">{title}</Text>
+          {!!sub && <Text style={[st.sub, paper && { color: E.sub }]}>{sub}</Text>}
         </View>
         {right}
       </View>

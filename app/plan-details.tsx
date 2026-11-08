@@ -19,7 +19,9 @@ const PLAN_IMG = require('../assets/hero/plan_full.jpg');
 const STACK_IMG = require('../assets/hero/stack_full.jpg');
 import { productImage } from '../src/lib/images';
 import { mealImage } from '../src/lib/meals';
-import { mealTiles, type Tile } from '../src/lib/foodPhotos';
+import FoodTiles, { FoodThumb } from '../src/components/FoodTiles';
+import { picFor } from '../src/lib/foodMatch';
+import { E } from '../src/lib/theme';
 import StackCheckCard from '../src/components/StackCheckCard';
 
 const TABS = ['Stack', 'Meals', 'Eating out', 'Groceries', 'Overview'] as const;
@@ -145,7 +147,7 @@ export default function PlanDetails() {
               <View style={{ gap: 10 }}>
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
-                  <MealPhoto name={o.name} ids={o.ids} fallback={mealImage(o.name, o.detail)} />
+                  <FoodTiles name={o.name} detail={o.detail} ids={o.ids} height={200} style={st.tiles} />
                   <Text style={st.optName}>{o.name}</Text>
                   <Body style={{ fontSize: 13 }}>{o.detail}</Body>
                   <Text style={st.macro}>{o.kcal} cal · {o.protein} protein</Text>
@@ -166,9 +168,22 @@ export default function PlanDetails() {
         </Card>
       ))}
 
-      {tab === 'Groceries' && (plan.grocery || []).map((g, k) => (
-        <Card key={k}><Text style={ui.label}>{g.aisle}</Text><Body>{g.items}</Body></Card>
-      ))}
+      {tab === 'Groceries' && (plan.grocery || []).map((g, k) => {
+        const items = g.items.split(/,|·|\n/).map((x) => x.trim()).filter(Boolean);
+        return (
+          <Card key={k}>
+            <Text style={ui.label}>{g.aisle}</Text>
+            <View style={st.groc}>
+              {items.map((it, j) => (
+                <View key={j} style={st.grocItem}>
+                  <FoodThumb {...picFor(it)} size={58} />
+                  <Text style={st.grocT} numberOfLines={3}>{it}</Text>
+                </View>
+              ))}
+            </View>
+          </Card>
+        );
+      })}
     </Screen>
   );
 }
@@ -180,30 +195,6 @@ const FoodPhoto = ({ source }: { source: ReturnType<typeof mealImage> }) =>
       <Image source={source} resizeMode="cover" accessibilityIgnoresInvertColors style={{ width: '100%', height: '100%' }} />
     </View>
   ) : null;
-
-/** The meal's own foods, photographed: one big tile plus up to two more. */
-function MealPhoto({ name, ids, fallback }: { name: string; ids?: string[]; fallback: ReturnType<typeof mealImage> }) {
-  const tiles = mealTiles(name, ids);
-  if (!tiles.length) return <FoodPhoto source={fallback} />;
-  const T = ({ t, style }: { t: Tile; style?: any }) => (
-    <View style={[{ overflow: 'hidden', backgroundColor: C.bg }, style]}>
-      <Image source={t.source} resizeMode="cover" accessibilityIgnoresInvertColors style={{ width: '100%', height: '100%' }} />
-      <View style={st.tileTag}><Text style={st.tileTagT} numberOfLines={1}>{t.label}</Text></View>
-    </View>
-  );
-  return (
-    <View style={[st.photo, { flexDirection: 'row', gap: 3, backgroundColor: 'transparent' }]} accessibilityLabel={`Photo: ${tiles.map((t) => t.label).join(', ')}`}>
-      <T t={tiles[0]} style={{ flex: tiles.length === 3 ? 1.5 : 1 }} />
-      {tiles.length === 2 && <T t={tiles[1]} style={{ flex: 1 }} />}
-      {tiles.length === 3 && (
-        <View style={{ flex: 1, gap: 3 }}>
-          <T t={tiles[1]} style={{ flex: 1 }} />
-          <T t={tiles[2]} style={{ flex: 1 }} />
-        </View>
-      )}
-    </View>
-  );
-}
 
 const Num = ({ v, l }: { v: string; l: string }) => (
   <View style={{ width: '31%', gap: 2 }}><Text style={st.num}>{v}</Text><Text style={st.numL}>{l}</Text></View>
@@ -229,6 +220,10 @@ const st = StyleSheet.create({
   option: { borderTopWidth: 1, borderTopColor: C.line, paddingTop: 14, gap: 4 },
   tileTag: { position: 'absolute', left: 6, bottom: 6, maxWidth: '90%', backgroundColor: 'rgba(9,20,42,0.82)', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 3 },
   tileTagT: { fontFamily: F.xbold, fontSize: 11, color: '#ffffff' },
+  tiles: { borderRadius: 14, marginBottom: 8 },
+  groc: { gap: 2 },
+  grocItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: E.hair },
+  grocT: { flex: 1, fontFamily: F.semi, fontSize: 15, lineHeight: 20, color: C.ink },
   photo: { width: '100%', aspectRatio: 16 / 10, borderRadius: 14, overflow: 'hidden', marginBottom: 8, backgroundColor: C.bg },
   optName: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
   macro: { fontFamily: F.xbold, fontSize: 12, color: C.green },

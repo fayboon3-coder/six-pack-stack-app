@@ -8,7 +8,9 @@ import type { Plan } from './types';
 
 /** Food log: anything eaten that isn't a ticked plan meal (photo, barcode, label or quick add). */
 export type FoodSource = 'photo' | 'barcode' | 'label' | 'quick';
-export type FoodEntry = { id: string; name: string; kcal: number; protein: number; carbs?: number | null; fat?: number | null; source: FoodSource; at: number };
+export type FoodEntry = { id: string; name: string; kcal: number; protein: number; carbs?: number | null; fat?: number | null; source: FoodSource; at: number;
+  /** The photo they snapped, or the product photo from the barcode. */
+  img?: string | null };
 
 const key = (d: string) => 'sps:food:' + d;
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';

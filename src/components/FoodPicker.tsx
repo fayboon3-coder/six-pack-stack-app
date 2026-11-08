@@ -5,6 +5,10 @@ import { CheckIcon } from './icons';
 import { CAT_LABEL, CAT_ORDER, FOOD_DB, foodById, makeCustomFood, QUICK_START, type Food, type FoodCat } from '../data/foods';
 import { whatsMissing } from '../lib/mealplan';
 import { track } from '../lib/track';
+import { foodPhoto } from '../lib/foodPhotos';
+import { FOOD_HD } from '../lib/hd';
+import Pic from './Pic';
+import { Pop, Press } from './motion';
 
 /** Popular picks shown first in each category. */
 const POPULAR = ['chicken_breast', 'ground_beef_93', 'eggs', 'salmon', 'sirloin', 'turkey_deli', 'whey', 'greek_yogurt',
@@ -64,11 +68,17 @@ export default function FoodPicker({ ids, custom, onChange }: {
       <View style={st.grid}>
         {list.map((f) => {
           const on = sel.has(f.id);
+          const src = foodPhoto(f.id);
           return (
-            <Pressable key={f.id} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => toggle(f.id)} style={[st.chip, on && st.chipOn]}>
-              {on && <View style={st.tick}><CheckIcon size={10} color={C.red} /></View>}
-              <Text style={[st.chipText, on && { color: C.onAccent }]}>{f.name}</Text>
-            </Pressable>
+            <Press key={f.id} accessibilityRole="checkbox" accessibilityState={{ checked: on }} accessibilityLabel={f.name} onPress={() => toggle(f.id)} scale={0.95} style={st.cell}>
+              <View style={[st.pic, on && st.picOn]}>
+                {src || FOOD_HD[f.id] ? <Pic source={src} hd={FOOD_HD[f.id]} w={360} style={st.fill} />
+                  : <View style={[st.fill, st.own0]}><Text style={st.own0T}>{f.name.slice(0, 1).toUpperCase()}</Text></View>}
+                {on && <View style={st.veil} />}
+                <Pop show={on} style={st.tick}><CheckIcon size={12} color="#fff" /></Pop>
+              </View>
+              <Text style={[st.cellT, on && { fontFamily: F.bold }]} numberOfLines={2}>{f.name}</Text>
+            </Press>
           );
         })}
         {!list.length && <Text style={st.note}>No match. Add it as your own food below.</Text>}
@@ -135,11 +145,16 @@ const st = StyleSheet.create({
   tab: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
   tabOn: { backgroundColor: C.ink, borderColor: C.ink },
   tabText: { fontFamily: F.bold, fontSize: 13, color: C.ink },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 13, paddingVertical: 11, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, backgroundColor: C.card },
-  chipOn: { borderColor: C.red, backgroundColor: C.red },
-  chipText: { fontFamily: F.semi, fontSize: 14, color: C.ink },
-  tick: { width: 18, height: 18, borderRadius: 9, backgroundColor: C.onAccent, alignItems: 'center', justifyContent: 'center' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 14 },
+  cell: { width: '31.5%', gap: 6 },
+  pic: { width: '100%', aspectRatio: 1, borderRadius: 16, overflow: 'hidden', backgroundColor: '#eeece6', borderWidth: 2.5, borderColor: 'transparent' },
+  picOn: { borderColor: C.red },
+  fill: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' },
+  veil: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(16,23,42,0.18)' },
+  tick: { position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
+  cellT: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: C.ink },
+  own0: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#e6e3dc' },
+  own0T: { fontFamily: F.black, fontSize: 28, color: C.ink },
   addBtn: { height: 50, borderRadius: 14, borderWidth: 1.5, borderColor: C.ink, alignItems: 'center', justifyContent: 'center' },
   addText: { fontFamily: F.black, fontSize: 14, color: C.ink, letterSpacing: 0.4, textTransform: 'uppercase' },
   summary: { borderRadius: 16, borderWidth: 1.5, borderColor: C.line, backgroundColor: 'rgba(20,38,69,0.6)', padding: 14, gap: 4 },
