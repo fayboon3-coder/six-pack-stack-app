@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { Redirect, useFocusEffect, useRouter } from 'expo-router';
+import { isCoached } from '../../src/lib/access';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
@@ -12,10 +13,12 @@ import { dayMeta } from '../../src/lib/workoutMeta';
 import { checkinState, focusOf, loadCoaching, type ClientCheckin, type Review } from '../../src/lib/coaching';
 import { allWeighIns } from '../../src/lib/body';
 import { trendSeries, type TrendPoint } from '../../src/lib/trend';
-import { num, proteinGoal, readDay, stepGoal, type Day } from '../../src/lib/daily';
+import { addProtein, num, proteinGoal, readDay, stepGoal, type Day } from '../../src/lib/daily';
+import { afterProtein } from '../../src/lib/reminders';
 import { kcalToday } from '../../src/lib/food';
 import { track } from '../../src/lib/track';
 import { GoalPath, MiniRing, WeekLine } from '../../src/components/charts';
+import { FuelCard } from '../../src/components/Fuel';
 
 const BOON = require('../../assets/hero/boon_avatar.jpg');
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
@@ -43,6 +46,8 @@ export default function Corner() {
     if (plan) kcalToday(plan).then(setKcal);
   }, [session, plan]));
 
+  // The 1:1 home is for coaching clients (and Boon, to see what they see).
+  if (profile && !isCoached(profile) && profile.role !== 'coach') return <Redirect href="/" />;
   if (!plan) return <NoPlan name={profile?.first_name} />;
   const name = plan.name || profile?.first_name || '';
   const week = weekOf(plan.train.s);
@@ -66,7 +71,7 @@ export default function Corner() {
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 130 }}>
+      <ScrollView keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ paddingBottom: 130 }}>
         {/* Hero */}
         <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[st.hero, { paddingTop: insets.top + 16 }]}>
           <View style={st.badgeRow}>
@@ -148,18 +153,20 @@ export default function Corner() {
               <View style={st.play}><Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M7 4v16l13-8z" fill="#fff" /></Svg></View>
             </Pressable>
             <View style={st.div} />
-            <View style={{ flexDirection: 'row', gap: 14, padding: 16 }}>
-              <Mini label="Calories" v={fmt(kcal)} of={fmt(kg)} pct={kcal / kg} color={C.red} />
-              <Mini label="Protein" v={`${fmt(day.protein)}g`} of={`${fmt(pg)} g`} pct={day.protein / pg} color={C.ink} />
-              <Mini label="Steps" v={fmt(day.steps)} of={fmt(sg)} pct={day.steps / sg} color={C.green} />
-            </View>
-            <View style={st.div} />
-            <View style={{ flexDirection: 'row' }}>
-              <Quick label="Log food" onPress={() => router.push('/log-food')} />
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Pressable accessibilityRole="button" accessibilityLabel={`Steps ${fmt(day.steps)} of ${fmt(sg)}`} onPress={() => router.push('/you')} style={st.steps}>
+                <MiniRing pct={day.steps / sg} color={C.green} size={36} stroke={4} />
+                <View><Text style={st.stepsV}>{fmt(day.steps)}</Text><Text style={st.stepsK}>of {fmt(sg)} steps</Text></View>
+              </Pressable>
               <Quick label="Weigh in" onPress={() => router.push('/weigh-in')} />
               <Quick label="Ask Stack" onPress={() => router.push('/stack')} last />
             </View>
           </View>
+
+          <Text style={st.sec}>YOUR NUMBERS TODAY</Text>
+          <FuelCard kcal={kcal} kGoal={kg} protein={day.protein} pGoal={pg} where="corner"
+            onProtein={async () => { const d = await addProtein(25); setDay(d); afterProtein(d.protein, pg).catch(() => {}); track('protein_add', { where: 'corner', g: 25 }); }}
+            onLogged={async () => { const [k, d] = await Promise.all([kcalToday(plan), readDay()]); setKcal(k); setDay(d); afterProtein(d.protein, pg).catch(() => {}); }} />
 
           {/* Guarantee */}
           <Text style={st.sec}>YOUR GOAL AND MY GUARANTEE</Text>
@@ -236,7 +243,7 @@ const Mini = ({ label, v, of, pct, color }: { label: string; v: string; of: stri
   </View>
 );
 const Quick = ({ label, onPress, last }: { label: string; onPress: () => void; last?: boolean }) => (
-  <Pressable accessibilityRole="button" onPress={onPress} style={[st.q, !last && { borderRightWidth: 1, borderRightColor: C.line }]}><Text style={st.qT}>{label}</Text></Pressable>
+  <Pressable accessibilityRole="button" onPress={onPress} style={[st.q, { borderLeftWidth: 1, borderLeftColor: C.line }]}><Text style={st.qT}>{label}</Text></Pressable>
 );
 const Tile = ({ k, t, s, onPress }: { k: string; t: string; s: string; onPress: () => void }) => (
   <Pressable accessibilityRole="button" onPress={onPress} style={[st.card, { flex: 1, padding: 16, gap: 2 }]}>
@@ -248,6 +255,9 @@ const Wa = ({ size = 18 }: { size?: number }) => (
 );
 
 const st = StyleSheet.create({
+  steps: { flex: 1.3, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
+  stepsV: { fontFamily: F.xbold, fontSize: 15, color: C.ink },
+  stepsK: { fontFamily: F.medium, fontSize: 11.5, color: C.muted },
   hero: { paddingHorizontal: 20, paddingBottom: 56, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   badgeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   badge: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },

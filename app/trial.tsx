@@ -222,7 +222,7 @@ export default function TrialOffer() {
             body="Every exercise has a form video and 3 cues. The app gives you today's target, weight and reps, so you add a little every week. The rest timer runs itself."
             chips={[{ t: "Today's target: 140 × 8" }, { t: 'New PR: +10 lb', tone: 'green' }]} />
           <Feature title="Log food in" accent="seconds" img={IMG.food} flip
-            body="Snap your plate and Stack counts the calories and protein. Scan a barcode for anything packaged. Your meals are already planned from foods you like."
+            body="Type it the way you'd say it, like 6 oz chicken and a cup of rice, and the calories and protein fill in. Or snap your plate, or scan a barcode. Your meals are already planned from foods you like."
             chips={[{ t: 'Snap a meal' }, { t: '+52 g protein', tone: 'green' }]} />
           <Feature title="Know what's" accent="worth buying" img={IMG.stack}
             body="All 47 products I investigated, each with a verdict. Scan a barcode or snap a label in the store and see mine. Ask Stack, the AI coach built on my plans, any time."
@@ -275,7 +275,7 @@ export default function TrialOffer() {
               {t ? `${cap(t)} free, then ${price(pick)} ${pick === 'yearly' ? "a year. That's $1.90 a week." : 'a month. Cancel anytime.'}` : `${price(pick)} ${pick === 'yearly' ? 'a year' : 'a month'}. Cancel anytime.`}
             </Text>
             <View style={{ alignSelf: 'stretch', gap: 10 }}>
-              {['All 12 weeks of training and meals', 'Calories that adjust to your trend every week', 'Snap a meal, barcode and label scanning', 'Stack, your AI coach, plus all 47 verdicts', 'Trend weight, goal date and photo compare'].map((t) => (
+              {['All 12 weeks of training and meals', 'Calories that adjust to your trend every week', 'Log food by typing it, snapping it or scanning it', 'Stack, your AI coach, plus all 47 verdicts', 'Trend weight, goal date and photo compare'].map((t) => (
                 <View key={t} style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
                   <View style={s.tick}><Text style={s.tickMark}>✓</Text></View>
                   <Text style={[s.small, { color: '#fff', fontFamily: F.semi, flex: 1 }]}>{t}</Text>

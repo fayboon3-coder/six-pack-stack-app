@@ -63,7 +63,6 @@ function Gate() {
       <Stack.Screen name="btl" />
       <Stack.Screen name="quiz" options={{ gestureEnabled: false }} />
       <Stack.Screen name="ready" options={{ gestureEnabled: false }} />
-      <Stack.Screen name="apply" options={{ presentation: 'modal' }} />
       <Stack.Screen name="coaching" />
       <Stack.Screen name="unlock" options={{ presentation: 'modal' }} />
       <Stack.Screen name="stack-check" />

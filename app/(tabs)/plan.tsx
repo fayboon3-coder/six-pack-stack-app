@@ -69,7 +69,7 @@ export default function Meals() {
   return (
     <View style={{ flex: 1, backgroundColor: E.paper }}>
       <ProgramsHeader active="meals" />
-      <MotionScroll contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+      <MotionScroll keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         {/* Today's numbers */}
         <Reveal style={[st.gutter, { marginTop: 18 }]}>
           <FuelCard kcal={kcal} kGoal={kcalGoal} protein={protein} pGoal={pg} onLogged={load} where="meals"

@@ -19,7 +19,7 @@ export default function Welcome() {
       </SafeAreaView>
       <SafeAreaView edges={['bottom']} style={st.sheet}>
         <Text style={st.h1}>Stop guessing.{'\n'}Start stacking.</Text>
-        <Text style={st.sub}>A plan built around the food you already eat and workouts that fit your week. Snap a meal to log it, watch your real trend, and check any supplement before you buy it.</Text>
+        <Text style={st.sub}>A plan built around the food you already eat and workouts that fit your week. Type or snap a meal to log it, watch your real trend, and check any supplement before you buy it.</Text>
         <Pressable accessibilityRole="button" onPress={() => { track('welcome_pick', { want: 'plan' }); router.push('/quiz'); }} style={({ pressed }) => [st.btn, { opacity: pressed ? 0.88 : 1 }]}>
           <Text style={st.btnT}>Build my plan</Text>
         </Pressable>

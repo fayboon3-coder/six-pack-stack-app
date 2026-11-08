@@ -185,7 +185,7 @@ export default function Today() {
 
   return (
     <View style={{ flex: 1, backgroundColor: E.paper }}>
-      <MotionScroll contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+      <MotionScroll keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ paddingTop: insets.top + 10, paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         {/* ---------- Masthead ---------- */}
         <Reveal style={st.gutter} y={10}>
           <View style={st.mastRow}>
