@@ -15,6 +15,8 @@ import { track } from '../src/lib/track';
 import HealthCard from '../src/components/HealthCard';
 import { applyReminders, askPermission, readPrefs, type ReminderPrefs } from '../src/lib/reminders';
 import { isFree } from '../src/lib/access';
+import { GoalPath } from '../src/components/charts';
+import { pathWeights } from '../src/lib/program';
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
 const label = (iso: string) => iso === isoDate() ? 'Today' : new Date(iso + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -91,6 +93,17 @@ export default function WeighIn() {
         )}
         {!!saved && !!prefs?.weigh && <Text style={st.hint}>Morning reminder is on.</Text>}
       </View>
+
+      {!!plan && (() => {
+        const { startW, goalW } = pathWeights(plan, profile?.quiz, series[0]?.w);
+        if (!startW || !goalW) return null;
+        return (
+          <Panel title="Your 12-week path" right={`${Math.round(startW)} → ${Math.round(goalW)} lbs`}>
+            <GoalPath startW={startW} goalW={goalW} startDate={plan.train.s} series={series} height={168} />
+            <Text style={[st.hint, { marginTop: 10 }]}>{series.length ? 'Red is your trend. The dotted line is the plan. Stay close to it and you land on your goal.' : 'Every morning you weigh in adds a dot. Stay close to this line and you land on your goal.'}</Text>
+          </Panel>
+        );
+      })()}
 
       <HealthCard />
 

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MiniRing } from '../../src/components/charts';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../../src/lib/auth';
 import { C, F } from '../../src/lib/theme';
@@ -141,8 +142,8 @@ export default function You() {
 
         <Section title="Nutrition" onPress={() => router.push('/plan')}>
           <View style={{ flexDirection: 'row', gap: 18 }}>
-            <Target label="Calories target" value={fmt(kcalGoal)} left={`${fmt(Math.max(0, kcalGoal - kcal))} left`} pct={kcal / kcalGoal} color="#ffb347" onAdd={() => router.push('/log-food')} addLabel="Log food" />
-            <Target label="Protein target" value={`${fmt(pg)} g`} left={`${fmt(Math.max(0, pg - protein))} g left`} pct={protein / pg} color="#d22f26" onAdd={() => setAdding(!adding)} addLabel="Add protein" />
+            <Target label="Calories" value={fmt(kcalGoal)} left={`${fmt(Math.max(0, kcalGoal - kcal))} left`} pct={kcal / kcalGoal} color={C.red} onAdd={() => router.push('/log-food')} addLabel="Log food" />
+            <Target label="Protein" value={`${fmt(pg)} g`} left={`${fmt(Math.max(0, pg - protein))} g left`} pct={protein / pg} color={C.ink} onAdd={() => setAdding(!adding)} addLabel="Add protein" />
           </View>
           {adding && (
             <View style={st.addRow}>
@@ -176,16 +177,20 @@ export default function You() {
 
 function Target({ label, value, left, pct, color, onAdd, addLabel }: { label: string; value: string; left: string; pct: number; color: string; onAdd: () => void; addLabel: string }) {
   return (
-    <View style={{ flex: 1 }}>
-      <Text style={st.small}>{label}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-        <Text style={st.num}>{value}</Text>
+    <View style={{ flex: 1, minWidth: 0, gap: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <MiniRing pct={pct} color={color} size={50} stroke={5}><Text style={st.ringP}>{Math.round(Math.min(1, Math.max(0, pct)) * 100)}%</Text></MiniRing>
+        <View style={{ flex: 1, minWidth: 0 }}>
+          <Text style={[st.small, { marginTop: 0 }]} numberOfLines={1}>{label}</Text>
+          <Text style={st.num} numberOfLines={1} adjustsFontSizeToFit>{value}</Text>
+        </View>
+      </View>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text style={[st.small, { marginTop: 0 }]}>{left}</Text>
         <Pressable accessibilityRole="button" accessibilityLabel={addLabel} onPress={onAdd} hitSlop={6} style={st.plus}>
           <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M12 5v14M5 12h14" stroke="#fff" strokeWidth={2.8} strokeLinecap="round" /></Svg>
         </Pressable>
       </View>
-      <View style={st.track}><View style={[st.fill, { width: `${Math.min(100, Math.max(0, pct * 100))}%`, backgroundColor: color }]} /></View>
-      <Text style={st.small}>{left}</Text>
     </View>
   );
 }
@@ -205,6 +210,7 @@ function Section({ title, children, onPress }: { title: string; children: React.
 }
 
 const st = StyleSheet.create({
+  ringP: { fontFamily: F.xbold, fontSize: 11.5, color: C.ink },
   head: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingBottom: 14, paddingTop: 8, borderBottomWidth: 1, borderBottomColor: C.line, backgroundColor: C.bg },
   title: { flex: 1, fontFamily: F.black, fontSize: 34, letterSpacing: -0.6, color: C.ink },
   round: { width: 46, height: 46, borderRadius: 22, borderWidth: 1.5, borderColor: '#d9dde7', alignItems: 'center', justifyContent: 'center' },

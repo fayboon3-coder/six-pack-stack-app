@@ -22,6 +22,13 @@ export const phaseOf = (week: number) =>
 
 export const PHOTO_WEEKS = [1, 3, 5, 7, 9, 11, 12];
 
+/** Start and goal weight for the 12-week path: the plan's own numbers, else the quiz, else the first weigh-in. */
+export function pathWeights(plan: Plan, quiz: any, firstWeighIn?: number | null) {
+  const goalW = Number((plan.goal_short || '').match(/(\d{2,3})\s*lbs/i)?.[1]) || Number(quiz?.goal_weight) || null;
+  const startW = Number(plain(plan.goal_long || '').match(/from\s*(\d{2,3})/i)?.[1]) || Number(quiz?.weight) || firstWeighIn || null;
+  return { startW, goalW };
+}
+
 const DAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
 /** Index of today's training day, or the next one coming up. */

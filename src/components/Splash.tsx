@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { C } from '../lib/theme';
+import { raiseCurtain } from './motion';
 
 const LOGO = require('../../assets/logo-b.png');
 
@@ -35,6 +36,7 @@ export default function Splash({ ready, onDone }: { ready: boolean; onDone: () =
     const wait = setInterval(() => {
       if (!intro.current) return;
       clearInterval(wait);
+      raiseCurtain();
       Animated.timing(out, { toValue: 0, duration: 320, useNativeDriver: true }).start(() => onDone());
     }, 50);
     return () => clearInterval(wait);

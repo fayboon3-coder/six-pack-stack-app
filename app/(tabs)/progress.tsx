@@ -23,6 +23,7 @@ import { adaptFor, applyAdapt } from '../../src/lib/adaptive';
 import { demoHistory, mondayOf } from '../../src/lib/recap';
 import { isCoached } from '../../src/lib/access';
 import { track } from '../../src/lib/track';
+import { DotTrack, DrawSpark, GoalPath, PhotoSlots, TrendExplainer, WeekBars } from '../../src/components/charts';
 
 type Log = { exercise_id: string; weight: number | null; reps: number | null; logged_on: string };
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -46,7 +47,7 @@ export default function Progress() {
   useFocusEffect(useCallback(() => {
     const uid = session?.user.id;
     allWeighIns(DEMO ? undefined : uid).then((w) => setSeries(trendSeries(w))).catch(() => {});
-    if (DEMO) { setLogs(demoHistory()); listPhotos('demo', plan?.train.s).then(setPhotos); return; }
+    if (DEMO) { setLogs(process.env.EXPO_PUBLIC_DEMO_FRESH === '1' ? [] : demoHistory()); listPhotos('demo', plan?.train.s).then(setPhotos); return; }
     if (!uid) return;
     withTimeout(supabase.from('checkins').select('id,week,checkin_date,weight,workouts,nutrition_days,energy,win').eq('user_id', uid).order('checkin_date', { ascending: true }), 5000, { data: [] } as any)
       .then(({ data }: any) => setRows((data as Checkin[]) || []));
@@ -101,8 +102,6 @@ export default function Progress() {
     const wk = start ? Math.min(12, Math.max(1, Math.floor((new Date(l.logged_on + 'T12:00:00').getTime() - start) / 864e5 / 7) + 1)) : 1;
     vol[wk] = (vol[wk] || 0) + (Number(l.weight) || 0) * (Number(l.reps) || 0);
   }
-  const bars = Array.from({ length: Math.min(week, 6) }, (_, k) => week - Math.min(week, 6) + 1 + k);
-  const maxV = Math.max(1, ...bars.map((w) => vol[w] || 0));
 
   // ---- Photos: first vs latest (front if they have it)
   const fronts = photos.filter((p) => p.angle === 'front');
@@ -123,17 +122,16 @@ export default function Progress() {
           <Text style={st.heroK}>TREND WEIGHT</Text>
           {since != null && since !== 0 && <Text style={[st.heroChip, since > 0 && !((profile?.quiz as any)?.goal || '').startsWith('Build') && { backgroundColor: 'rgba(226,67,59,0.25)' }]}>{since > 0 ? '+' : '−'}{Math.abs(since).toFixed(1)} since start</Text>}
         </View>
-        <Text style={st.heroV}>{last ? last.t.toFixed(1) : '––'}<Text style={st.heroU}> lbs</Text></Text>
-        <Text style={st.heroPace}>{paceLine}</Text>
-        {goalW != null && (
-          <View style={{ marginTop: 14, gap: 8 }}>
-            <View style={st.heroTrack}><View style={[st.heroFill, { width: `${pct}%` }]} /></View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Text style={st.heroSm}>{startW ? `Start ${startW}` : ''}</Text>
-              <Text style={st.heroSm}>Goal {goalW} lbs</Text>
-            </View>
+        {last ? <Text style={st.heroV}>{last.t.toFixed(1)}<Text style={st.heroU}> lbs</Text></Text>
+          : startW && goalW ? <Text style={st.heroV}>{Math.round(startW)}<Text style={st.heroArrow}>  →  </Text><Text style={{ color: '#5fd39a' }}>{Math.round(goalW)}</Text><Text style={st.heroU}> lbs</Text></Text>
+            : <Text style={st.heroV}>––<Text style={st.heroU}> lbs</Text></Text>}
+        <Text style={st.heroPace}>{last ? paceLine : 'Your 12-week path. ' + paceLine}</Text>
+        {goalW != null && startW != null && (
+          <View style={{ marginTop: 16, marginHorizontal: -6 }}>
+            <GoalPath dark startW={startW} goalW={goalW} startDate={plan.train.s} series={series} height={176} />
           </View>
         )}
+        {goalW != null && pct > 0 && <Text style={[st.heroSm, { marginTop: 4 }]}>{pct}% of the way to {goalW} lbs</Text>}
         <View style={st.heroRow}>
           <View style={{ flex: 1 }}>
             <Text style={st.heroSmK}>{eta ? 'ON PACE FOR YOUR GOAL' : 'YOUR GOAL DATE'}</Text>
@@ -157,8 +155,13 @@ export default function Progress() {
         </View>}>
         {series.length ? <TrendChart series={series} days={range} goal={goalW} rate={rate} /> : (
           <Pressable onPress={() => router.push('/weigh-in')} style={st.empty}>
-            <Text style={st.emptyT}>Weigh in most mornings</Text>
-            <Text style={st.small}>Your scale jumps around. The trend doesn't. After a week you'll see where you're really heading.</Text>
+            <TrendExplainer height={140} />
+            <View style={st.legend}>
+              <Text style={st.leg}><Text style={{ color: '#b9b4a8' }}>●</Text> Your scale, day to day</Text>
+              <Text style={st.leg}><Text style={{ color: '#e2433b' }}>━</Text> Your trend</Text>
+            </View>
+            <Text style={st.emptyT}>The scale jumps. The trend tells the truth.</Text>
+            <Text style={st.small}>Weigh in most mornings. Water and salt move the scale every day, so the app smooths it into one honest line.</Text>
           </Pressable>
         )}
         {series.length > 0 && (
@@ -196,7 +199,15 @@ export default function Progress() {
             <Text style={[st.body, { flex: 1 }]}>{adapt.why} {adapt.who === 'free' ? 'With The Full Stack, this check adjusts your calories every week.' : ''}</Text>
           </View>
         ) : (
-          <Text style={st.body}>{adapt.kind === 'adjust' && adapt.who === 'free' ? `Your trend says ${fmt(adapt.to)} calories would fit you better. The Full Stack adjusts this for you every week.` : adapt.why}</Text>
+          <View style={{ gap: 12 }}>
+            {adapt.kind === 'need_data' && (
+              <View style={{ gap: 8 }}>
+                <DotTrack total={8} have={Math.min(adapt.have, 8)} size={14} label={`${Math.min(adapt.have, 8)} of 8 weigh-ins`} />
+                <Text style={st.lbl}>{Math.min(adapt.have, 8)} of 8 weigh-ins</Text>
+              </View>
+            )}
+            <Text style={st.body}>{adapt.kind === 'adjust' && adapt.who === 'free' ? `Your trend says ${fmt(adapt.to)} calories would fit you better. The Full Stack adjusts this for you every week.` : adapt.why}</Text>
+          </View>
         )}
         {adapt.who === 'free' && adapt.kind !== 'need_data' && (
           <Pressable accessibilityRole="button" onPress={() => router.push('/unlock')} style={[st.btnGhost, { marginTop: 12 }]}><Text style={st.btnGhostT}>See The Full Stack</Text></Pressable>
@@ -218,9 +229,13 @@ export default function Progress() {
             <View style={st.btnNavy}><Text style={st.btnNavyT}>Compare side by side</Text></View>
           </Pressable>
         ) : (
-          <Pressable accessibilityRole="button" onPress={() => router.push('/photos')} style={st.empty}>
-            <Text style={st.emptyT}>Take your first photo</Text>
-            <Text style={st.small}>Front, side and back. Same spot, same light. In 4 weeks you'll be glad you did.</Text>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/photos')} style={[st.empty, { gap: 12 }]}>
+            <PhotoSlots week={week} />
+            <View style={{ gap: 4 }}>
+              <Text style={st.emptyT}>Four photos tell the whole story</Text>
+              <Text style={st.small}>Front, side and back. Same spot, same light. Week 1 next to week 12 is the picture you'll want.</Text>
+            </View>
+            <View style={st.btnNavy}><Text style={st.btnNavyT}>Take week {Math.min(12, Math.max(1, week))} photos</Text></View>
           </Pressable>
         )}
       </Panel>
@@ -239,7 +254,12 @@ export default function Progress() {
 
       {/* Strength */}
       <Panel title="Strength" right="Estimated max" bodyStyle={{ paddingVertical: 4 }}>
-        {!lifts.length && <Text style={[st.small, { paddingVertical: 10 }]}>Log your first workout. Every set you save shows up here.</Text>}
+        {!lifts.length && (
+          <View style={{ paddingVertical: 12, gap: 12 }}>
+            <WeekBars values={Array.from({ length: 12 }, () => null)} week={week} />
+            <Text style={st.small}>Your plan adds a little weight or a rep every week. Log your first workout and these bars fill in with what you actually lift.</Text>
+          </View>
+        )}
         {lifts.map((l, k) => {
           const pctUp = l.first ? Math.round((l.gain / l.first) * 100) : 0;
           return (
@@ -248,7 +268,7 @@ export default function Progress() {
                 <Text style={st.liftT} numberOfLines={1}>{exName(l.id, plan)}</Text>
                 <Text style={st.small}>{l.gain > 0 ? `${fmt(l.first)} → ${fmt(l.last)} lbs` : `${fmt(l.last)} lbs`}</Text>
               </View>
-              <Spark pts={l.pts.map((p) => p.e)} />
+              <DrawSpark pts={l.pts.map((p) => p.e)} color={C.green} />
               {pctUp > 0 ? <Text style={st.pr}>+{pctUp}%</Text> : <View style={{ width: 46 }} />}
             </View>
           );
@@ -256,14 +276,8 @@ export default function Progress() {
         {logs.length > 0 && (
           <View style={[st.line0, { paddingTop: 14, paddingBottom: 10 }]}>
             <Text style={st.lbl}>Weight lifted per week</Text>
-            <View style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-end', height: 80, marginTop: 10 }}>
-              {bars.map((w) => (
-                <View key={w} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-                  <Text style={st.barV}>{vol[w] ? `${Math.round(vol[w] / 1000)}k` : ''}</Text>
-                  <View style={[st.bar, { height: Math.max(6, ((vol[w] || 0) / maxV) * 50), backgroundColor: w === week ? '#e2433b' : '#d5d9e3' }]} />
-                  <Text style={st.barL}>W{w}</Text>
-                </View>
-              ))}
+            <View style={{ marginTop: 10 }}>
+              <WeekBars values={Array.from({ length: 12 }, (_, k) => vol[k + 1] || null)} week={week} format={(n) => `${Math.round(n / 1000)}k`} />
             </View>
           </View>
         )}
@@ -288,14 +302,6 @@ export default function Progress() {
   );
 }
 
-function Spark({ pts }: { pts: number[] }) {
-  const W = 64, H = 26;
-  if (pts.length < 2) return <View style={{ width: W }} />;
-  const lo = Math.min(...pts), hi = Math.max(...pts);
-  const p = pts.map((v, k) => `${(k * W) / (pts.length - 1)},${H - 3 - ((v - lo) / Math.max(1, hi - lo)) * (H - 6)}`).join(' ');
-  return <Svg width={W} height={H}><Polyline points={p} fill="none" stroke={C.green} strokeWidth={2.2} strokeLinejoin="round" strokeLinecap="round" /></Svg>;
-}
-
 const FILL = { position: 'absolute' as const, top: 0, left: 0, width: '100%' as const, height: '100%' as const };
 
 const st = StyleSheet.create({
@@ -307,6 +313,7 @@ const st = StyleSheet.create({
   heroV: { fontFamily: F.black, fontSize: 52, letterSpacing: -1.5, color: '#fff', marginTop: 4 },
   heroU: { fontFamily: F.bold, fontSize: 18, letterSpacing: 0, color: 'rgba(255,255,255,0.75)' },
   heroPace: { fontFamily: F.semi, fontSize: 15, color: '#ffffff' },
+  heroArrow: { fontFamily: F.bold, fontSize: 28, color: 'rgba(255,255,255,0.45)' },
   heroTrack: { height: 8, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)', overflow: 'hidden' },
   heroFill: { height: 8, borderRadius: 4, backgroundColor: '#e2433b' },
   heroSm: { fontFamily: F.medium, fontSize: 12, color: 'rgba(255,255,255,0.75)', marginTop: 2 },

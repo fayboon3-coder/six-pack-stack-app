@@ -39,7 +39,7 @@ export function mondayOf(now = new Date()) {
   const m = new Date(now); m.setHours(12, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m;
 }
 
-const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const DEMO = process.env.EXPO_PUBLIC_DEMO === '1' && process.env.EXPO_PUBLIC_DEMO_FRESH !== '1';
 const dowOf = (t: string) => Math.max(0, SHORT.findIndex((s) => s.toLowerCase() === t.trim().slice(0, 3).toLowerCase()));
 
 /** Programs · Training: the 12 weeks, today's session as a photo, and every day of the week. */

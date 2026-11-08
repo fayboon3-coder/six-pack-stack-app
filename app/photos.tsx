@@ -12,6 +12,7 @@ import { trendSeries, type TrendPoint } from '../src/lib/trend';
 import { weekOf } from '../src/lib/program';
 import { isCoached } from '../src/lib/access';
 import { track } from '../src/lib/track';
+import { PhotoSlots } from '../src/components/charts';
 
 const ANGLES: Angle[] = ['front', 'side', 'back'];
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
@@ -73,9 +74,9 @@ export default function Photos() {
 
       {!list.length ? (
         <View style={st.empty}>
-          <Svg width={36} height={36} viewBox="0 0 24 24"><Path d="M3 9a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke={C.red} strokeWidth={1.8} fill="none" strokeLinejoin="round" /><Path d="M12 10a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z" stroke={C.red} strokeWidth={1.8} fill="none" /></Svg>
-          <Text style={st.emptyT}>No {angle} photos yet</Text>
-          <Text style={st.emptyS}>Same spot, same light, same time of day. Phone at chest height. That's what makes the comparison honest.</Text>
+          <View style={{ alignSelf: 'stretch', marginBottom: 8 }}><PhotoSlots week={weekOf(plan?.train.s)} /></View>
+          <Text style={st.emptyT}>Your first {angle} photo starts the story</Text>
+          <Text style={st.emptyS}>Week 1, 4, 8 and 12, side by side. Same spot, same light, same time of day. Phone at chest height. That's what makes the comparison honest.</Text>
         </View>
       ) : (
         <>

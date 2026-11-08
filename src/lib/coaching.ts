@@ -7,6 +7,7 @@ export type ClientCheckin = { id: string; week: number; checkin_date: string; we
 export type ThreadItem = { kind: 'checkin'; at: string; c: ClientCheckin } | { kind: 'review'; at: string; r: Review };
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const SEED = DEMO && process.env.EXPO_PUBLIC_DEMO_FRESH !== '1'; // design previews: FRESH shows a brand-new account
 const withTimeout = <T,>(p: PromiseLike<T>, ms: number, fallback: T) => Promise.race([Promise.resolve(p).catch(() => fallback), new Promise<T>((r) => setTimeout(() => r(fallback), ms))]);
 
 /** "Your one thing this week": Boon's focus line, or the first sentence of his review. */
@@ -19,7 +20,7 @@ export function focusOf(r?: Review | null) {
 }
 
 export async function loadCoaching(userId: string): Promise<{ reviews: Review[]; checkins: ClientCheckin[] }> {
-  if (DEMO) return demo();
+  if (DEMO) return SEED ? demo() : { reviews: [], checkins: [] };
   const [r, c] = await Promise.all([
     withTimeout(supabase.from('coach_reviews').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(30), 5000, { data: [] } as any),
     withTimeout(supabase.from('checkins').select('id,week,checkin_date,weight,workouts,win,hardest,questions,adherence,stronger').eq('user_id', userId).order('checkin_date', { ascending: false }).limit(30), 5000, { data: [] } as any),

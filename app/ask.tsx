@@ -12,6 +12,7 @@ import { WHATSAPP } from '../src/components/NoPlan';
 import { track } from '../src/lib/track';
 import { AI_CONSENT_KEY as CONSENT, AI_CONSENT_TEXT, ask, ChatMsg, loadHistory, questionsLeft, STARTERS } from '../src/lib/askboon';
 import * as ImagePicker from 'expo-image-picker';
+import StackIntro from '../src/components/StackIntro';
 import { prepImage } from '../src/lib/scan';
 import { isCoached, isFree } from '../src/lib/access';
 import { showCoaching } from '../src/components/Coach';
@@ -116,6 +117,9 @@ export default function Ask() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView ref={scroll} contentContainerStyle={st.list} keyboardShouldPersistTaps="handled">
           <Bubble role="assistant" content={`Hey${name ? ' ' + name : ''}. Ask me anything about your plan, food, training or a supplement you saw online. I know your numbers, so I'll answer for you, not for everyone.`} />
+          {empty && !blocked && !photo && (
+            <StackIntro onSnap={snap} onCheck={() => router.push('/stack-check')} onAsk={() => setText('What should I eat tonight to stay on plan?')} />
+          )}
           {msgs.map((m) => <Bubble key={m.id} role={m.role} content={m.content} photo={(m as any).photo} />)}
           {thinking && <Typing />}
 

@@ -7,6 +7,7 @@ import type { Plan } from '../lib/types';
 import { isoDate, loggedDays } from '../lib/logs';
 import { allTimeStacked, phoneStepsAvailable, setSteps, stepGoal, proteinGoal, trainingDows, weekStatus, type Day } from '../lib/daily';
 import Panel from './Panel';
+import { MiniRing } from './charts';
 
 const DOW = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -48,16 +49,20 @@ export default function DaysStacked({ plan, userId, onProtein }: { plan: Plan; u
   const saveSteps = async () => { const n = Number(stepsTxt.replace(/\D/g, '')); if (n >= 0) await setSteps(n); setEditSteps(false); load(); };
 
   return (
-    <Panel title="Days Stacked" onMore={() => setOpen(!open)} bodyStyle={{ paddingHorizontal: 0, paddingVertical: 0 }}>
+    <Panel title="Days Stacked" bodyStyle={{ paddingHorizontal: 0, paddingVertical: 0 }}>
       <View style={st.top}>
         <View style={{ flex: 1 }}>
           <Text style={st.big}>Current week</Text>
           <Text style={st.small}>{week.length ? `${short(week[0].date)} – ${short(week[6].date)} · ` : ''}{total} stacked all-time</Text>
         </View>
-        <Text accessibilityLabel={`${stacked} of 7 days stacked`}><Text style={st.score}>{stacked}</Text><Text style={st.of}>/7</Text></Text>
+        <View accessibilityLabel={`${stacked} of 7 days stacked`}>
+          <MiniRing pct={stacked / 7} color={C.red} size={64} stroke={6}>
+            <Text><Text style={st.ringV}>{stacked}</Text><Text style={st.ringO}>/7</Text></Text>
+          </MiniRing>
+        </View>
       </View>
 
-      {open && (
+      {(
         <View style={st.weekRow}>
           {week.map((w) => (
             <View key={w.date} style={{ alignItems: 'center', gap: 6, flex: 1 }} accessibilityLabel={`${w.date}${w.stacked ? ', stacked' : ''}`}>
@@ -81,19 +86,19 @@ export default function DaysStacked({ plan, userId, onProtein }: { plan: Plan; u
         <Text style={st.label}>Today</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <Pressable accessibilityRole="button" accessibilityLabel={`Steps ${d.steps} of ${sg}. Tap to edit`} onPress={() => { setStepsTxt(d.steps ? String(d.steps) : ''); setEditSteps(!editSteps); }} style={st.tile}>
+            <MiniRing pct={d.steps / sg} color="#17a062" size={54} stroke={5.5}><Text style={st.ringIn}>{d.steps >= 1000 ? `${(d.steps / 1000).toFixed(1)}k` : fmt(d.steps)}</Text></MiniRing>
             <Text style={st.tileL}>Steps</Text>
-            <Text style={[st.tileV, { color: '#17894f' }]}>{fmt(d.steps)}</Text>
-            <Bar v={d.steps} max={sg} color="#17a062" />
+            <Text style={st.tileS}>of {fmt(sg)}</Text>
           </Pressable>
           <View style={st.tile} accessibilityLabel={`${workouts} of ${nTrain} workouts this week`}>
+            <MiniRing pct={workouts / Math.max(1, nTrain)} color={C.ink} size={54} stroke={5.5}><Text style={st.ringIn}>{workouts}/{nTrain}</Text></MiniRing>
             <Text style={st.tileL}>Workouts</Text>
-            <Text style={[st.tileV, { color: '#1f6fd1' }]}>{workouts} of {nTrain}</Text>
-            <Bar v={workouts} max={nTrain} color="#5b9bf0" />
+            <Text style={st.tileS}>this week</Text>
           </View>
           <Pressable accessibilityRole="button" accessibilityLabel={`Protein ${Math.round(d.protein)} of ${pg} grams. Tap to add`} onPress={onProtein} style={st.tile}>
+            <MiniRing pct={d.protein / pg} color={C.red} size={54} stroke={5.5}><Text style={st.ringIn}>{fmt(d.protein)}g</Text></MiniRing>
             <Text style={st.tileL}>Protein</Text>
-            <Text style={[st.tileV, { color: '#b26b00' }]}>{fmt(d.protein)} g</Text>
-            <Bar v={d.protein} max={pg} color="#ffb347" />
+            <Text style={st.tileS}>of {fmt(pg)} g</Text>
           </Pressable>
         </View>
         {editSteps && (
@@ -129,8 +134,12 @@ const st = StyleSheet.create({
   tipIT: { fontFamily: F.xbold, fontSize: 13, color: '#ffffff' },
   tipT: { flex: 1, fontFamily: F.medium, fontSize: 14, lineHeight: 20, color: C.ink },
   label: { fontFamily: F.bold, fontSize: 15, color: C.ink },
-  tile: { flex: 1, borderWidth: 1, borderColor: '#d9dde7', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 10, backgroundColor: C.bg, gap: 4 },
-  tileL: { fontFamily: F.semi, fontSize: 12, color: C.ink },
+  tile: { flex: 1, borderWidth: 1, borderColor: '#d9dde7', borderRadius: 14, paddingHorizontal: 8, paddingVertical: 12, backgroundColor: C.bg, gap: 2, alignItems: 'center' },
+  tileL: { fontFamily: F.bold, fontSize: 13, color: C.ink, marginTop: 6 },
+  tileS: { fontFamily: F.medium, fontSize: 11.5, color: C.muted },
+  ringIn: { fontFamily: F.xbold, fontSize: 12, color: C.ink },
+  ringV: { fontFamily: F.black, fontSize: 22, color: C.ink },
+  ringO: { fontFamily: F.bold, fontSize: 12, color: C.muted },
   tileV: { fontFamily: F.xbold, fontSize: 20 },
   bar: { height: 5, borderRadius: 3, backgroundColor: '#e8eaf0', overflow: 'hidden', marginTop: 2 },
   barF: { height: 5, borderRadius: 3 },

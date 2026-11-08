@@ -15,6 +15,7 @@ import { trendSeries, type TrendPoint } from '../../src/lib/trend';
 import { num, proteinGoal, readDay, stepGoal, type Day } from '../../src/lib/daily';
 import { kcalToday } from '../../src/lib/food';
 import { track } from '../../src/lib/track';
+import { GoalPath, MiniRing, WeekLine } from '../../src/components/charts';
 
 const BOON = require('../../assets/hero/boon_avatar.jpg');
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
@@ -56,7 +57,7 @@ export default function Corner() {
 
   // Guarantee: the goal Boon set, and how close the trend is
   const goalW = Number((plan.goal_short || '').match(/(\d{2,3})\s*lbs/i)?.[1]) || null;
-  const startW = Number(plain(plan.goal_long || '').match(/from\s*(\d{2,3})/i)?.[1]) || series[0]?.w || null;
+  const startW = Number(plain(plan.goal_long || '').match(/from\s*(\d{2,3})/i)?.[1]) || Number((profile?.quiz as any)?.weight) || series[0]?.w || null;
   const last = series.length ? series[series.length - 1].t : null;
   const pct = startW && goalW && last && startW !== goalW ? Math.max(0, Math.min(100, Math.round(((startW - last) / (startW - goalW)) * 100))) : 0;
   const onTime = checkins.length;
@@ -148,8 +149,8 @@ export default function Corner() {
             </Pressable>
             <View style={st.div} />
             <View style={{ flexDirection: 'row', gap: 14, padding: 16 }}>
-              <Mini label="Protein" v={`${fmt(day.protein)}`} of={`${fmt(pg)} g`} pct={day.protein / pg} color="#d22f26" />
-              <Mini label="Calories" v={fmt(kcal)} of={fmt(kg)} pct={kcal / kg} color="#ffb347" />
+              <Mini label="Calories" v={fmt(kcal)} of={fmt(kg)} pct={kcal / kg} color={C.red} />
+              <Mini label="Protein" v={`${fmt(day.protein)}g`} of={`${fmt(pg)} g`} pct={day.protein / pg} color={C.ink} />
               <Mini label="Steps" v={fmt(day.steps)} of={fmt(sg)} pct={day.steps / sg} color={C.green} />
             </View>
             <View style={st.div} />
@@ -164,7 +165,9 @@ export default function Corner() {
           <Text style={st.sec}>YOUR GOAL AND MY GUARANTEE</Text>
           <View style={[st.card, { padding: 18, gap: 12 }]}>
             <Text style={st.goal}>{plain(plan.goal_short) || 'Your 12-week goal'}</Text>
-            <View style={st.track}><View style={[st.fill, { width: `${pct}%` }]} /></View>
+            {startW && goalW ? (
+              <View style={{ marginTop: 4 }}><GoalPath startW={startW} goalW={goalW} startDate={plan.train.s} series={series} height={168} /></View>
+            ) : <View style={st.track}><View style={[st.fill, { width: `${pct}%` }]} /></View>}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={st.s}>{last ? `Trend ${last.toFixed(1)} lbs` : 'Weigh in to track it'}</Text>
               <Text style={[st.s, { fontFamily: F.bold }]}>{pct}% there</Text>
@@ -185,6 +188,9 @@ export default function Corner() {
           {/* 12 weeks */}
           <Text style={st.sec}>THE 12 WEEKS</Text>
           <View style={[st.card, { paddingVertical: 6 }]}>
+            <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: C.line }}>
+              <WeekLine week={week} photoWeeks={PHOTO_WEEKS} />
+            </View>
             {MILESTONES.filter((m) => m.w >= week - 1).slice(0, 4).map((m, k, arr) => (
               <View key={m.w + m.t} style={[st.ms, k < arr.length - 1 && st.msLine]}>
                 <View style={[st.msDot, m.w <= week && { backgroundColor: C.red, borderColor: C.red }]}><Text style={[st.msW, m.w <= week && { color: '#fff' }]}>{m.w}</Text></View>
@@ -221,10 +227,12 @@ const MILESTONES = [
 ];
 
 const Mini = ({ label, v, of, pct, color }: { label: string; v: string; of: string; pct: number; color: string }) => (
-  <View style={{ flex: 1 }}>
-    <Text style={st.miniL}>{label}</Text>
-    <Text style={st.miniV}>{v}<Text style={st.miniOf}> / {of}</Text></Text>
-    <View style={st.miniT}><View style={{ height: 5, borderRadius: 3, width: `${Math.min(100, Math.max(0, pct * 100))}%`, backgroundColor: color }} /></View>
+  <View style={{ flex: 1, alignItems: 'center', gap: 6 }} accessibilityLabel={`${label} ${v} of ${of}`}>
+    <MiniRing pct={pct} color={color} size={62} stroke={6}><Text style={st.miniV}>{v}</Text></MiniRing>
+    <View style={{ alignItems: 'center' }}>
+      <Text style={st.miniL}>{label}</Text>
+      <Text style={st.miniOf}>of {of}</Text>
+    </View>
   </View>
 );
 const Quick = ({ label, onPress, last }: { label: string; onPress: () => void; last?: boolean }) => (
@@ -282,8 +290,8 @@ const st = StyleSheet.create({
   s: { fontFamily: F.medium, fontSize: 13, lineHeight: 18, color: C.ink },
   play: { width: 46, height: 46, borderRadius: 23, backgroundColor: C.red, alignItems: 'center', justifyContent: 'center' },
   div: { height: 1, backgroundColor: C.line },
-  miniL: { fontFamily: F.semi, fontSize: 12, color: C.ink },
-  miniV: { fontFamily: F.xbold, fontSize: 16, color: C.ink, marginTop: 2 },
+  miniL: { fontFamily: F.bold, fontSize: 12.5, color: C.ink },
+  miniV: { fontFamily: F.xbold, fontSize: 13, color: C.ink },
   miniOf: { fontFamily: F.medium, fontSize: 12, color: C.muted },
   miniT: { height: 5, borderRadius: 3, backgroundColor: '#e3e6ee', marginTop: 6, overflow: 'hidden' },
   q: { flex: 1, height: 48, alignItems: 'center', justifyContent: 'center' },

@@ -20,6 +20,25 @@ let reduce = false;
 AccessibilityInfo.isReduceMotionEnabled?.().then((v) => { reduce = !!v; }).catch(() => {});
 export const reducedMotion = () => reduce;
 
+/*
+ * The launch splash covers the first screen for a moment. Nothing plays until it lifts, so the
+ * person actually sees the charts draw and the sections rise in.
+ */
+let curtainUp = false;
+const waiters = new Set<() => void>();
+export function raiseCurtain() {
+  if (curtainUp) return;
+  curtainUp = true;
+  waiters.forEach((f) => f());
+  waiters.clear();
+}
+setTimeout(raiseCurtain, 6000); // never wait forever
+function whenCurtainUp(f: () => void) {
+  if (curtainUp) { f(); return () => {}; }
+  waiters.add(f);
+  return () => { waiters.delete(f); };
+}
+
 /* ---------------- Scroll-triggered reveals ---------------- */
 
 type Pending = { check: () => void };
@@ -57,10 +76,11 @@ export function Reveal({ children, delay = 0, y = 18, style }: { children: React
   const done = useRef(reduce);
   useEffect(() => {
     if (done.current) return;
+    let unsub = () => {};
     const go = () => {
       if (done.current) return;
       done.current = true;
-      Animated.timing(v, { toValue: 1, duration: 700, delay, easing: EASE, useNativeDriver: native }).start();
+      unsub = whenCurtainUp(() => Animated.timing(v, { toValue: 1, duration: 700, delay, easing: EASE, useNativeDriver: native }).start());
     };
     const check = () => {
       if (done.current || !ref.current) return;
@@ -73,7 +93,7 @@ export function Reveal({ children, delay = 0, y = 18, style }: { children: React
     const off = ctx?.add({ check });
     const t = setTimeout(check, 60);
     const safety = setTimeout(() => { if (!ctx) go(); }, 50);
-    return () => { off?.(); clearTimeout(t); clearTimeout(safety); };
+    return () => { off?.(); clearTimeout(t); clearTimeout(safety); unsub(); };
   }, []);
   return (
     <Animated.View ref={ref as any} collapsable={false}
@@ -81,6 +101,62 @@ export function Reveal({ children, delay = 0, y = 18, style }: { children: React
       {children}
     </Animated.View>
   );
+}
+
+/**
+ * True once the element behind `ref` has come on screen (inside a MotionScroll), so a chart can
+ * play its animation when the person actually sees it. Outside a MotionScroll it plays right away.
+ */
+export function useInView(): [React.MutableRefObject<any>, boolean] {
+  const ctx = useContext(RevealCtx);
+  const ref = useRef<any>(null);
+  const [seen, setSeen] = useState(reduce);
+  useEffect(() => {
+    if (seen) return;
+    let done = false, unsub = () => {};
+    const show = () => { if (!done) { done = true; unsub = whenCurtainUp(() => setSeen(true)); } };
+    const check = () => {
+      if (done || !ref.current?.measureInWindow) return;
+      ref.current.measureInWindow((_x: number, top: number, _w: number, h: number) => {
+        const winH = Dimensions.get('window').height || 800;
+        if (h === 0 && top === 0) return;
+        if (top < winH - 40) show();
+      });
+    };
+    const off = ctx?.add({ check });
+    const t = setTimeout(ctx ? check : show, ctx ? 140 : 160);
+    const t2 = setTimeout(check, 700);
+    return () => { off?.(); clearTimeout(t); clearTimeout(t2); unsub(); };
+  }, []);
+  return [ref, seen];
+}
+
+/** A number that eases from where it was to `to` (cubic ease-out), once `run` is true. */
+export function useTween(to: number, { duration = 1100, delay = 0, run = true }: { duration?: number; delay?: number; run?: boolean } = {}) {
+  const [v, setV] = useState(reduce ? to : 0);
+  const from = useRef(reduce ? to : 0);
+  const first = useRef(true);
+  useEffect(() => {
+    if (!run) return;
+    if (reduce) { from.current = to; setV(to); return; }
+    const a = from.current;
+    if (a === to) return;
+    let raf = 0, t0 = 0;
+    const wait = first.current ? delay : 0;
+    first.current = false;
+    const timer = setTimeout(() => {
+      const step = (ts: number) => {
+        if (!t0) t0 = ts;
+        const t = Math.min(1, (ts - t0) / duration);
+        const n = a + (to - a) * (1 - Math.pow(1 - t, 3));
+        from.current = n; setV(n);
+        if (t < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    }, wait);
+    return () => { clearTimeout(timer); cancelAnimationFrame(raf); };
+  }, [to, run]);
+  return v;
 }
 
 /* ---------------- Numbers and bars ---------------- */

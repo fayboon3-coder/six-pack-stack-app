@@ -19,6 +19,7 @@ import MealCard from '../../src/components/MealCard';
 import Pic from '../../src/components/Pic';
 import { FoodThumb } from '../../src/components/FoodTiles';
 import { Bar, CountUp, Drift, Marquee, MotionScroll, Press, Reveal } from '../../src/components/motion';
+import { FuelCard } from '../../src/components/charts';
 import { track } from '../../src/lib/track';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
@@ -70,20 +71,9 @@ export default function Meals() {
       <ProgramsHeader active="meals" />
       <MotionScroll contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
         {/* Today's numbers */}
-        <Reveal style={st.gutter}>
-          <View style={st.totals}>
-            <View style={{ flex: 1 }}>
-              <Text style={st.k}>CALORIES</Text>
-              <View style={st.bigRow}><CountUp value={kcal} style={st.big} /><Text style={st.of}>/ {fmt(kcalGoal)}</Text></View>
-              <Bar pct={kcal / kcalGoal} color={kcal > kcalGoal + 150 ? E.red : E.ink} track={E.soft} />
-            </View>
-            <View style={st.vHair} />
-            <View style={{ flex: 1 }}>
-              <Text style={st.k}>PROTEIN</Text>
-              <View style={st.bigRow}><CountUp value={protein} style={st.big} /><Text style={st.of}>/ {pg} g</Text></View>
-              <Bar pct={protein / pg} color={protein >= pg ? E.green : E.red} track={E.soft} />
-            </View>
-          </View>
+        <Reveal style={[st.gutter, { marginTop: 18 }]}>
+          <FuelCard kcal={kcal} kGoal={kcalGoal} protein={protein} pGoal={pg}
+            parts={meals.map((m, k) => ({ label: m.slot, kcal: num(opt(k).kcal), done: !!day.eaten[k] })).filter((x) => x.kcal > 0)} />
         </Reveal>
 
         {/* The foods it's built from, gliding by */}

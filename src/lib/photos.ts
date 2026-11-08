@@ -8,6 +8,7 @@ export type Angle = 'front' | 'side' | 'back';
 export type ProgressPhoto = { id: string; angle: Angle; src: ImageSourcePropType; date: string; week: number };
 
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const SEED = DEMO && process.env.EXPO_PUBLIC_DEMO_FRESH !== '1'; // design previews: FRESH shows a brand-new account
 /** Design previews only: Boon's own before/after (never in real builds). */
 function demoPhotos(start?: string): ProgressPhoto[] {
   const before = require('../../assets/demo/before.jpg'), after = require('../../assets/demo/after.jpg');
@@ -21,7 +22,7 @@ function demoPhotos(start?: string): ProgressPhoto[] {
 }
 
 export async function listPhotos(userId: string, start?: string): Promise<ProgressPhoto[]> {
-  if (DEMO) return demoPhotos(start);
+  if (DEMO) return SEED ? demoPhotos(start) : [];
   try {
     const { data } = await supabase.from('photos').select('id,angle,path,created_at').eq('user_id', userId).order('created_at', { ascending: true }).limit(200);
     const rows = (data as { id: string; angle: Angle; path: string; created_at: string }[]) || [];

@@ -41,3 +41,5 @@ yarn-error.*
 /android
 asc-key.p8
 distd4/
+
+dist*/

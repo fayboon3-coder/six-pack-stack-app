@@ -19,6 +19,7 @@ export type Recap = {
 
 export const mondayOf = (d = new Date()) => { const m = new Date(d); m.setHours(12, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const SEED = DEMO && process.env.EXPO_PUBLIC_DEMO_FRESH !== '1'; // design previews: FRESH shows a brand-new account
 
 type Log = { exercise_id: string; weight: number | null; reps: number | null; logged_on: string };
 
@@ -32,7 +33,7 @@ export async function weekRecap(userId: string, plan: Plan, monday: Date): Promi
       new Promise((res) => setTimeout(() => res({ data: [] }), 5000)),
     ]).catch(() => ({ data: [] }));
     logs = r?.data || [];
-  } else logs = demoLogs(start);
+  } else logs = SEED ? demoLogs(start) : [];
   const week = logs.filter((l) => l.logged_on >= start && l.logged_on <= end);
   const before = logs.filter((l) => l.logged_on < start);
   const dates = new Set(logs.map((l) => l.logged_on));
@@ -56,7 +57,7 @@ export async function weekRecap(userId: string, plan: Plan, monday: Date): Promi
     if (day.protein >= proteinGoal(plan)) proteinDays++;
     if (day.steps > 0) steps.push(day.steps);
   }
-  if (DEMO && !steps.length) { stacked = 5; proteinDays = 6; steps = [9400, 8100, 10200, 7600, 9900]; }
+  if (SEED && !steps.length) { stacked = 5; proteinDays = 6; steps = [9400, 8100, 10200, 7600, 9900]; }
 
   const series = trendSeries(await allWeighIns(userId));
   const at = (iso: string) => { const p = series.filter((x) => x.date <= iso); return p.length ? p[p.length - 1].t : null; };

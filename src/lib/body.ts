@@ -8,6 +8,7 @@ import { health } from './health';
 /** Daily weigh-ins: saved on the phone first, backed up to daily_stats.weight, merged with check-ins and Apple Health. */
 const KEY = 'sps:weights';
 const DEMO = process.env.EXPO_PUBLIC_DEMO === '1';
+const SEED = DEMO && process.env.EXPO_PUBLIC_DEMO_FRESH !== '1'; // design previews: FRESH shows a brand-new account
 
 /** Sample weigh-ins for design previews only (never in real builds). */
 function demoWeights(): Record<string, number> {
@@ -26,9 +27,9 @@ export async function readWeights(): Promise<Record<string, number>> {
   try {
     const s = await AsyncStorage.getItem(KEY);
     const v = s ? JSON.parse(s) : {};
-    if (DEMO && !Object.keys(v).length) return demoWeights();
+    if (SEED && !Object.keys(v).length) return demoWeights();
     return v;
-  } catch { return DEMO ? demoWeights() : {}; }
+  } catch { return SEED ? demoWeights() : {}; }
 }
 async function writeWeights(v: Record<string, number>) { try { await AsyncStorage.setItem(KEY, JSON.stringify(v)); } catch {} }
 
