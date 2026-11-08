@@ -18,6 +18,7 @@ import {
 } from '../src/lib/training';
 import { cfgOf, saveTraining } from '../src/lib/trainingSave';
 import { track } from '../src/lib/track';
+import { goBack } from '../src/lib/nav';
 
 const LETTERS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -61,14 +62,14 @@ export default function Training() {
     if (!r.ok) return setMsg("That didn't save. Check your connection and try again.");
     track('training_saved', { split: cfg.split, equip: cfg.equip, focus: cfg.focus.join(','), swaps: Object.keys(cfg.swaps).length, extras: cfg.extras.length });
     await refresh();
-    router.back();
+    goBack(router, '/');
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
-        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/')} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <Text style={st.k}>Your plan</Text>
@@ -190,7 +191,7 @@ export default function Training() {
           );
         })}
 
-        <Button title={busy ? 'Saving…' : changed ? 'Save my training' : 'Done'} loading={busy} onPress={changed ? save : () => router.back()} />
+        <Button title={busy ? 'Saving…' : changed ? 'Save my training' : 'Done'} loading={busy} onPress={changed ? save : () => goBack(router, '/')} />
         <Text style={[st.small, { textAlign: 'center' }]}>Changing days starts this week's ticks fresh. Your logged weights carry over.</Text>
       </ScrollView>
 

@@ -24,6 +24,7 @@ import { focusOf, loadCoaching } from '../src/lib/coaching';
 import { LinearGradient } from 'expo-linear-gradient';
 import { allWeighIns } from '../src/lib/body';
 import { trendSeries } from '../src/lib/trend';
+import { goBack } from '../src/lib/nav';
 
 const BOON = require('../assets/hero/boon_avatar.jpg');
 
@@ -87,7 +88,7 @@ export default function CheckinScreen() {
   const submit = async () => {
     if (!session) return;
     if (!weight) return Alert.alert('Add your weight first', 'Use your 7-day average. If you only weighed once, that works too.');
-    if (isPreviewing()) { Alert.alert('Preview only', 'This is what they see. Nothing was saved.'); return router.back(); }
+    if (isPreviewing()) { Alert.alert('Preview only', 'This is what they see. Nothing was saved.'); return goBack(router, '/'); }
     setSaved(false);
     setBusy(true);
     const uid = session.user.id;
@@ -121,7 +122,7 @@ export default function CheckinScreen() {
     Alert.alert('Got it. Nice work this week.', coached ? 'I\'ll go through everything and send your adjustments within 24 hours.'
       : newNums ? `Week ${week} re-set: your new numbers are ${newNums.kcal} calories and ${newNums.protein} g of protein a day (were ${newNums.before}). Your meals are updated.`
       : 'Your numbers are saved. Check the trend on your Progress tab.');
-    router.back();
+    goBack(router, '/');
   };
 
   const footer = (

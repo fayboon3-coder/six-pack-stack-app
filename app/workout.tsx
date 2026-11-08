@@ -26,6 +26,7 @@ import { applySwap, resetSwap, type TrainCfg } from '../src/lib/training';
 import { canEditTraining, saveTraining } from '../src/lib/trainingSave';
 import { suggestNext } from '../src/lib/trend';
 import { health } from '../src/lib/health';
+import { goBack } from '../src/lib/nav';
 
 type Entry = { w: string; r: string; done: boolean };
 const REST = 90;
@@ -173,7 +174,7 @@ export default function Workout() {
           <RemindersCard compact />
           <CoachCard where="workout_done" title="Want me in your corner for the next 12 weeks?"
             body="Your plan in 48 hours, Sunday check-ins with me, and you can text me anytime on WhatsApp." />
-          <Button title="Back to my plan" onPress={() => router.back()} />
+          <Button title="Back to my plan" onPress={() => goBack(router, '/')} />
         </ScrollView>
       </SafeAreaView>
     );

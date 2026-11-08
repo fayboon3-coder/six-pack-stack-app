@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, usePathname, useGlobalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import LoadingScreen from '../src/components/LoadingScreen';
@@ -20,13 +20,25 @@ function Gate() {
   const segments = useSegments();
   const router = useRouter();
   const landed = useRef(false);
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  // Where a signed-out visitor was headed (e.g. a link in an email). They go there right after logging in.
+  const pending = useRef<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
     const seg = segments[0] as string | undefined;
-    const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'apply', 'coaching', 'stack-check', 'verdict'].includes(seg || '');
-    if (!session && !open) router.replace('/welcome');
-    if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) router.replace('/');
+    const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'coaching-application', 'coaching', 'stack-check', 'verdict'].includes(seg || '');
+    if (!session && !open) {
+      const q = Object.entries(params).filter(([, v]) => typeof v === 'string').map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
+      if (pathname && pathname !== '/') pending.current = pathname + (q ? `?${q}` : '');
+      router.replace('/welcome');
+    }
+    if (!session && seg === 'quiz') pending.current = null; // building a new plan: the plan flow decides where to go
+    if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) {
+      const to = pending.current; pending.current = null;
+      router.replace((to || '/') as any);
+    }
     // 1:1 coaching clients open on their coach home (once per launch).
     if (session && profile && !landed.current) {
       landed.current = true;
@@ -34,7 +46,7 @@ function Gate() {
       const home = seg === '(tabs)' && (!sub || sub === 'index');
       if (home && profile.role === 'client' && profile.tier === 'coached') router.replace('/corner');
     }
-  }, [session, loading, segments, router, profile]);
+  }, [session, loading, segments, router, profile, pathname]);
 
   if (loading) {
     return (

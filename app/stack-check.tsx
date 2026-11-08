@@ -16,6 +16,7 @@ import Poster from '../src/components/Poster';
 import { imageFor, KIND, search, Verdict, VERDICTS } from '../src/lib/stackcheck';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
+import { goBack } from '../src/lib/nav';
 
 const FILTERS = ['All', 'Worth it', 'Depends', 'Skip it'] as const;
 
@@ -116,7 +117,7 @@ function Library() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 48, gap: 10 }}
         ListHeaderComponent={
           <View style={{ gap: 14, paddingBottom: 6 }}>
-            <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+            <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/')} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
               <BackIcon />
             </Pressable>
             <Text style={st.k}>Stack Check</Text>

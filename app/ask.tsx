@@ -17,6 +17,7 @@ import { isCoached, isFree } from '../src/lib/access';
 import { showCoaching } from '../src/components/Coach';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PRIVACY_URL } from '../src/lib/access';
+import { goBack } from '../src/lib/nav';
 
 
 const FACE = require('../assets/logo-b.png');
@@ -104,7 +105,7 @@ export default function Ask() {
     <SafeAreaView edges={inTab ? ['top'] : ['top', 'bottom']} style={{ flex: 1, backgroundColor: C.bg, paddingBottom: inTab ? 96 : 0 }}>
       <Backdrop />
       <View style={st.top}>
-        {!inTab && <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={12} style={st.back}><BackIcon /></Pressable>}
+        {!inTab && <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/stack')} hitSlop={12} style={st.back}><BackIcon /></Pressable>}
         <Image source={FACE} style={st.avatar} />
         <View style={{ flex: 1 }}>
           <Text style={st.topT}>Stack</Text>

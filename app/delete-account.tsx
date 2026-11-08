@@ -10,6 +10,7 @@ import Backdrop from '../src/components/Backdrop';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { twoTone } from '../src/components/TwoTone';
 import { isPreviewing } from '../src/lib/preview';
+import { goBack } from '../src/lib/nav';
 
 /** Delete my account (Apple requires this inside the app). */
 export default function DeleteAccount() {
@@ -68,7 +69,7 @@ export default function DeleteAccount() {
             placeholderTextColor="rgba(27,36,64,0.35)" style={st.input} accessibilityLabel="Type DELETE to confirm" />
           {!!err && <Text style={st.err}>{err}</Text>}
           <Button title="Delete my account" onPress={run} disabled={!ok} />
-          <Button title="Keep my account" variant="ghost" onPress={() => router.back()} />
+          <Button title="Keep my account" variant="ghost" onPress={() => goBack(router, '/you')} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

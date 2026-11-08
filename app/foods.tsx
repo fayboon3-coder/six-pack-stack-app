@@ -13,6 +13,7 @@ import FoodPicker from '../src/components/FoodPicker';
 import { foodsOf } from '../src/lib/quiz';
 import { buildFoodGrocery, buildFoodPlan, whatsMissing } from '../src/lib/mealplan';
 import { foodById, type Food } from '../src/data/foods';
+import { goBack } from '../src/lib/nav';
 
 const num = (s?: string) => Number(String(s || '').replace(/[^\d.]/g, '')) || 0;
 
@@ -43,14 +44,14 @@ export default function Foods() {
     setBusy(false);
     if (error) return setMsg("That didn't save. Check your connection and try again.");
     await refresh();
-    router.back();
+    goBack(router, '/plan');
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
-        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/plan')} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <Text style={st.k}>Your meal plan</Text>

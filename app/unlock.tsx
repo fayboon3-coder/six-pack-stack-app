@@ -9,6 +9,7 @@ import { CoachingCard, SubscriptionCard } from '../src/components/Offers';
 import { coachingFirst } from '../src/lib/access';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
+import { goBack } from '../src/lib/nav';
 
 /** The offers screen: The Full Stack (App Store subscription) and coaching. */
 export default function Unlock() {
@@ -19,7 +20,7 @@ export default function Unlock() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => goBack(router, '/')} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <Text style={st.k}>Keep going{plan?.name ? `, ${plan.name}` : ''}</Text>

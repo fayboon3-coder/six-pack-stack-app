@@ -67,7 +67,7 @@ export default function WeighIn() {
         <Text style={st.k}>{label(isoDate()).toUpperCase()}</Text>
         <View style={st.row}>
           <Pressable accessibilityRole="button" accessibilityLabel="Minus 0.2" onPress={() => bump(-0.2)} style={st.step}><Svg width={18} height={18} viewBox="0 0 24 24"><Path d="M5 12h14" stroke={C.ink} strokeWidth={3} strokeLinecap="round" /></Svg></Pressable>
-          <View style={{ alignItems: 'center', flex: 1 }}>
+          <View style={{ alignItems: 'center', flex: 1, minWidth: 0 }}>
             <TextInput value={txt} onChangeText={(t) => { setSaved(null); setTxt(t.replace(/[^\d.]/g, '')); }} keyboardType="decimal-pad" style={st.big} accessibilityLabel="Weight in pounds" selectTextOnFocus placeholder="000.0" placeholderTextColor="#c3c8d4" maxLength={5} />
             <Text style={st.unit}>lbs</Text>
           </View>
@@ -117,7 +117,7 @@ const st = StyleSheet.create({
   k: { fontFamily: F.bold, fontSize: 12, letterSpacing: 1, color: C.ink, textAlign: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   step: { width: 52, height: 52, borderRadius: 26, borderWidth: 1.5, borderColor: '#d5d9e3', backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
-  big: { fontFamily: F.black, fontSize: 64, letterSpacing: -2, color: C.ink, textAlign: 'center', minWidth: 180, padding: 0, outlineWidth: 0 } as any,
+  big: { fontFamily: F.black, fontSize: 64, letterSpacing: -2, color: C.ink, textAlign: 'center', width: '100%', padding: 0, outlineWidth: 0 } as any,
   unit: { fontFamily: F.bold, fontSize: 15, color: C.muted, marginTop: -4 },
   hint: { fontFamily: F.medium, fontSize: 13, lineHeight: 19, color: C.ink, textAlign: 'center' },
   result: { borderRadius: 16, backgroundColor: '#e7f6ee', padding: 14, alignItems: 'center', gap: 2 },

@@ -8,6 +8,7 @@ import { BackIcon, LockIcon } from '../../src/components/icons';
 import Poster from '../../src/components/Poster';
 import { byId, imageFor, KIND } from '../../src/lib/stackcheck';
 import Backdrop from '../../src/components/Backdrop';
+import { goBack } from '../../src/lib/nav';
 
 
 /** One verdict. Free users get the verdict and the why; the full breakdown comes with the subscription. */
@@ -25,7 +26,7 @@ export default function VerdictScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}>
       <Backdrop />
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 56 }}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/stack-check')} hitSlop={10} style={{ width: 40, height: 40, justifyContent: 'center' }}>
           <BackIcon />
         </Pressable>
         <View style={{ flexDirection: 'row', gap: 16, alignItems: 'center' }}>

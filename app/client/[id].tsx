@@ -10,6 +10,7 @@ import { plain } from '../../src/lib/program';
 import Backdrop from '../../src/components/Backdrop';
 import { sendPush } from '../../src/lib/push';
 import { trendSeries, ratePerWeek } from '../../src/lib/trend';
+import { goBack } from '../../src/lib/nav';
 
 type Checkin = {
   id: string; week: number; checkin_date: string; weight: number | null; waist: number | null; steps: number | null;
@@ -89,7 +90,7 @@ export default function ClientDetail() {
       <Backdrop />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ padding: 20, gap: 14, paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
-          <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={st.back}><BackIcon /></Pressable>
+          <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => goBack(router, '/coach')} style={st.back}><BackIcon /></Pressable>
           <Text style={st.kicker}>{profile?.tier === 'coached' ? 'Coaching client' : profile?.tier || ''}</Text>
           <Text style={st.title}>{name}</Text>
           {!!profile?.email && <Text style={st.meta}>{profile.email}</Text>}

@@ -9,6 +9,7 @@ import { Button } from '../src/components/ui';
 import { CheckIcon } from '../src/components/icons';
 import { KIT_FORMS, kitForm } from '../src/lib/kit';
 import { RoundBtn } from '../src/components/PageTitle';
+import { goBack } from '../src/lib/nav';
 
 const START = ['This week', 'Within 2 weeks', 'Within a month', 'Just looking'];
 const INVEST = ['Yes', 'Yes, with a payment plan', 'Not right now'];
@@ -73,7 +74,7 @@ export default function Apply() {
         <Text style={st.h}>Got it, {f.name.trim()}. Your application is in.</Text>
         <Text style={st.body}>I read every application myself, within 24 hours. Watch your inbox at {f.email.trim()}. If we're a fit, you'll get a short video I recorded for you and a link to claim your spot.</Text>
         <Text style={st.body}>Check your spam or promotions folder and move my email to your main inbox so you don't miss it.</Text>
-        {session ? <Button title="Back to my plan" onPress={() => router.back()} />
+        {session ? <Button title="Back to my plan" onPress={() => goBack(router, '/')} />
           : <Button title="Get The Free Stack while you wait" onPress={() => router.replace('/quiz')} />}
       </SafeAreaView>
     );
