@@ -27,5 +27,9 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       - name: Link the Expo project
         run: eas init --non-interactive --force
+      # The commit message goes in through an env var (never pasted into the script), first line only,
+      # so quotes or symbols in a message can't break or change the command.
       - name: Publish update
-        run: eas update --branch main --message "${{ github.event.head_commit.message || 'manual' }}" --non-interactive --platform ios
+        env:
+          MSG: ${{ github.event.head_commit.message || 'manual' }}
+        run: eas update --branch main --message "$(printf '%s' "$MSG" | head -n 1 | cut -c 1-120)" --non-interactive --platform ios
