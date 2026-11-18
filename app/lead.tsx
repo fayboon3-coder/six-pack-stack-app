@@ -43,7 +43,7 @@ export default function LeadScreen() {
         setAuto(true); await ready;
         const e = h.email.trim().toLowerCase();
         await captureLead({ first_name: h.name.trim(), email: e, want, src: s0 });
-        router.replace({ pathname: '/quiz' as any, params: { name: h.name.trim(), email: e, ...(s0 ? { src: s0 } : {}) } });
+        router.replace({ pathname: '/quiz' as any, params: s0 ? { src: s0 } : {} }); // name and email stay on the device, never in the link
       }
     });
   }, []);
@@ -57,7 +57,7 @@ export default function LeadScreen() {
     await captureLead({ first_name: name.trim(), email: e, want, src });
     setBusy(false);
     if (c.next === 'coaching') return router.replace('/coaching');
-    router.replace({ pathname: c.next as any, params: { name: name.trim(), email: e, ...(src ? { src } : {}) } });
+    router.replace({ pathname: c.next as any, params: src ? { src } : {} }); // name and email are saved by captureLead, never put in the link
   };
 
   if (auto) return <SafeAreaView style={{ flex: 1, backgroundColor: C.bg }}><Backdrop /></SafeAreaView>;

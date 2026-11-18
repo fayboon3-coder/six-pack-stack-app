@@ -9,10 +9,7 @@ import { supabase } from '../src/lib/supabase';
 import { C, F } from '../src/lib/theme';
 import { GOALS, projection, Quiz, savePendingQuiz, targets } from '../src/lib/quiz';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SPOTS } from '../src/lib/menu';
-import FoodPicker from '../src/components/FoodPicker';
-import { whatsMissing } from '../src/lib/mealplan';
-import { foodById, type Food } from '../src/data/foods';
+import { QUICK_START } from '../src/data/foods';
 import { kitTag } from '../src/lib/kit';
 import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
 import { hasGoal, quizFromHandoff, readHandoff } from '../src/lib/handoff';
@@ -55,21 +52,18 @@ const PLACE: Opt[] = [
   { v: 'Home with dumbbells', t: 'Home with dumbbells', s: 'A set of dumbbells and a bench', icon: ICON.home },
   { v: 'Home, no equipment', t: 'Home, no equipment', s: 'Bodyweight only', icon: ICON.body },
 ];
-const COACH_OPTS: Opt[] = [
-  { v: 'Yes', t: 'Yes', s: "I'm ready to go all in" },
-  { v: 'Yes, with a payment plan', t: 'Yes, with a payment plan', s: 'Spread it over a few months' },
-  { v: 'Not right now', t: 'Not right now', s: "I'll start with the app" },
-];
 const INJURIES = ['Lower back', 'Knees', 'Shoulders', 'Wrists / elbows', 'Hips', 'Other'];
 const STEPS_GOAL = ['6,000', '8,000', '10,000', '12,000'];
-const STEP_IDS = ['goal', 'sex', 'height', 'weight', 'activity', 'experience', 'place', 'days', 'foods', 'spots', 'injuries', 'coaching', 'loading', 'account', 'email'] as const;
+// Kept short on purpose: food, restaurants and coaching interest are asked after the plan is saved
+// (Plan tab → Edit foods). Everyone starts on the balanced starter food list.
+const STEP_IDS = ['goal', 'sex', 'height', 'weight', 'activity', 'experience', 'place', 'days', 'injuries', 'loading', 'account', 'email'] as const;
 type StepId = typeof STEP_IDS[number];
-const ASKED = 12;
+const ASKED = STEP_IDS.indexOf('loading');
 
 type Q2 = Quiz & { activity?: string; injuries?: string[]; steps_goal?: string };
 const EMPTY: Q2 = {
   goal: '', sex: '', age: '28', height_ft: '', height_in: '', weight: '', goal_weight: '', where_train: '', days: '4 days',
-  experience: '', tried: [], likes: [], foods: [], custom_foods: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
+  experience: '', tried: [], likes: [], foods: [...QUICK_START], custom_foods: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
   first_name: '', email: '', activity: '', injuries: [], steps_goal: '8,000',
 };
 
@@ -105,7 +99,7 @@ export default function QuizScreen() {
   // From the Stack Score, how long they've lifted is already known from how they train: don't ask again.
   const skip = (k: number) => fromScore && STEP_IDS[k] === 'experience' && !!a.experience;
   const next = () => { setErr(''); setI((x) => { let n = x + 1; if (skip(n)) n++; return Math.min(STEP_IDS.length - 1, n); }); };
-  const back = () => { setErr(''); if (i === first) goBack(router, '/welcome'); else if (step === 'account') setI(STEP_IDS.indexOf('coaching')); else setI(skip(i - 1) ? i - 2 : i - 1); };
+  const back = () => { setErr(''); if (i === first) goBack(router, '/welcome'); else if (step === 'account') setI(STEP_IDS.indexOf('injuries')); else setI(skip(i - 1) ? i - 2 : i - 1); };
   const go = (to: StepId) => { setErr(''); setI(STEP_IDS.indexOf(to)); };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
@@ -124,7 +118,7 @@ export default function QuizScreen() {
   } else if (step === 'sex') {
     body = <>{fromScore && i === first && (
         <View style={qs.fromScore}><Text style={qs.fromScoreT}>{a.first_name ? `${a.first_name}, your Stack Score is in.` : 'Your Stack Score is in.'}</Text>
-          <Text style={qs.fromScoreS}>Your goal, training and stack are already filled in. A few quick questions about you and the food you like, then your plan is built.</Text></View>)}
+          <Text style={qs.fromScoreS}>Your goal, training and stack are already filled in. A few quick taps about your body and your week, then your plan is built.</Text></View>)}
       <Q q="Male or female?" sub="Sets your starting calorie and protein numbers." />
       <Options opts={[{ v: 'Male', t: 'Male' }, { v: 'Female', t: 'Female' }]} value={a.sex} onPick={(v) => set('sex', v)} /></>;
     cta = <Cta title="Continue" onPress={() => (a.sex ? next() : setErr('Pick one to continue.'))} />;
@@ -168,17 +162,6 @@ export default function QuizScreen() {
       const cfg = defaultCfg({ days: a.days, experience: a.experience });
       set('split', cfg.split); set('train_days', DEFAULT_DAYS[d]); next();
     }} />;
-  } else if (step === 'foods') {
-    body = <><Q q="Pick the foods you actually eat" sub="Your meal plan is built only from these. No foods you hate." />
-      <FoodPicker ids={a.foods || []} custom={a.custom_foods || []} onChange={(ids, custom) => { set('foods', ids); set('custom_foods', custom); }} /></>;
-    cta = <Cta title="Continue" onPress={() => {
-      const chosen = (a.foods || []).map((id) => (a.custom_foods || []).find((f: Food) => f.id === id) || foodById(id)).filter(Boolean) as Food[];
-      const miss = whatsMissing(chosen);
-      if (miss.length) return setErr(`Add ${miss.join(', ')} so every meal has options.`);
-      next();
-    }} />;
-  } else if (step === 'spots') {
-    body = <SpotsStep a={a} set={set} />;
   } else if (step === 'injuries') {
     const cur = a.injuries || [];
     body = <><Q q="Anything I should train around?" sub="Tap any that bug you. I'll swap the exercises that aggravate them." />
@@ -192,13 +175,9 @@ export default function QuizScreen() {
         })}
       </View>
       <Or />
-      <Pressable accessibilityRole="button" onPress={() => { set('injuries', []); next(); }} style={st.ghost}><Text style={st.ghostT}>Nothing to work around</Text></Pressable>
+      <Pressable accessibilityRole="button" onPress={() => { set('injuries', []); next(); }} style={st.ghost}><Text style={st.ghostT}>Nothing, build my plan</Text></Pressable>
       <Text style={st.fine}>Have a medical condition or take prescription meds? Check with your doctor before starting.</Text></>;
-    cta = <Cta title="Continue" onPress={next} />;
-  } else if (step === 'coaching') {
-    body = <><Q q="If I coached you 1:1, would you invest in yourself?" sub="Your free plan doesn't depend on this. It helps me know who to help first." />
-      <Options opts={COACH_OPTS} value={a.ready_to_invest} onPick={(v) => set('ready_to_invest', v)} check /></>;
-    cta = <Cta title="Build my plan" onPress={() => (a.ready_to_invest ? next() : setErr('Pick one to continue.'))} />;
+    cta = <Cta title="Build my plan" onPress={next} />;
   } else if (step === 'account') {
     return <SaveYourPlan a={a} set={set} onBack={back} onDone={() => { track('quiz_done', { foods: (a.foods || []).length }); router.replace('/ready'); }} />;
   } else if (step === 'email') {
@@ -363,42 +342,6 @@ function WeightStep({ a, set }: { a: Q2; set: (k: keyof Q2, v: any) => void }) {
   );
 }
 
-function SpotsStep({ a, set }: { a: Q2; set: (k: keyof Q2, v: any) => void }) {
-  const cur = a.spots || [];
-  const [adding, setAdding] = useState(false);
-  const [txt, setTxt] = useState('');
-  const list = [...SPOTS.filter((s) => !['None of these'].includes(s)), ...cur.filter((s) => !SPOTS.includes(s as any))];
-  return (
-    <>
-      <Q q="Where do you eat out?" sub="You'll get the exact order to get at each spot that still fits your numbers." />
-      <View style={{ gap: 10 }}>
-        {list.map((o) => {
-          const on = cur.includes(o);
-          return (
-            <Pressable key={o} accessibilityRole="checkbox" accessibilityState={{ checked: on }} onPress={() => set('spots', on ? cur.filter((x) => x !== o) : [...cur, o])}
-              style={[st.row, on && st.on]}>
-              <Text style={[st.rowT, on && st.onT]}>{o}</Text>
-              <View style={[st.box, on && { backgroundColor: C.onAccent, borderColor: C.onAccent }]}>
-                {on && <Svg width={13} height={13} viewBox="0 0 24 24"><Path d="M5 12.5l4.5 4.5L19 7.5" stroke={C.red} strokeWidth={3.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>}
-              </View>
-            </Pressable>
-          );
-        })}
-        {adding ? (
-          <View style={[st.row, { borderStyle: 'dashed' }]}>
-            <TextInput autoFocus value={txt} onChangeText={setTxt} placeholder="Restaurant name" placeholderTextColor={C.muted} style={[st.rowT, { flex: 1 }]}
-              onSubmitEditing={() => { const t = txt.trim(); if (t) set('spots', [...cur, t]); setTxt(''); setAdding(false); }} returnKeyType="done" accessibilityLabel="Restaurant name" />
-          </View>
-        ) : (
-          <Pressable accessibilityRole="button" onPress={() => setAdding(true)} style={[st.row, st.dashed]}>
-            <Text style={[st.rowT, { color: C.ink }]}>+  Add a restaurant</Text>
-          </Pressable>
-        )}
-      </View>
-    </>
-  );
-}
-
 /** Creating your plan: a ring fills while each part ticks off, then it moves on by itself. */
 function Loading({ onDone }: { onDone: () => void }) {
   const [pct, setPct] = useState(0);
@@ -409,7 +352,7 @@ function Loading({ onDone }: { onDone: () => void }) {
     return () => clearInterval(t);
   }, []);
   useEffect(() => { if (pct >= 100) { const t = setTimeout(onDone, 500); return () => clearTimeout(t); } }, [pct]);
-  const labels = ['Setting your calories and protein', 'Building meals from your foods', 'Picking workouts for your gym', 'Planning your eat-out orders'];
+  const labels = ['Setting your calories and protein', 'Building your meals', 'Picking workouts for your gym', 'Planning your eat-out orders'];
   const R = 86, L = 2 * Math.PI * R;
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: C.bg, alignItems: 'center', paddingHorizontal: 24, paddingTop: 70 }}>

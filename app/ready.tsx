@@ -72,7 +72,7 @@ export default function Ready() {
         <LoadingScreen
           title={slow ? 'Almost| there' : 'Building your| plan'}
           sub={slow ? 'This is taking longer than usual. Your plan will be on the Today tab.' : 'Made from your answers. Nothing generic.'}
-          steps={['Setting your calories and protein', 'Building meals from the foods you picked', 'Writing your training split', 'Picking your starter stack', 'Mapping your 12 weeks']}
+          steps={['Setting your calories and protein', 'Building your meals', 'Writing your training split', 'Picking your starter stack', 'Mapping your 12 weeks']}
           stepMs={700}
           done={!!plan}
           onFinish={() => setRevealed(true)}
@@ -147,7 +147,7 @@ export default function Ready() {
 
           {meals.length > 0 && (
             <Rise delay={320} style={s.card}>
-              <Kicker t="Your meals, from foods you picked" />
+              <Kicker t="Your starter meals · swap any food in Plan" />
               <Text style={s.h2}>{plan.kcal} calories · {plan.protein}g protein</Text>
               <View style={{ gap: 10, marginTop: 6 }}>
                 {meals.map((m) => (
