@@ -19,6 +19,8 @@ const COPY: Record<Want, { k: string; h: string; sub: string; cta: string; next:
   coaching: { k: '1:1 coaching', h: 'Where should I send the details?', sub: "Next: everything you get with 1:1 coaching, and the Abs or It's Free guarantee.", cta: 'Show me', next: 'coaching' },
 };
 
+const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 /** One screen between "what are you here for" and the path: name + email, straight into Boon's emails. */
 export default function LeadScreen() {
   const { want: w } = useLocalSearchParams<{ want?: string }>();
@@ -30,21 +32,31 @@ export default function LeadScreen() {
   const [src, setSrc] = useState<string | undefined>();
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
-  const [auto, setAuto] = useState(false);
+  const skips = want === 'plan' || want === 'sub';
+  // Came from the Stack Score with a name and email: never show this screen, not even for a split second.
+  const [auto, setAuto] = useState(() => { const h = readHandoff(); return skips && !!h?.name && !!h?.email && EMAIL_OK.test(h.email); });
 
   useEffect(() => {
     let s0: string | undefined;
     const ready = Linking.getInitialURL().then((u) => { const s = u ? Linking.parse(u).queryParams?.src : undefined; if (s) { s0 = String(s).slice(0, 80); setSrc(s0); } }).catch(() => {});
     readLead().then(async (l) => {
-      if (l) { setName(l.first_name); setEmail(l.email); return; }
-      const h = readHandoff(); if (h?.email) setEmail(h.email); if (h?.name) setName(h.name); // came from the Stack Score
-      // They just gave their name and email on the Stack Score: don't ask again, go straight to the quiz.
-      if (want === 'plan' && h?.name && h?.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(h.email)) {
+      const h = readHandoff();
+      const fromScore = !!(h?.name && h?.email && EMAIL_OK.test(h.email));
+      const known = !!(l?.first_name && l?.email && EMAIL_OK.test(l.email));
+      // They already gave their name and email (on the Stack Score, or here before): go straight to the quiz.
+      if (skips && (fromScore || known)) {
         setAuto(true); await ready;
-        const e = h.email.trim().toLowerCase();
-        await captureLead({ first_name: h.name.trim(), email: e, want, src: s0 });
+        if (fromScore) {
+          const e = h!.email!.trim().toLowerCase();
+          // Tag them in Kit as an app lead (the Stack Score sign-up is a different form), unless this exact lead is already saved.
+          if (!known || l!.email !== e || l!.want !== want) await captureLead({ first_name: h!.name!.trim(), email: e, want, src: s0 || l?.src });
+        }
         router.replace({ pathname: '/quiz' as any, params: s0 ? { src: s0 } : {} }); // name and email stay on the device, never in the link
+        return;
       }
+      setAuto(false);
+      if (l) { setName(l.first_name); setEmail(l.email); return; }
+      if (h?.email) setEmail(h.email); if (h?.name) setName(h.name);
     });
   }, []);
 
