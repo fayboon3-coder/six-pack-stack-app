@@ -73,7 +73,7 @@ export default function Corner() {
     <View style={{ flex: 1, backgroundColor: C.bg }}>
       <ScrollView keyboardShouldPersistTaps="handled" automaticallyAdjustKeyboardInsets contentContainerStyle={{ paddingBottom: 130 }}>
         {/* Hero */}
-        <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[st.hero, { paddingTop: insets.top + 16 }]}>
+        <LinearGradient colors={['#141c33', '#141c33']} style={[st.hero, { paddingTop: insets.top + 16 }]}>
           <View style={st.badgeRow}>
             <View style={st.badge}><Text style={st.badgeT}>1:1 COACHING</Text></View>
             <Text style={st.heroWeek}>Week {week} of 12 · {phase.name}</Text>

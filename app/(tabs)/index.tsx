@@ -421,7 +421,7 @@ export default function Today() {
               <Pressable accessibilityRole="button" onPress={go('/photos', 'photos')} style={st.ghostBtn}><Text style={st.ghostT}>Photos</Text></Pressable>
             </View>
             {adapt.who !== 'none' && (
-              <Pressable accessibilityRole="button" onPress={go('/progress', 'calorie_check')} style={[st.check, adapt.kind === 'adjust' && adapt.who !== 'coached' && { backgroundColor: '#fdeceb' }]}>
+              <Pressable accessibilityRole="button" onPress={go('/progress', 'calorie_check')} style={[st.check, adapt.kind === 'adjust' && adapt.who !== 'coached' && { backgroundColor: '#eef1f8' }]}>
                 <Text style={st.checkK}>WEEKLY CALORIE CHECK</Text>
                 <Text style={st.checkT}>
                   {adapt.who === 'coached' ? 'Boon sets your calories at your Sunday check-in.'
@@ -517,13 +517,13 @@ export default function Today() {
             <Press accessibilityRole="button" onPress={() => { track('coaching_tap', { where: 'today' }); router.push('/coaching'); }} scale={0.985} style={st.coach}>
               <View style={st.coachPic}>
                 <Drift source={BOON_WIDE} style={st.fill} range={0.05} />
-                <LinearGradient colors={['rgba(16,23,42,0)', 'rgba(16,23,42,1)']} locations={[0.55, 1]} style={st.fill} />
+                <LinearGradient colors={['rgba(20,28,51,0)', 'rgba(20,28,51,1)']} locations={[0.55, 1]} style={st.fill} />
               </View>
               <View style={st.coachBody}>
-                <Text style={st.coachK}>1:1 COACHING WITH BOON</Text>
+                <Text style={st.coachK}>1:1 COACHING · LIMITED SPOTS</Text>
                 <Text style={st.coachT}>Want me in your corner?</Text>
                 <Text style={st.coachS}>I review your week every Sunday and change one thing at a time. Abs in 12 weeks, or I keep coaching you free.</Text>
-                <View style={st.coachBtn}><Text style={st.coachBtnT}>See if you qualify</Text></View>
+                <View style={st.coachBtn}><Text style={st.coachBtnT}>See if I qualify  →</Text></View>
               </View>
             </Press>
           </Reveal>
@@ -635,7 +635,7 @@ const st = StyleSheet.create({
   heroMeta: { fontFamily: F.semi, fontSize: 13.5, color: 'rgba(255,255,255,0.86)', marginTop: 6 },
   heroBody: { padding: 16, gap: 14 },
   targetRow: { flexDirection: 'row', gap: 12, alignItems: 'flex-start' },
-  targetIcon: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#fdeceb', alignItems: 'center', justifyContent: 'center' },
+  targetIcon: { width: 34, height: 34, borderRadius: 17, backgroundColor: '#eef1f8', alignItems: 'center', justifyContent: 'center' },
   targetK: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 1.4, color: E.red, marginBottom: 2 },
   target: { fontFamily: F.medium, fontSize: 15, lineHeight: 21, color: E.ink },
   heroBtns: { flexDirection: 'row', gap: 10 },
@@ -682,7 +682,7 @@ const st = StyleSheet.create({
   miniV: { fontFamily: F.black, fontSize: 14, color: E.ink },
   miniO: { fontFamily: F.bold, fontSize: 10, color: E.sub },
   miniT: { fontFamily: F.semi, fontSize: 13, lineHeight: 17, color: E.ink, marginTop: 2 },
-  heart: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#fdeceb', alignItems: 'center', justifyContent: 'center' },
+  heart: { width: 48, height: 48, borderRadius: 24, backgroundColor: '#eef1f8', alignItems: 'center', justifyContent: 'center' },
   mAdd: { height: 26, paddingHorizontal: 10, borderRadius: 13, backgroundColor: E.ink, justifyContent: 'center' },
   mAddT: { fontFamily: F.bold, fontSize: 12, color: '#fff' },
 
@@ -735,14 +735,14 @@ const st = StyleSheet.create({
   hot: { paddingHorizontal: 6, height: 18, borderRadius: 5, backgroundColor: E.red, justifyContent: 'center' },
   hotT: { fontFamily: F.bold, fontSize: 9.5, letterSpacing: 0.8, color: '#fff' },
 
-  coach: { borderRadius: 24, overflow: 'hidden', backgroundColor: E.ink },
+  coach: { borderRadius: 24, overflow: 'hidden', backgroundColor: '#141c33', borderWidth: 1, borderColor: '#2a3456' },
   coachPic: { height: 210 },
   coachBody: { padding: 20, paddingTop: 4, gap: 8 },
   coachK: { fontFamily: F.bold, fontSize: 11, letterSpacing: 1.4, color: '#ff8a80' },
   coachT: { fontFamily: F.black, fontSize: 28, lineHeight: 31, letterSpacing: -0.8, color: '#fff' },
   coachS: { fontFamily: F.medium, fontSize: 14.5, lineHeight: 21, color: 'rgba(255,255,255,0.88)' },
-  coachBtn: { alignSelf: 'flex-start', height: 44, paddingHorizontal: 20, borderRadius: 22, backgroundColor: '#fff', justifyContent: 'center', marginTop: 6 },
-  coachBtnT: { fontFamily: F.bold, fontSize: 15, color: E.ink },
+  coachBtn: { alignSelf: 'flex-start', height: 46, paddingHorizontal: 20, borderRadius: 12, backgroundColor: '#d0362f', justifyContent: 'center', marginTop: 6 },
+  coachBtnT: { fontFamily: F.black, fontSize: 15, color: '#fff' },
 
   colophon: { fontFamily: F.bold, fontSize: 10.5, letterSpacing: 2, color: E.faint, textAlign: 'center', marginTop: 40 },
 });

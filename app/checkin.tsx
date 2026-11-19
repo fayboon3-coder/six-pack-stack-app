@@ -136,7 +136,7 @@ export default function CheckinScreen() {
       <Page tabs={false} footer={footer} style={{ gap: 0 }}
         header={<PageTitle back title={coached ? 'Your week, for Boon' : 'Sunday check-in'} sub={`Week ${week} · about 2 minutes`} size={26} />}>
         {coached && (
-          <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.boon}>
+          <LinearGradient colors={['#141c33', '#141c33']} style={st.boon}>
             <Image source={BOON} style={st.boonAv} />
             <Text style={st.boonT}>Talk to me like you'd text me. I read every word and send your adjustments within 24 hours.</Text>
           </LinearGradient>

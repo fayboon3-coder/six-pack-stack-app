@@ -22,7 +22,7 @@ import { exName } from '../src/lib/workoutMeta';
 
 const L = {
   bg: '#f3f4f8', white: '#ffffff', ink: '#16203b', body: '#3b4664', muted: '#6d7894',
-  line: '#e3e6ee', red: '#d6352c', redTint: '#fdeceb', green: '#12804f', greenTint: '#e6f4ec',
+  line: '#e3e6ee', red: '#d0362f', redTint: '#eef1f8', green: '#12804f', greenTint: '#e6f4ec',
 };
 const IMG = {
   programs: require('../assets/img/pay/lp-programs.jpg'),

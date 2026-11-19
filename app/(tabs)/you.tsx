@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MiniRing } from '../../src/components/charts';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../../src/lib/auth';
+import CoachPromo from '../../src/components/CoachPromo';
 import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import RemindersCard from '../../src/components/RemindersCard';
@@ -66,10 +67,7 @@ export default function You() {
           </Pressable>
         )}
 
-        <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
-          <Image source={LOGO} style={{ width: 44, height: 44 }} />
-          <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
-        </Pressable>
+        <CoachPromo where="you_signed_out" />
         {profile?.role !== 'coach' && <Pressable accessibilityRole="button" onPress={() => router.push('/quiz')} style={st.card2}><View style={{ flex: 1 }}><Text style={st.rowTitle}>Build my free plan</Text><Text style={st.small}>2-minute quiz</Text></View><Chevron /></Pressable>}
         <Pressable accessibilityRole="button" onPress={signOut} style={st.ghost}><Text style={st.ghostT}>Sign out</Text></Pressable>
       </ScrollView>
@@ -115,11 +113,7 @@ export default function You() {
             <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
           </Pressable>
         ) : profile?.role !== 'coach' && (
-          <Pressable accessibilityRole="button" onPress={() => router.push('/coaching')} style={st.coachBanner}>
-            <Image source={LOGO} style={{ width: 44, height: 44 }} />
-            <View style={{ flex: 1 }}><Text style={[st.rowTitle, { color: C.onAccent }]}>Want me in your corner?</Text><Text style={[st.small, { color: C.onAccent }]}>1:1 coaching with Boon · Apply here</Text></View>
-            <Svg width={16} height={16} viewBox="0 0 24 24"><Path d="M9 5l7 7-7 7" stroke="#fff" strokeWidth={2.4} fill="none" strokeLinecap="round" strokeLinejoin="round" /></Svg>
-          </Pressable>
+          <CoachPromo where="you" />
         )}
 
         {!!session && !viewAs && <Leaderboard userId={session.user.id} />}

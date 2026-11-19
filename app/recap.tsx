@@ -73,7 +73,7 @@ function Card({ r, name, svgRef }: { r: Recap; name: string; svgRef: React.Mutab
     <Svg ref={svgRef} width="100%" height="100%" viewBox={`0 0 ${W} ${H}`}>
       <Defs>
         <LinearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#141c33" /><Stop offset="0.55" stopColor="#1d2a52" /><Stop offset="1" stopColor="#2a1530" />
+          <Stop offset="0" stopColor="#141c33" /><Stop offset="1" stopColor="#141c33" />
         </LinearGradient>
         <LinearGradient id="red" x1="0" y1="0" x2="1" y2="1"><Stop offset="0" stopColor="#ff5a4e" /><Stop offset="1" stopColor="#c92f2a" /></LinearGradient>
       </Defs>

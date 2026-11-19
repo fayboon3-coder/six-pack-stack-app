@@ -117,7 +117,7 @@ export default function Progress() {
       </Pressable>} />}>
 
       {/* Trend hero */}
-      <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={st.hero}>
+      <LinearGradient colors={['#141c33', '#141c33']} style={st.hero}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={st.heroK}>TREND WEIGHT</Text>
           {since != null && since !== 0 && <Text style={[st.heroChip, since > 0 && !((profile?.quiz as any)?.goal || '').startsWith('Build') && { backgroundColor: 'rgba(226,67,59,0.25)' }]}>{since > 0 ? '+' : '−'}{Math.abs(since).toFixed(1)} since start</Text>}
