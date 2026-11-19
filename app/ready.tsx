@@ -110,7 +110,7 @@ export default function Ready() {
     <View style={{ flex: 1, backgroundColor: L.bg }}>
       <ScrollView contentContainerStyle={{ paddingBottom: (wide ? 40 : 110) + insets.bottom }}>
         {/* Hero */}
-        <LinearGradient colors={['#141c33', '#1d2a52', '#2a1530']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[s.hero, { paddingTop: insets.top + 28 }]}>
+        <LinearGradient colors={['#141c33', '#141c33']} style={[s.hero, { paddingTop: insets.top + 28 }]}>
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 40 }]}>
             <Rise style={{ flex: wide ? 1.1 : undefined, gap: 16 }}>
               <View style={s.pill}><View style={s.dot} /><Text style={s.pillT}>YOU'RE IN · WEEK 1 STARTS TODAY</Text></View>
@@ -180,9 +180,9 @@ export default function Ready() {
             <Text style={[s.h2, { marginBottom: 12 }]}>Strip. Stack. Six-Pack.</Text>
             <View style={[{ gap: 10 }, wide && { flexDirection: 'row' }]}>
               {phases.map((p, i) => (
-                <View key={p.n} style={[s.phase, wide && { flex: 1 }, i === 0 && { borderColor: L.red, backgroundColor: L.redTint }]}>
+                <View key={p.n} style={[s.phase, wide && { flex: 1 }, i === 0 && { borderColor: '#141c33', backgroundColor: '#eef1f8' }]}>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={[s.phaseN, i === 0 && { color: L.red }]}>{p.n}</Text>
+                    <Text style={[s.phaseN, i === 0 && { color: '#141c33' }]}>{p.n}</Text>
                     <Text style={s.phaseW}>{i === 0 ? 'Now · ' : ''}{p.w}</Text>
                   </View>
                   <Text style={s.phaseT}>{p.t}</Text>
@@ -212,13 +212,13 @@ export default function Ready() {
 const s = StyleSheet.create({
   wrap: { width: '100%', maxWidth: 1040, alignSelf: 'center', paddingHorizontal: 20 },
   hero: { paddingBottom: 56, borderBottomLeftRadius: 30, borderBottomRightRadius: 30, overflow: 'hidden' },
-  pill: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: 'rgba(47,209,127,0.14)', borderWidth: 1, borderColor: 'rgba(47,209,127,0.4)', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
+  pill: { flexDirection: 'row', alignItems: 'center', gap: 8, alignSelf: 'flex-start', backgroundColor: '#1c2542', borderWidth: 1, borderColor: '#2a3456', borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2fd17f' },
   pillT: { fontFamily: F.xbold, fontSize: 11.5, letterSpacing: 1.2, color: '#7ff0b5' },
   h1: { fontFamily: F.black, fontSize: 40, lineHeight: 44, color: '#fff', letterSpacing: -1 },
   lede: { fontFamily: F.medium, fontSize: 16.5, lineHeight: 24, color: '#c7cde0' },
   stats: { flexDirection: 'row', gap: 10, marginTop: 4 },
-  stat: { flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)', borderRadius: 16, paddingVertical: 12, alignItems: 'center', gap: 2 },
+  stat: { flex: 1, backgroundColor: '#1c2542', borderWidth: 1, borderColor: '#2a3456', borderRadius: 16, paddingVertical: 12, alignItems: 'center', gap: 2 },
   statV: { fontFamily: F.black, fontSize: 21, color: '#fff' },
   statL: { fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.2, color: '#9aa3bd' },
   phones: { position: 'relative', alignSelf: 'stretch' },
