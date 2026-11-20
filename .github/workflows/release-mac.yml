@@ -32,7 +32,8 @@ jobs:
           ls -d /Applications/Xcode*.app
           X=$(ls -d /Applications/Xcode_27.1*.app 2>/dev/null | sort -V | tail -1)
           [ -z "$X" ] && X=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1)
-          if [ -z "$X" ]; then echo "No Xcode 27 on this runner yet."; exit 1; fi
+          # GitHub's Macs don't have Xcode 27 yet: fall back to the newest Xcode 26 they have.
+          [ -z "$X" ] && X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
           sudo xcode-select -s "$X" && xcodebuild -version
       - name: Set up Expo
         uses: expo/expo-github-action@v8
