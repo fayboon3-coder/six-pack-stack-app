@@ -118,6 +118,20 @@ export function fitMeal(m: MyMeal, kcal: number, protein: number, pantry: Food[]
     }
   }
   t = totals(parts);
+  // Too light to count as a meal (a shake on its own): add one of their carbs or a fruit to fill it out.
+  if (t.kcal < K * 0.8 && !byCarb) {
+    const inMeal = new Set(parts.map((x) => x.food.id));
+    const want = (tag === 'B' || tag === 'S') ? ['fruit', 'carb'] : ['carb'];
+    const fill = pantry.filter((f) => want.includes(f.cat) && f.meals.includes(tag) && !inMeal.has(f.id))
+      .sort((a, b) => want.indexOf(a.cat) - want.indexOf(b.cat))[0];
+    if (fill) {
+      const amt = portion(fill, (K - t.kcal) / Math.max(1, fill.kcal));
+      const added = { food: fill, amt, theirs: amt };
+      parts.push(added);
+      tweak = `${tweak ? tweak + ' ' : ''}I added ${partText(added)} so it's a full ${tag === 'S' ? 'snack' : 'meal'} at your numbers.`;
+    }
+  }
+  t = totals(parts);
   const fit = fitOf(t.kcal, t.p, K, P);
   const changed = parts.some((x) => x.amt !== x.theirs);
   if (!tweak && changed) tweak = 'Same foods. I adjusted the amounts to fit your numbers.';
@@ -158,7 +172,7 @@ export function withMyMeals(meals: MealSlot[], mine: MyMeal[] = [], kcal: number
 /** How a takeout order fits their day. */
 export function orderNote(o: Pick<MyOrder, 'kcal' | 'protein'>, kcal: number, protein: number) {
   const share = o.kcal / Math.max(1, kcal);
-  let t = share <= 0.36 ? 'Fits as your lunch or dinner.'
+  let t = share <= 0.36 ? 'Fits as one of your meals, no changes needed.'
     : share <= 0.5 ? 'A big one: make it your main meal and keep breakfast and your snack light that day.'
       : `That's ${Math.round(share * 100)}% of your day. Share it, skip a side, or keep it to once a week.`;
   if (o.protein < protein * 0.22) t += ' Low on protein, so have a protein shake or Greek yogurt later.';

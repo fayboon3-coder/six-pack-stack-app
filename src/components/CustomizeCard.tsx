@@ -12,8 +12,8 @@ export default function CustomizeCard({ tab, done }: { tab: 'train' | 'food'; do
   const train = tab === 'train';
   const title = done ? (train ? 'Your training, tailored to you' : 'Your meals, tailored to you') : (train ? 'Tailor your training exactly to you' : 'Tailor your meals exactly to you');
   const body = train
-    ? 'The workouts and moves you like, and the exact weights you lift now. Your plan rebuilds around them.'
-    : 'The meals you actually eat, the takeout you order, the foods you skip. Sized to your calories and protein.';
+    ? 'Tell me your week, the moves you like and what you lift, in your own words. Your plan rebuilds around it.'
+    : 'Tell me what you eat, what you order and what you skip. Your meals get built from it, sized to your numbers.';
   return (
     <Press accessibilityRole="button" onPress={() => { track('customize_card', { tab }); router.push({ pathname: '/customize', params: { tab } }); }} style={st.card}>
       <View style={st.icon}>{train ? <DumbbellIcon color="#fff" size={22} /> : <ForkIcon color="#fff" size={22} />}</View>

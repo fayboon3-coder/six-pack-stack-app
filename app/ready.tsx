@@ -145,14 +145,14 @@ export default function Ready() {
           <Rise delay={200} style={[s.card, s.custom]}>
             <Kicker t="Advanced customization" />
             <Text style={s.h2}>Want your plan tailored exactly to you?</Text>
-            <Text style={s.customBody}>Tell me what you already do and I rebuild your plan around it, the same way I would if we sat down together. Your calories and protein stay locked in.</Text>
+            <Text style={s.customBody}>A few quick questions, answered in your own words. Nothing's required. I rebuild your plan around what you already do, the same way I would if we sat down together.</Text>
             <View style={[{ gap: 10, marginTop: 8 }, wide && { flexDirection: 'row' }]}>
               {canTrain && (
                 <Pressable accessibilityRole="button" onPress={() => customize('tile', 'train')} style={[s.tile, wide && { flex: 1 }]}>
                   <View style={s.tileIcon}><DumbbellIcon color="#fff" size={20} /></View>
                   <View style={{ flex: 1, gap: 3 }}>
                     <Text style={s.tileT}>Training</Text>
-                    <Text style={s.tileS}>The workouts and moves you like, and the exact weights you lift now.</Text>
+                    <Text style={s.tileS}>Your week in the gym, the moves you like, what you lift now.</Text>
                   </View>
                   <Text style={s.tileArrow}>›</Text>
                 </Pressable>
@@ -161,7 +161,7 @@ export default function Ready() {
                 <View style={[s.tileIcon, { backgroundColor: L.red }]}><ForkIcon color="#fff" size={20} /></View>
                 <View style={{ flex: 1, gap: 3 }}>
                   <Text style={s.tileT}>Food</Text>
-                  <Text style={s.tileS}>The meals you eat, your takeout orders, and the foods you won't touch.</Text>
+                  <Text style={s.tileS}>A normal day of eating, what you order out, what you skip.</Text>
                 </View>
                 <Text style={s.tileArrow}>›</Text>
               </Pressable>
