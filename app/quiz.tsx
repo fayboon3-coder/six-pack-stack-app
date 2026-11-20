@@ -83,6 +83,12 @@ const LABEL: Record<string, string> = { goal: 'Your goal', experience: 'Experien
 type Q2 = Quiz & { activity?: string; injuries?: string[]; steps_goal?: string };
 const validContact = (name: string, email: string) => name.trim().length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
+/** The saved lead, read synchronously on the web (AsyncStorage keeps it in localStorage under the same key). */
+function leadNow(): { first_name?: string; email?: string } | null {
+  if (Platform.OS !== 'web') return null;
+  try { return JSON.parse(window.localStorage.getItem('sps:lead') || 'null'); } catch { return null; }
+}
+
 const EMPTY: Q2 = {
   goal: '', sex: '', age: '28', height_ft: '', height_in: '', weight: '', goal_weight: '', where_train: '', days: '4 days',
   experience: '', tried: [], likes: [], foods: [...QUICK_START], custom_foods: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
@@ -94,10 +100,14 @@ export default function QuizScreen() {
   const params = useLocalSearchParams<{ src?: string; name?: string; email?: string }>();
   // Came from the Stack Score on this browser: goal, training, stack and name are already known.
   const [fromScore] = useState(() => hasGoal(readHandoff()));
-  const [a, setA] = useState<Q2>(() => { const { email, ...pre } = quizFromHandoff(readHandoff()); return { ...EMPTY, ...pre }; });
+  const [a, setA] = useState<Q2>(() => {
+    const { email, ...pre } = quizFromHandoff(readHandoff());
+    const l = leadNow(); // the email always comes from the saved lead (Stack Score or the email screen), read right away on the web
+    return { ...EMPTY, ...pre, ...(l && validContact(l.first_name || '', l.email || '') ? { first_name: pre.first_name || l.first_name, email: l.email } : {}) };
+  });
   const [known] = useState(() => ({ goal: fromScore, experience: fromScore && !!a.experience }));
   // Name and email already known (Stack Score, the email screen or a link): no "where should I send your plan" step.
-  const [hasContact, setHasContact] = useState(false);
+  const [hasContact, setHasContact] = useState(() => { const l = leadNow(); return !!l && validContact(l.first_name || '', l.email || ''); });
   const asked = STEP_IDS.slice(0, ASKED).filter((s) => !(known as any)[s] && !(s === 'contact' && hasContact)) as StepId[];
   const [i, setI] = useState(() => STEP_IDS.indexOf(asked[0]));
   const [err, setErr] = useState('');
@@ -127,14 +137,19 @@ export default function QuizScreen() {
     track('quiz_step', { step, n: asked.indexOf(step) + 1 }, { once: true });
   }, [i]);
 
+  // Email turned out to be known while they're on the email step: move on to the next question.
+  useEffect(() => { if (hasContact && step === 'contact') next(); }, [hasContact, step]);
+
   const set = (k: keyof Q2, v: any) => { setErr(''); setA((x) => ({ ...x, [k]: v })); };
   const go = (to: StepId) => { setErr(''); setI(STEP_IDS.indexOf(to)); };
-  const next = () => { const k = asked.indexOf(step); go(k >= 0 && k < asked.length - 1 ? asked[k + 1] : 'loading'); };
+  // The next question still to ask, by position (safe even if the current step stopped being asked, e.g. the email became known).
+  const next = () => { const at = STEP_IDS.indexOf(step); go(asked.find((s) => STEP_IDS.indexOf(s) > at) || 'loading'); };
   const back = () => {
     setErr('');
     if (step === 'account') return go(asked[asked.length - 1]);
-    const k = asked.indexOf(step);
-    if (k <= 0) goBack(router, '/welcome'); else go(asked[k - 1]);
+    const at = STEP_IDS.indexOf(step);
+    const prev = asked.filter((s) => STEP_IDS.indexOf(s) < at).pop();
+    if (!prev) goBack(router, '/welcome'); else go(prev);
   };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
