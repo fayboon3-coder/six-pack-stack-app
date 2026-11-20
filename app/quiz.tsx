@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
@@ -18,6 +18,7 @@ import { readLead } from '../src/lib/lead';
 import { track } from '../src/lib/track';
 import { DEFAULT_DAYS, defaultCfg } from '../src/lib/training';
 import { goBack } from '../src/lib/nav';
+import { AFTER_TRIAL_KEY } from '../src/lib/afterTrial';
 
 const LOGO = require('../assets/logo-b.png');
 
@@ -124,7 +125,12 @@ export default function QuizScreen() {
   };
 
   if (step === 'loading') return <Loading onDone={() => go('account')} />;
-  if (step === 'account') return <SaveYourPlan a={a} set={set} onBack={back} onDone={() => { track('quiz_done', { foods: (a.foods || []).length }); router.replace('/ready'); }} />;
+  if (step === 'account') return <SaveYourPlan a={a} set={set} onBack={back} onDone={async () => {
+    track('quiz_done', { foods: (a.foods || []).length });
+    // Straight to the offer; after it (paid or "Not now") they land on "You're in" (/ready).
+    await AsyncStorage.setItem(AFTER_TRIAL_KEY, 'ready').catch(() => {});
+    router.replace('/trial');
+  }} />;
 
   const n = asked.indexOf(step) + 1, total = asked.length;
   let body: React.ReactNode = null;
@@ -437,6 +443,9 @@ function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v:
   const name = a.first_name.trim().split(' ')[0];
   const line = p.build ? `12 weeks of training built to add muscle` : p.w > p.g ? `On pace for ${p.at12} lbs by ${p.end12}` : `12 weeks built to lean out and show your abs`;
   useEffect(() => { track('account_view', { known }, { once: true }); }, []);
+  // Name and email already known (from the Stack Score): save the plan with no screen at all.
+  const [auto, setAuto] = useState(known);
+  useEffect(() => { if (known) submit().finally(() => setAuto(false)); }, []);
   const oauth = async (provider: 'apple' | 'google') => {
     setNote('');
     const redirectTo = Platform.OS === 'web' ? `${window.location.origin}/app/` : Linking.createURL('/');
@@ -469,6 +478,7 @@ function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v:
     if (!res.data.session) return setNote('Check your email to confirm your account, then log in. Your plan will be waiting.');
     onDone();
   };
+  if (auto && !err && !note) return <View style={{ flex: 1, backgroundColor: N.bg, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color={N.navy} /></View>;
   return (
     <View style={{ flex: 1, backgroundColor: N.bg }}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>

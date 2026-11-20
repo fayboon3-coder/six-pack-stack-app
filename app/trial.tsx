@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AFTER_TRIAL_KEY } from '../src/lib/afterTrial';
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Animated, Image, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -124,7 +126,11 @@ export default function TrialOffer() {
   };
 
   const depth = useRef(0);
-  const skip = () => { track('trial_offer_skip', { depth: depth.current }); router.replace('/'); };
+  // Came straight from the plan quiz: after the offer, show "You're in" once; otherwise Today.
+  const [next, setNext] = useState<'/ready' | '/'>('/');
+  useEffect(() => { AsyncStorage.getItem(AFTER_TRIAL_KEY).then((v) => { if (v === 'ready') setNext('/ready'); }).catch(() => {}); }, []);
+  const leave = (to: '/ready' | '/') => { AsyncStorage.removeItem(AFTER_TRIAL_KEY).catch(() => {}); router.replace(to); };
+  const skip = () => { track('trial_offer_skip', { depth: depth.current }); leave(next); };
   /** How far down the page people get, in quarters (25/50/75/100), once each. */
   const onScroll = (e: any) => {
     const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
@@ -132,7 +138,10 @@ export default function TrialOffer() {
     for (const q of [25, 50, 75, 100]) if (pct >= q && depth.current < q) { depth.current = q; track('paywall_scroll', { pct: q }, { once: true }); }
   };
   // Already paid (e.g. they just subscribed): straight in.
-  useEffect(() => { if (profile && !isFree(profile)) router.replace('/'); }, [profile?.tier]);
+  useEffect(() => {
+    if (!profile || isFree(profile)) return;
+    AsyncStorage.getItem(AFTER_TRIAL_KEY).then((v) => leave(v === 'ready' ? '/ready' : '/')).catch(() => leave('/'));
+  }, [profile?.tier]);
 
   const name = plan?.name || profile?.first_name || '';
   const phoneW = Math.min(wide ? 250 : width * 0.56, 260);

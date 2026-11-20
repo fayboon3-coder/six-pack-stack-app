@@ -7,8 +7,7 @@ import { useAuth } from '../src/lib/auth';
 import { F } from '../src/lib/theme';
 import { Button } from '../src/components/ui';
 import { CoachingCard } from '../src/components/Offers';
-import { coachingFirst, isFree } from '../src/lib/access';
-import { purchasesEnabled, webCheckoutEnabled } from '../src/lib/purchases';
+import { coachingFirst } from '../src/lib/access';
 import { plain } from '../src/lib/program';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { track } from '../src/lib/track';
@@ -56,8 +55,8 @@ export default function Ready() {
   const { width } = useWindowDimensions();
   const wide = width >= 820;
   const [tries, setTries] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  useEffect(() => { if (revealed) track('plan_ready', {}, { once: true }); }, [revealed]);
+  // No "building your plan" animation any more: they come here after the trial offer, plan already made.
+  useEffect(() => { if (plan) track('plan_ready', {}, { once: true }); }, [!!plan]);
 
   useEffect(() => {
     if (plan || tries > 8) return;
@@ -65,7 +64,7 @@ export default function Ready() {
     return () => clearTimeout(t);
   }, [plan, tries, refresh]);
 
-  if (!plan || !revealed) {
+  if (!plan) {
     const slow = !plan && tries > 8;
     return (
       <SafeAreaView edges={[]} style={{ flex: 1, backgroundColor: L.bg }}>
@@ -74,8 +73,8 @@ export default function Ready() {
           sub={slow ? 'This is taking longer than usual. Your plan will be on the Today tab.' : 'Made from your answers. Nothing generic.'}
           steps={['Setting your calories and protein', 'Building your meals', 'Writing your training split', 'Picking your starter stack', 'Mapping your 12 weeks']}
           stepMs={700}
-          done={!!plan}
-          onFinish={() => setRevealed(true)}
+          done={false}
+          onFinish={() => {}}
         >
           {slow && <View style={{ marginTop: 24, alignSelf: 'stretch' }}><Button title="Go to Today" onPress={() => router.replace('/')} /></View>}
         </LoadingScreen>
@@ -86,7 +85,7 @@ export default function Ready() {
   // Free users go to the free-trial offer first (Apple sheet on iPhone, secure checkout on the web).
   const startWeek1 = (where: string) => {
     track('ready_start', { where });
-    router.replace(isFree(profile) && (purchasesEnabled() || webCheckoutEnabled()) ? '/trial' : '/');
+    router.replace('/'); // the trial offer was already shown right before this screen
   };
   const hot = coachingFirst(profile);
   const first = plan.train.d[0];

@@ -4,6 +4,7 @@ import { supabase } from './supabase';
 import type { Plan, Profile } from './types';
 import { buildFreePlan, clearPendingQuiz, readPendingQuiz } from './quiz';
 import { setPreviewing, type ViewAs } from './preview';
+import { AFTER_TRIAL_KEY } from './afterTrial';
 import { confirmWebPurchase, PURCHASED_FLAG, setupPurchases } from './purchases';
 import { track } from './track';
 
@@ -112,6 +113,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         track('purchase_done', { platform: 'web' }, { once: true });
         window.history?.replaceState?.(null, '', window.location.pathname);
         if (await confirmWebPurchase()) await load(data.session);
+        // Bought from the offer right after the plan quiz: show "You're in" next.
+        try { if (window.localStorage?.getItem(AFTER_TRIAL_KEY) === 'ready') { window.localStorage.removeItem(AFTER_TRIAL_KEY); window.location.replace('/app/ready'); } } catch {}
       }
     });
     const { data: sub } = supabase.auth.onAuthStateChange(async (_e, s) => {
