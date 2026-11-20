@@ -6,6 +6,7 @@ import { MiniRing } from '../../src/components/charts';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useAuth } from '../../src/lib/auth';
 import CoachPromo from '../../src/components/CoachPromo';
+import SetPassword from '../../src/components/SetPassword';
 import { C, F } from '../../src/lib/theme';
 import NoPlan from '../../src/components/NoPlan';
 import RemindersCard from '../../src/components/RemindersCard';
@@ -116,6 +117,7 @@ export default function You() {
           <CoachPromo where="you" />
         )}
 
+        {!!session && !viewAs && <SetPassword />}
         {!!session && !viewAs && <Leaderboard userId={session.user.id} />}
 
         <Section title="Upcoming check-ins">

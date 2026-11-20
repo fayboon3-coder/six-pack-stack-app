@@ -411,13 +411,22 @@ const OAUTH = process.env.EXPO_PUBLIC_OAUTH === '1';
  * One screen after the plan is built: their real numbers up top, then a password to save it.
  * Name and email are usually known already (Stack Score or the email screen), so it's often just one field.
  */
+/** A long random password nobody types. They can set their own later (You tab), or reset it from the sign-in screen. */
+function randomPassword() {
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+  const n = 32, out: string[] = [];
+  const g: any = (globalThis as any).crypto;
+  const buf = new Uint32Array(n);
+  if (g?.getRandomValues) g.getRandomValues(buf); else for (let k = 0; k < n; k++) buf[k] = Math.floor(Math.random() * 2 ** 32) ^ (Date.now() * (k + 7));
+  for (let k = 0; k < n; k++) out.push(abc[buf[k] % abc.length]);
+  return out.join('');
+}
+
 function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v: any) => void; onBack: () => void; onDone: () => void }) {
-  const [password, setPassword] = useState('');
-  const [show, setShow] = useState(false);
-  const [savePw, setSavePw] = useState(true);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
   const [note, setNote] = useState('');
+  const [existing, setExisting] = useState(false);
   const known = useRef(a.first_name.trim().length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(a.email.trim())).current;
   const [editing, setEditing] = useState(!known);
   const { profile } = useAuth();
@@ -440,21 +449,22 @@ function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v:
     const email = a.email.trim().toLowerCase();
     if (a.first_name.trim().length < 2) { setEditing(true); return setErr('Add your first name.'); }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setEditing(true); return setErr('Enter a valid email.'); }
-    if (password.length < 8) return setErr('Use at least 8 characters for your password.');
     setBusy(true);
     const q: Q2 = { ...a, email, first_name: a.first_name.trim(), done_at: new Date().toISOString() };
     await savePendingQuiz(q);
-    AsyncStorage.setItem('sps:save-password', savePw ? '1' : '0').catch(() => {});
-    const res = await supabase.auth.signUp({ email, password, options: { data: { first_name: q.first_name } } });
+    // No password step: the account is made with a long random password and stays signed in on this device.
+    // They can set their own password later from the You tab, or use "Forgot password" on another device.
+    const res = await supabase.auth.signUp({ email, password: randomPassword(), options: { data: { first_name: q.first_name } } });
     if (res.error) {
       setBusy(false);
       const m = res.error.message.toLowerCase();
-      if (m.includes('already')) return setErr('You already have an account with this email. Log in instead.');
+      if (m.includes('already')) { setExisting(true); return setErr('You already have an account with this email. Log in to see your plan.'); }
       return setErr(res.error.message);
     }
     kitTag(email, q.first_name, ['app-quiz-done', 'app-free', 'src-app'], {
       quiz_goal: q.goal, quiz_budget: q.ready_to_invest, quiz_where_train: q.where_train, app_tier: 'free', current_weight: q.weight, lead_source: q.src ? `app:${q.src}` : 'app',
     });
+    AsyncStorage.setItem('sps:needs-password', '1').catch(() => {});
     setBusy(false);
     if (!res.data.session) return setNote('Check your email to confirm your account, then log in. Your plan will be waiting.');
     onDone();
@@ -480,8 +490,8 @@ function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v:
           </LinearGradient>
 
           <View style={sp.sheet}>
-            <Text style={sp.title}>Create a password to save it</Text>
-            <Text style={sp.sub}>Your first 2 weeks are free. No card needed.</Text>
+            <Text style={sp.title}>Save your plan and start</Text>
+            <Text style={sp.sub}>Your first 2 weeks are free. No card and no password needed.</Text>
 
             {OAUTH && (
               <View style={{ gap: 10 }}>
@@ -504,27 +514,14 @@ function SaveYourPlan({ a, set, onBack, onDone }: { a: Q2; set: (k: keyof Q2, v:
               </View>
             )}
 
-            <View style={sp.pwWrap}>
-              <TextInput accessibilityLabel="Password" value={password} onChangeText={setPassword} placeholder="Create a password" secureTextEntry={!show} placeholderTextColor={C.muted}
-                style={[sp.input, { flex: 1, minWidth: 0, borderWidth: 0, borderRadius: 0, backgroundColor: 'transparent', paddingRight: 70 }]} autoComplete={savePw ? 'new-password' : 'off'} textContentType={savePw ? 'newPassword' : 'none'} onSubmitEditing={submit} autoFocus={known && Platform.OS !== 'web'} />
-              <Pressable accessibilityRole="button" accessibilityLabel={show ? 'Hide password' : 'Show password'} onPress={() => setShow(!show)} style={sp.showBtn} hitSlop={8}><Text style={sp.showT}>{show ? 'Hide' : 'Show'}</Text></Pressable>
-            </View>
-            <View style={sp.meter}>
-              <View style={[sp.meterBar, password.length >= 8 && { backgroundColor: C.green, width: '100%' }, password.length > 0 && password.length < 8 && { width: `${(password.length / 8) * 100}%` as any }]} />
-            </View>
-            <Text style={[sp.hint, password.length >= 8 && { color: C.green }]}>{password.length >= 8 ? '✓ Good to go' : '8 or more characters'}</Text>
-
-            <View style={sp.saveRow}>
-              <View style={{ flex: 1 }}><Text style={sp.saveT}>Save password on this phone</Text><Text style={sp.saveS}>Log in with Face ID next time</Text></View>
-              <Switch value={savePw} onValueChange={setSavePw} trackColor={{ true: N.navy, false: '#c3c8d4' }} thumbColor="#ffffff" accessibilityLabel="Save password on this phone" />
-            </View>
             {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
             {!!note && <Text style={[st.err, { color: C.green }]} accessibilityLiveRegion="polite">{note}</Text>}
+            {existing && <Pressable accessibilityRole="button" onPress={() => router.push('/sign-in')} style={st.ghost}><Text style={st.ghostT}>Log in</Text></Pressable>}
           </View>
         </ScrollView>
         <View style={sp.bottom}>
           <Pressable accessibilityRole="button" onPress={submit} disabled={busy} style={[sp.cta, { opacity: busy ? 0.6 : 1 }]}>
-            <Text style={sp.ctaT}>{busy ? 'Saving your plan…' : 'Save my plan and start  →'}</Text>
+            <Text style={sp.ctaT}>{busy ? 'Saving your plan…' : 'Start my plan  →'}</Text>
           </Pressable>
           <Text style={sp.fine}>By continuing you agree to the{' '}
             <Text accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)} style={{ textDecorationLine: 'underline' }}>Terms</Text> and{' '}
