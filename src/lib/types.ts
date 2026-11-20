@@ -37,6 +37,8 @@ export type Plan = {
   phase2?: string;
   phase3?: string;
   injury_note?: string;
+  /** How the plan was tailored to them (advanced customization), in plain words. */
+  personal?: string[];
   train: { n: string; s: string; e: number; note?: string; d: TrainDay[];
     /** Training choices (split, days, equipment, swaps…) when the plan was built by the app. */
     cfg?: import('./training').TrainCfg;

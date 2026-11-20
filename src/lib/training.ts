@@ -32,6 +32,8 @@ export type TrainCfg = {
   prefer?: string[];
   /** What they lift now, per exercise: week 1 starts from these instead of a guess. */
   lifts?: Record<string, Lift>;
+  /** Most exercises per workout (they're short on time). The main lifts come first, so the end gets trimmed. */
+  cap?: number;
 };
 
 /** A lift they can do today: weight in lbs for a number of reps. */
@@ -179,7 +181,7 @@ export function buildWeek(cfg: TrainCfg): BuiltDay[] {
       // Before the abs at the end, so the big lifts stay first.
       const at = s.slots.findIndex(([p]) => p === 'abs');
       const pos = at < 0 ? s.slots.length : at;
-      s.slots.splice(pos, 0, ...spec.slots);
+      s.slots.splice(pos, 0, ...spec.slots.map((x) => [x[0], x[1], x[2] ?? 0, true] as unknown as Slot));
     }
   }
 
@@ -188,7 +190,15 @@ export function buildWeek(cfg: TrainCfg): BuiltDay[] {
     const used = new Set<string>();
     const x: [string, string, string?][] = [];
     const p: (Pattern | null)[] = [];
-    for (const [pat, tgt, k = 0] of s.slots) {
+    // Short on time: keep the main lifts in order, but never drop the focus work they asked for.
+    let slots = s.slots;
+    if (cfg.cap) {
+      const room = Math.max(4, cfg.cap - cfg.extras.filter((e) => e.day === i).length);
+      const focus = s.slots.filter((x) => (x as unknown[])[3] === true);
+      const main = s.slots.filter((x) => (x as unknown[])[3] !== true).slice(0, Math.max(3, room - focus.length));
+      slots = s.slots.filter((x) => main.includes(x) || focus.includes(x));
+    }
+    for (const [pat, tgt, k = 0] of slots) {
       const opts = optionsFor(pat, cfg.equip, cfg.avoid);
       if (!opts.length) continue;
       const pool = opts.filter((c) => !used.has(c[0]));

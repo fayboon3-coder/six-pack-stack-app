@@ -86,3 +86,42 @@ describe('food, in their words', () => {
     expect(JSON.stringify(plan.meals)).not.toMatch(/salmon/i);
   });
 });
+
+describe('tailored to their goals and situation', () => {
+  const base = defaultCfg({ days: '4 days', where_train: 'Gym' });
+  it('keeps lifting off their sport days, adds focus and fits their time', () => {
+    const r = readTraining(base, { week: '4 days a week, about 45 minutes, want bigger arms. BJJ on Wednesdays' });
+    expect(r.cfg.days).not.toContain(3);
+    expect(r.cfg.days.length).toBe(4);
+    expect(r.focus).toEqual(['arms']);
+    expect(r.cfg.cap).toBe(5);
+    expect(buildWeek(r.cfg).every((d) => d.x.length <= 5)).toBe(true);
+    expect(r.personal.join(' ')).toMatch(/jiu-jitsu/i);
+  });
+  it('lets them change anything directly, and their change wins', () => {
+    const r = readTraining(base, { week: 'upper lower 4 days' }, { count: 3, split: 'fb3', equip: 'db', addMoves: ['goblet_squat'], lifts: { leg_press: { w: 300, r: 10 } }, focus: ['glutes'] });
+    expect(r.cfg).toMatchObject({ split: 'fb3', equip: 'db', focus: ['glutes'] });
+    expect(r.cfg.days.length).toBe(3);
+    expect(r.prefer).toContain('goblet_squat');
+    expect(r.cfg.lifts!.leg_press).toEqual({ w: 300, r: 10 });
+  });
+  it('writes rules for their situation', () => {
+    const f = readFood({ extra: "I work nights, don't love cooking, and weekends are where I fall off" });
+    expect(f.rules.length).toBe(3);
+    expect(readFood({ extra: "I work nights, don't love cooking" }, { drop: ['rule:0'] }).rules.length).toBe(1);
+  });
+  it('takes meals, orders and foods added by hand, and moves a meal to another slot', () => {
+    const f = readFood({ day: 'eggs and toast' }, { addMeals: [{ key: 'm1', slot: 'Dinner', text: 'salmon and rice' }], addOrders: [{ key: 'a1', where: 'Cava', order: 'chicken bowl' }], addNo: ['mushrooms'], slot: { d0: 'Breakfast' } });
+    expect(f.meals.map((m) => m.slot)).toEqual(['Breakfast', 'Dinner']);
+    expect(f.orders.some((o) => o.where === 'Cava')).toBe(true);
+    expect(f.noFoods).toContain('mushrooms');
+  });
+});
+
+describe('short on time with a focus', () => {
+  it('keeps the focus work when workouts are trimmed', () => {
+    const r = readTraining(defaultCfg({ days: '4 days', where_train: 'Gym' }), { week: '4 days, 45 minutes, I want bigger arms' });
+    const ids = buildWeek(r.cfg).flatMap((d) => d.x.map((x) => x[0]));
+    expect(ids.filter((id) => /curl|pushdown|ext|skull|dip/.test(id)).length).toBeGreaterThanOrEqual(4);
+  });
+});

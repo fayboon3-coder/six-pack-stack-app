@@ -210,32 +210,76 @@ export function readNoFoods(text: string): { ids: string[]; diets: string[]; unk
   return { ids: [...out], diets, unknown };
 }
 
+/* ------------------------------------------------------------------ their situation */
+
+/**
+ * "Anything else I should know?" → rules written for their life. Each rule is the playbook move for
+ * that situation, worded for them. Shown on their plan with the other rules.
+ */
+const SITUATIONS: [RegExp, string][] = [
+  [/weekends?|saturday|sunday|fall off|friday night/, 'Weekends: plan one meal out and eat your normal meals around it. A good weekend is 2 normal days, not 2 perfect ones.'],
+  [/dont (love|like) cooking|hate cooking|no time to cook|dont cook|cant cook|not a cook|lazy|busy/, 'Cooking: batch it. Sunday, cook 2 proteins and 1 carb for the week. Every meal is then a 2-minute build.'],
+  [/meal prep/, 'Meal prep: your meals are built to reheat. Cook Sunday and Wednesday so nothing sits more than 3 days.'],
+  [/nights?|night shift|graveyard|overnight|late shifts?|swing shift/, "Shift work: your 'breakfast' is your first meal after you wake up, whenever that is. Keep the last meal 2 to 3 hours before you sleep."],
+  [/travel|on the road|hotel|flights?/, "Travel: order from your eating-out list, and pack a protein shake or jerky so a delayed flight doesn't turn into fast food."],
+  [/budget|cheap|money|afford|expensive|broke/, 'Budget: chicken thighs, eggs, ground beef, rice, potatoes, oats and frozen veg carry this plan. Skip the pricey extras.'],
+  [/sweet tooth|sugar|dessert|chocolate|candy|ice cream|cravings?/, 'Cravings: keep one planned treat in your day (about 150 calories). Planned treats stop the 9pm binge.'],
+  [/late night|night snack|snack at night|before bed|midnight/, 'Night snacking: save your snack for after dinner. Greek yogurt or a shake keeps you full until bed.'],
+  [/drink|alcohol|beer|wine|bar|party|going out/, "Drinks: pick lighter drinks (seltzers, light beer, liquor with diet mixers) and eat a protein meal first. Count them, don't skip dinner for them."],
+  [/kids|family|wife|husband|girlfriend|boyfriend|partner|roommates?/, 'Family meals: eat what everyone eats, just build your plate protein first and keep the carb to your portion.'],
+  [/skip breakfast|not hungry in the morning|intermittent|fasting|dont eat breakfast/, "Mornings: not hungry early? Start with your shake or yogurt snack and move breakfast later. Total for the day is what counts."],
+  [/stress|anxious|sleep|tired|exhausted/, 'Sleep and stress: 7+ hours matters as much as the gym. On a bad night, keep the workout and drop one set per exercise.'],
+];
+
+export function readSituation(text: string): string[] {
+  const t = lower(text).replace(/[^a-z0-9 ]+/g, ' ');
+  if (!t.trim()) return [];
+  return SITUATIONS.filter(([re]) => re.test(t)).map(([, r]) => r).slice(0, 5);
+}
+
 /* ------------------------------------------------------------------ all together */
 
 export type FoodAnswers = { day?: string; out?: string; no?: string; extra?: string };
-export type FoodEdits = { drop?: string[]; nums?: Record<string, { kcal?: number; protein?: number }> };
+export type FoodEdits = {
+  drop?: string[]; nums?: Record<string, { kcal?: number; protein?: number }>;
+  /** Direct changes on the screen: meals and orders they add, a meal moved to another slot, foods to skip. */
+  addMeals?: { key: string; slot: SlotName; text: string }[]; slot?: Record<string, SlotName>;
+  addOrders?: { key: string; where: string; order: string; kcal?: number; protein?: number }[]; addNo?: string[];
+};
 
 export type FoodRead = {
   parts: ReadMealPart[]; orders: ReadOrder[]; noFoods: string[]; diets: string[]; unknownNo: string[];
-  meals: MyMeal[]; myOrders: MyOrder[];
+  meals: MyMeal[]; myOrders: MyOrder[]; rules: string[];
 };
 
 export function readFood(a: FoodAnswers, e: FoodEdits = {}): FoodRead {
   const drop = new Set(e.drop || []);
-  const parts = readDay(a.day || '').filter((p) => !drop.has(p.key));
+  const added = (e.addMeals || []).map((m) => {
+    const p = readDay(`${m.slot === 'Afternoon' ? 'snack' : m.slot.toLowerCase()}: ${m.text}`)[0];
+    return p ? { ...p, key: m.key, slot: m.slot, ...(p.meal ? { meal: { ...p.meal, id: m.key, slot: m.slot } } : {}), ...(p.order ? { order: { ...p.order, id: m.key } } : {}) } : null;
+  }).filter(Boolean) as ReadMealPart[];
+  const parts = [...readDay(a.day || ''), ...added].filter((p) => !drop.has(p.key)).map((p) => {
+    const slot = e.slot?.[p.key];
+    return slot ? { ...p, slot, ...(p.meal ? { meal: { ...p.meal, slot } } : {}) } : p;
+  });
   const fromDay = parts.filter((p) => p.order).map((p) => p.order!);
-  const outs = readOrders(a.out || '').filter((o) => !drop.has(o.id));
+  const typed = (e.addOrders || []).map((o) => {
+    const r = readOrder(`${o.where}: ${o.order}`, o.key);
+    return r && { ...r, where: o.where.trim() || r.where, order: o.order.trim() || r.order };
+  }).filter(Boolean) as ReadOrder[];
+  const outs = [...readOrders(a.out || ''), ...typed].filter((o) => !drop.has(o.id));
   const seen = new Set<string>();
   const orders = [...outs, ...fromDay].filter((o) => {
     // The same place in their day and in their takeout answer: keep the takeout one (it's more specific).
-    const k = o.where === 'Takeout' ? (o.where + o.order).toLowerCase() : o.where.toLowerCase();
+    const k = o.where === 'Takeout' ? (o.where + o.order).toLowerCase() : (o.where + (o.id.startsWith('a') ? o.order : '')).toLowerCase();
     return seen.has(k) ? false : (seen.add(k), true);
   }).map((o) => {
     const n = e.nums?.[o.id];
-    return n && (n.kcal || n.protein) ? { ...o, kcal: n.kcal || o.kcal, protein: n.protein ?? o.protein, est: !n.kcal && o.est } : o;
+    return n && (n.kcal || n.protein) ? { ...o, kcal: n.kcal || o.kcal, protein: n.protein || o.protein, est: !n.kcal && o.est } : o;
   });
   const no = readNoFoods(a.no || '');
-  const noFoods = no.ids.filter((id) => !drop.has('no:' + id));
+  const noFoods = [...new Set([...no.ids, ...(e.addNo || [])])].filter((id) => !drop.has('no:' + id));
   const meals = parts.filter((p) => p.meal).map((p) => p.meal!);
-  return { parts, orders, noFoods, diets: no.diets, unknownNo: no.unknown, meals, myOrders: orders.map(({ est, ...o }) => o) };
+  const rules = readSituation(a.extra || '').filter((r, k) => !drop.has('rule:' + k));
+  return { parts, orders, noFoods, diets: no.diets, unknownNo: no.unknown, meals, myOrders: orders.map(({ est, ...o }) => o), rules };
 }

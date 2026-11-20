@@ -65,6 +65,12 @@ export default function PlanDetails() {
             </View>
           </Card>
           {!!plan.goal_long && <Card><Text style={ui.label}>Your goal</Text><Body>{plain(plan.goal_long)}</Body></Card>}
+          {!!plan.personal?.length && (
+            <Card style={{ borderColor: '#cfe9db' }}>
+              <Text style={[ui.label, { color: '#12804f' }]}>Built around you</Text>
+              {plan.personal.map((r, k) => <Body key={k}>✓ {plain(r)}</Body>)}
+            </Card>
+          )}
           {!!plan.rules?.length && (
             <Card>
               <Text style={ui.label}>Your rules</Text>

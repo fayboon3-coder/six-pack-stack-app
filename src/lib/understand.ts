@@ -6,7 +6,7 @@
  */
 import { exercises } from './program';
 import {
-  DEFAULT_DAYS, SPLITS, SPLITS_FOR, type Equip, type Lift, type SplitId, type TrainCfg,
+  DAY_NAMES, DEFAULT_DAYS, EQUIP_LABEL, FOCUS_LABEL, MAX_FOCUS, SPLITS, SPLITS_FOR, type Equip, type Focus, type Lift, type SplitId, type TrainCfg,
 } from './training';
 
 const norm = (s: string) => ` ${s.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim()} `;
@@ -26,6 +26,8 @@ const SPORTS: [RegExp, string][] = [
 
 export type WeekRead = {
   count?: number; days?: number[]; split?: SplitId; equip?: Equip; sports: string[];
+  /** Days their sport or other training happens (lifting days avoid them when they don't pick days). */
+  sportDays: number[];
   /** Plain notes on what we changed from what they said ("2 days → plans start at 3"). */
   notes: string[];
 };
@@ -33,14 +35,16 @@ export type WeekRead = {
 /** "I lift 4 days, Mon Tue Thu Fri, push pull legs at Planet Fitness, plus jiu-jitsu Wednesday nights". */
 export function readWeek(text: string): WeekRead {
   const t = norm(text);
-  const out: WeekRead = { sports: [], notes: [] };
+  const out: WeekRead = { sports: [], notes: [], sportDays: [] };
   if (!t.trim()) return out;
   // Sports first, and the days next to them don't count as lifting days ("bjj wednesday").
   let lift = t;
   for (const [re, name] of SPORTS) {
     if (re.test(t)) {
       out.sports.push(name);
-      lift = lift.replace(new RegExp(`(${re.source})((\\s+\\w+){0,3})`, 'g'), ' ');
+      const near = t.match(new RegExp(`(${re.source})((\\s+\\w+){0,4})`));
+      if (near) for (const [dre, d] of DAY_WORDS) if (dre.test(near[0]) && !out.sportDays.includes(d)) out.sportDays.push(d);
+      lift = lift.replace(new RegExp(`(${re.source})((\\s+\\w+){0,4})`, 'g'), ' ');
     }
   }
   // Weekdays
@@ -179,6 +183,15 @@ export function findMoves(text: string): { id: string; at: number; end: number }
   return hits.sort((a, b) => a.at - b.at).filter((h) => (seen.has(h.id) ? false : (seen.add(h.id), true)));
 }
 
+/** Search the exercise library by name or nickname (for "+ Add a move"). */
+export function searchMoves(q: string, n = 6): string[] {
+  const t = norm(q).trim();
+  if (t.length < 2) return [];
+  const hits = new Set<string>(findMoves(q).map((m) => m.id));
+  for (const { id, t: term } of terms()) if (term.includes(t)) hits.add(id);
+  return [...hits].slice(0, n);
+}
+
 /** Pieces of their answer that named no exercise we know (offered as their own moves). */
 export function unknownMoves(text: string) {
   return text.split(/,|;|\n|\band\b|\balso\b|\bplus\b/i).map((c) => c.replace(/\d+\s*(x|lbs?|reps?|for|kg)?/gi, ' ').replace(/\s+/g, ' ').trim())
@@ -242,15 +255,53 @@ export function readPain(text: string): { avoid: string[]; areas: string[] } {
   return { avoid: [...avoid], areas };
 }
 
+/* ------------------------------------------------------------------ goals and time */
+
+const FOCUS_WORDS: [RegExp, Focus][] = [
+  [/\b(arms?|biceps?|triceps?|guns)\b/, 'arms'], [/\b(chest|pecs?)\b/, 'chest'], [/\b(back|lats|v taper|wider)\b/, 'back'],
+  [/\b(shoulders?|delts?|traps)\b/, 'shoulders'], [/\b(legs?|quads?|hamstrings?|calves|calf)\b/, 'legs'], [/\b(glutes?|butt|booty)\b/, 'glutes'],
+  [/\b(abs|six pack|sixpack|core|stomach)\b/, 'abs'],
+];
+
+/** "I want bigger arms", "my chest is lagging", "bring up my shoulders" → up to 2 focus areas. */
+export function readFocus(text: string): Focus[] {
+  const out: Focus[] = [];
+  const clauses = text.split(/[,.;\n!?]| and | but | also | plus /i).map(norm);
+  for (const c of clauses) {
+    if (!/\b(want|bring up|bigger|grow|build|lagging|weak|weakest|behind|focus|improve|work on|need more|stubborn|small|smaller|more)\b/.test(c)) continue;
+    if (/\b(hurt|pain|injur|bugs|sore)\b/.test(c)) continue;
+    for (const [re, f] of FOCUS_WORDS) if (re.test(c) && !out.includes(f)) out.push(f);
+  }
+  return out.slice(0, MAX_FOCUS);
+}
+
+/** How long they have per workout ("45 minutes", "about an hour", "short on time") → exercises per session. */
+export function readTime(text: string): { minutes?: number; cap?: number } {
+  const t = norm(text);
+  let m = t.match(/\b(\d{2,3})\s*(min|mins|minutes)\b/)?.[1] ? Number(t.match(/\b(\d{2,3})\s*(min|mins|minutes)\b/)![1]) : undefined;
+  if (!m && /\b(an hour|1 hour|one hour)\b/.test(t)) m = 60;
+  if (!m && /\b(half an hour|30 min)\b/.test(t)) m = 30;
+  if (!m && /\b(short on time|not much time|quick workouts?|busy|no time)\b/.test(t)) m = 45;
+  if (!m || m >= 75) return { minutes: m };
+  return { minutes: m, cap: Math.max(4, Math.floor((m - 5) / 8)) };
+}
+
 /* ------------------------------------------------------------------ all together */
 
 export type TrainAnswers = { week?: string; moves?: string; lifts?: string; pain?: string };
 /** What they took back out ("not that one"), and answers to the quick follow-ups. */
-export type TrainEdits = { drop?: string[]; days?: number[]; reps?: Record<string, number>; extras?: string[] };
+export type TrainEdits = {
+  drop?: string[]; days?: number[]; reps?: Record<string, number>; extras?: string[];
+  /** Direct changes they make on the screen (these win over what we read). */
+  count?: number; split?: SplitId; equip?: Equip;
+  addMoves?: string[]; addAvoid?: string[]; lifts?: Record<string, { w: number; r: number }>; focus?: Focus[];
+};
 
 export type TrainRead = {
   cfg: TrainCfg; week: WeekRead; prefer: string[]; lifts: { id: string; w: number; r: number }[];
-  avoid: string[]; areas: string[]; unknown: string[];
+  avoid: string[]; areas: string[]; unknown: string[]; focus: Focus[]; minutes?: number;
+  /** How the plan was tailored, in plain words (shown on the review and kept on the plan). */
+  personal: string[];
   /** Follow-ups worth asking (never required). */
   ask: { days?: number; reps?: string[] };
 };
@@ -258,45 +309,70 @@ export type TrainRead = {
 /** Their words + edits on top of the plan's current settings → the new settings. */
 export function readTraining(base: TrainCfg, a: TrainAnswers, e: TrainEdits = {}): TrainRead {
   const drop = new Set(e.drop || []);
+  const all = [a.week, a.moves, a.lifts, a.pain].filter(Boolean).join('. ');
   const week = readWeek(a.week || '');
   let cfg: TrainCfg = { ...base, extras: [...base.extras] };
-  if (week.equip && !drop.has('equip')) cfg.equip = week.equip;
-  const n = !drop.has('days') && week.count ? week.count : SPLITS[cfg.split].days;
-  const split = !drop.has('split') && week.split && SPLITS[week.split].days === n ? week.split
-    : SPLITS[cfg.split].days === n ? cfg.split : SPLITS_FOR[n][0];
+  const equip = e.equip || (week.equip && !drop.has('equip') ? week.equip : undefined);
+  if (equip) cfg.equip = equip;
+  const n = e.count || (!drop.has('days') && week.count ? week.count : SPLITS[cfg.split].days);
+  const split = e.split && SPLITS[e.split].days === n ? e.split
+    : !drop.has('split') && week.split && SPLITS[week.split].days === n ? week.split
+      : SPLITS[cfg.split].days === n ? cfg.split : SPLITS_FOR[n][0];
+  // Days: theirs if they picked them, then what they wrote, then the plan's, keeping clear of their sport days.
+  const clear = (list: number[]) => list.filter((d) => !week.sportDays.includes(d));
+  const spread = () => {
+    const pool = [1, 2, 3, 4, 5, 6, 0].filter((d) => !week.sportDays.includes(d));
+    const pref = DEFAULT_DAYS[n].filter((d) => pool.includes(d));
+    for (const d of pool) if (pref.length < n && !pref.includes(d)) pref.push(d);
+    return pref.slice(0, n).sort((x, y) => x - y);
+  };
   const days = e.days?.length === n ? [...e.days].sort((x, y) => x - y)
     : !drop.has('days') && week.days?.length === n ? week.days
-      : base.days.length === n ? base.days : DEFAULT_DAYS[n];
+      : base.days.length === n && clear(base.days).length === n ? base.days : spread();
   cfg = { ...cfg, split, days, extras: cfg.extras.filter((x) => x.day < n) };
 
   const pain = readPain(a.pain || '');
-  const avoid = pain.avoid.filter((id) => !drop.has('avoid:' + id));
+  const avoid = [...new Set([...pain.avoid, ...(e.addAvoid || [])])].filter((id) => !drop.has('avoid:' + id));
   const liftsRead = readLifts(a.lifts || '').concat(readLifts(a.moves || '')).filter((l, i, arr) => arr.findIndex((x) => x.id === l.id) === i);
-  const prefer = [...findMoves(a.moves || '').map((m) => m.id), ...liftsRead.map((l) => l.id)]
+  const prefer = [...findMoves(a.moves || '').map((m) => m.id), ...liftsRead.map((l) => l.id), ...(e.addMoves || [])]
     .filter((id, i, arr) => arr.indexOf(id) === i && !drop.has('move:' + id) && !avoid.includes(id));
-  // Customization owns favorites and lifts: they come from their words every time.
   const lifts: Record<string, Lift> = {};
   for (const l of liftsRead) {
     if (drop.has('lift:' + l.id)) continue;
-    const r = l.r || e.reps?.[l.id] || 0;
-    lifts[l.id] = { w: l.w, r };
+    lifts[l.id] = { w: l.w, r: l.r || e.reps?.[l.id] || 0 };
   }
-  // Their own moves (named, but not ones we know), offered and added only when they tap them.
+  for (const [id, l] of Object.entries(e.lifts || {})) if (!drop.has('lift:' + id) && l.w > 0) lifts[id] = l;
+  // Goals ("bigger arms") and time ("45 minutes").
+  const focus = (e.focus || readFocus(all).filter((f) => !drop.has('focus:' + f))).slice(0, MAX_FOCUS);
+  const time = readTime(all);
   const unknown = unknownMoves(a.moves || '');
-  let next: TrainCfg = { ...cfg, prefer, lifts, avoid: [...new Set([...(base.avoid || []), ...avoid])] };
+  let next: TrainCfg = { ...cfg, prefer, lifts, focus: focus.length ? focus : cfg.focus, avoid: [...new Set([...(base.avoid || []), ...avoid])], ...(time.cap && !drop.has('time') ? { cap: time.cap } : { cap: undefined }) };
   for (const name of e.extras || []) {
-    if (!unknown.includes(name)) continue;
     const counts = Array.from({ length: n }, (_, d) => next.extras.filter((x) => x.day === d).length);
     const day = counts.indexOf(Math.min(...counts));
     if (counts[day] < 2 && !next.extras.some((x) => x.name.toLowerCase() === name.toLowerCase())) {
       next = { ...next, extras: [...next.extras, { id: `my_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_').slice(0, 30)}`, name, day, target: '3 × 10–15' }] };
     }
   }
+  const allLifts = Object.entries(lifts).map(([id, l]) => ({ id, ...l }));
+
+  // How it's tailored, in plain words.
+  const personal: string[] = [];
+  personal.push(`${n} days a week (${SPLITS[split].label}) on ${days.map((d) => DAY_NAMES[d]).join(', ')}${week.sportDays.length ? `, clear of your ${week.sports.join(' and ').toLowerCase()} days` : ''}.`);
+  if (equip) personal.push(`Built for ${EQUIP_LABEL[cfg.equip].toLowerCase()}.`);
+  if (prefer.length) personal.push(`Your moves are in every workout they fit: ${prefer.slice(0, 5).map((id) => exercises[id]?.name || id).join(', ')}${prefer.length > 5 ? ` and ${prefer.length - 5} more` : ''}.`);
+  if (allLifts.filter((l) => l.r).length) personal.push(`Week 1 starts from what you lift now on ${allLifts.filter((l) => l.r).length} exercise${allLifts.filter((l) => l.r).length > 1 ? 's' : ''}, then goes up as you beat it.`);
+  if (pain.areas.length) personal.push(`Easy on your ${pain.areas.join(' and ')}: the moves that usually aggravate it are swapped for joint-friendlier ones.`);
+  else if (avoid.length) personal.push(`Kept out: ${avoid.slice(0, 4).map((id) => exercises[id]?.name || id).join(', ')}.`);
+  if (focus.length) personal.push(`Extra work for your ${focus.map((f) => FOCUS_LABEL[f].toLowerCase()).join(' and ')}, the area${focus.length > 1 ? 's' : ''} you want to bring up.`);
+  if (next.cap) personal.push(`Workouts kept to about ${time.minutes} minutes (${next.cap} exercises), the main lifts first.`);
+  if (week.sports.length && !week.sportDays.length) personal.push(`Noted: you also do ${week.sports.join(' and ').toLowerCase()}. Tell me the days and I'll keep lifting off them.`);
+
   return {
-    cfg: next, week, prefer, lifts: liftsRead.filter((l) => !drop.has('lift:' + l.id)), avoid, areas: pain.areas, unknown,
+    cfg: next, week, prefer, lifts: allLifts, avoid, areas: pain.areas, unknown, focus, minutes: time.minutes, personal,
     ask: {
-      days: week.count && !week.days && !(e.days?.length === n) ? n : undefined,
-      reps: liftsRead.filter((l) => !l.r && !e.reps?.[l.id] && !drop.has('lift:' + l.id)).map((l) => l.id),
+      days: (e.count || week.count) && !week.days && !(e.days?.length === n) ? n : undefined,
+      reps: allLifts.filter((l) => !l.r).map((l) => l.id),
     },
   };
 }
