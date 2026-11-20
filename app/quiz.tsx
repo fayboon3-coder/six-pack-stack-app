@@ -14,7 +14,7 @@ import { kitTag } from '../src/lib/kit';
 import { PRIVACY_URL, TERMS_URL } from '../src/lib/access';
 import { hasGoal, quizFromHandoff, readHandoff } from '../src/lib/handoff';
 import { useAuth } from '../src/lib/auth';
-import { readLead } from '../src/lib/lead';
+import { captureLead, readLead } from '../src/lib/lead';
 import { track } from '../src/lib/track';
 import { DEFAULT_DAYS, defaultCfg } from '../src/lib/training';
 import { goBack } from '../src/lib/nav';
@@ -42,6 +42,7 @@ const ICON = {
   shield: 'M12 3l7.5 3v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6zM12 9v6M9 12h6',
   scale: 'M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zM8.5 9.5a4 4 0 0 1 7 0M12 9.5l1.4-1.8',
   check: 'M5 12.5l4.5 4.5L19 7.5',
+  mail: 'M4.5 6h15a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1zM4 7l8 6 8-6',
 };
 type IconK = keyof typeof ICON;
 const Ico = ({ k, size = 22, color = N.navy, w = 1.8 }: { k: IconK; size?: number; color?: string; w?: number }) => (
@@ -74,12 +75,14 @@ const PLACE: Opt[] = [
 const INJURIES = ['Lower back', 'Knees', 'Shoulders', 'Wrists / elbows', 'Hips', 'Other'];
 // Only what changes the plan. Coming from the Stack Score: 4 screens (goal, training and experience are known).
 // Food, restaurants and coaching interest are asked after the plan is saved (Plan tab → Edit foods).
-const STEP_IDS = ['goal', 'experience', 'body', 'activity', 'training', 'injuries', 'loading', 'account'] as const;
+const STEP_IDS = ['goal', 'experience', 'contact', 'body', 'activity', 'training', 'injuries', 'loading', 'account'] as const;
 type StepId = typeof STEP_IDS[number];
 const ASKED = STEP_IDS.indexOf('loading');
-const LABEL: Record<string, string> = { goal: 'Your goal', experience: 'Experience', body: 'Your body', activity: 'Your day', training: 'Your training', injuries: 'Train around' };
+const LABEL: Record<string, string> = { goal: 'Your goal', experience: 'Experience', contact: 'Your plan', body: 'Your body', activity: 'Your day', training: 'Your training', injuries: 'Train around' };
 
 type Q2 = Quiz & { activity?: string; injuries?: string[]; steps_goal?: string };
+const validContact = (name: string, email: string) => name.trim().length >= 2 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
 const EMPTY: Q2 = {
   goal: '', sex: '', age: '28', height_ft: '', height_in: '', weight: '', goal_weight: '', where_train: '', days: '4 days',
   experience: '', tried: [], likes: [], foods: [...QUICK_START], custom_foods: [], spots: [], monthly_spend: '', eat_out: '', struggle: '', start_timing: '', ready_to_invest: '',
@@ -93,14 +96,24 @@ export default function QuizScreen() {
   const [fromScore] = useState(() => hasGoal(readHandoff()));
   const [a, setA] = useState<Q2>(() => { const { email, ...pre } = quizFromHandoff(readHandoff()); return { ...EMPTY, ...pre }; });
   const [known] = useState(() => ({ goal: fromScore, experience: fromScore && !!a.experience }));
-  const asked = STEP_IDS.slice(0, ASKED).filter((s) => !(known as any)[s]) as StepId[];
+  // Name and email already known (Stack Score, the email screen or a link): no "where should I send your plan" step.
+  const [hasContact, setHasContact] = useState(false);
+  const asked = STEP_IDS.slice(0, ASKED).filter((s) => !(known as any)[s] && !(s === 'contact' && hasContact)) as StepId[];
   const [i, setI] = useState(() => STEP_IDS.indexOf(asked[0]));
   const [err, setErr] = useState('');
   const step: StepId = STEP_IDS[i];
 
   useEffect(() => {
-    if (params.name || params.email) { setA((x) => ({ ...x, first_name: params.name || x.first_name, email: params.email || x.email })); return; }
-    readLead().then((l) => { if (l) setA((x) => ({ ...x, first_name: x.first_name || l.first_name, email: x.email || l.email })); });
+    if (params.name || params.email) {
+      setA((x) => ({ ...x, first_name: params.name || x.first_name, email: params.email || x.email }));
+      if (validContact(params.name || '', params.email || '')) setHasContact(true);
+      return;
+    }
+    readLead().then((l) => {
+      if (!l) return;
+      setA((x) => ({ ...x, first_name: x.first_name || l.first_name, email: x.email || l.email }));
+      if (validContact(l.first_name, l.email)) setHasContact(true);
+    });
   }, [params.name, params.email]);
   useEffect(() => {
     if (params.src) { setA((x) => ({ ...x, src: String(params.src).slice(0, 80) })); return; }
@@ -145,6 +158,23 @@ export default function QuizScreen() {
     body = <><QHead icon="level" q="How long have you been lifting?" sub="Picks your exercises and how hard the first weeks hit." />
       <Options opts={EXPERIENCE} value={a.experience} onPick={(v) => set('experience', v)} /></>;
     cta = <Cta title="Continue" onPress={need(a.experience)} />;
+  } else if (step === 'contact') {
+    body = <><QHead icon="mail" q="Where should I send your plan?" sub="Your plan is saved to this email, so you can open it on any device." />
+      <View style={{ gap: 12 }}>
+        <TextInput accessibilityLabel="First name" value={a.first_name} onChangeText={(v) => set('first_name', v)} placeholder="First name" placeholderTextColor={C.muted} style={sp.input} autoComplete="given-name" textContentType="givenName" returnKeyType="next" />
+        <TextInput accessibilityLabel="Email" value={a.email} onChangeText={(v) => set('email', v)} placeholder="Email" autoCapitalize="none" autoCorrect={false} keyboardType="email-address" placeholderTextColor={C.muted} style={sp.input} autoComplete="email" textContentType="emailAddress" />
+      </View>
+      <Text style={st.fine}>I'll email you tips and offers. Unsubscribe anytime. No spam, and I never sell your email.</Text></>;
+    cta = <Cta title="Continue" onPress={() => {
+      const name = a.first_name.trim(), email = a.email.trim().toLowerCase();
+      if (name.length < 2) return setErr('Add your first name.');
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setErr('Enter a valid email.');
+      set('email', email);
+      // They're a lead now, even if they stop before the end (starts the app nurture emails in Kit).
+      captureLead({ first_name: name, email, want: 'plan', src: a.src }).catch(() => {});
+      track('quiz_contact', {}, { once: true });
+      next();
+    }} />;
   } else if (step === 'body') {
     body = <BodyStep a={a} set={set} intro={fromScore && n === 1 ? a.first_name : null} />;
     cta = <Cta title="Continue" onPress={() => {
