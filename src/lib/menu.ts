@@ -65,7 +65,7 @@ export const LIBRARY: Slot[] = [
   },
 ];
 
-const EAT_OUT: Record<string, { where: string; order: string; kcal: string; protein: string }> = {
+export const EAT_OUT: Record<string, { where: string; order: string; kcal: string; protein: string }> = {
   Chipotle: { where: 'Chipotle', order: 'Bowl: double chicken, white rice, black beans, fajita veggies, salsa. Skip sour cream and cheese.', kcal: 'about 745', protein: '77 g' },
   Starbucks: { where: 'Starbucks', order: '2 egg bites + a grande latte, no syrup. Or a protein box.', kcal: 'about 490', protein: '32 g' },
   Subway: { where: 'Subway', order: 'Footlong rotisserie chicken on wheat, all the veggies, mustard. Skip the cookies and chips.', kcal: 'about 700', protein: '50 g' },

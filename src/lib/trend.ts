@@ -154,5 +154,24 @@ export function suggestNext(target: string, last: (SetRec | undefined)[], week: 
   return { weight: w, reps: Math.min(hi, minReps + 1), tag: 'reps', note: `Same weight, aim for ${Math.min(hi, minReps + 1)} reps.` };
 }
 
+/**
+ * Week 1 from a lift they told us ("I do 135 × 8"). Inside the plan's rep range: start right there.
+ * Outside it: convert through their estimated max to the weight they'd get about 2 more reps with
+ * than the bottom of the range, so the first session is honest but never a grinder.
+ */
+export function suggestFromLift(target: string, lift: { w: number; r: number } | undefined, lower = false): Suggestion | null {
+  const range = repRange(target);
+  if (!range || !lift || !(lift.w > 0) || !(lift.r > 0)) return null;
+  const [lo, hi] = range;
+  const step = lower ? 5 : lift.w < 30 ? 2.5 : 5;
+  const round = (n: number) => Math.max(step, Math.round(n / step) * step);
+  if (lift.r >= lo && lift.r <= hi) {
+    return { weight: lift.w, reps: Math.min(hi, lift.r + 1), tag: 'start', note: `From your ${lift.w} × ${lift.r}. Beat it by a rep.` };
+  }
+  const max = e1rm(lift.w, Math.min(lift.r, 15));
+  const w = round(max / (1 + (lo + 2) / 30));
+  return { weight: w, reps: lo, tag: 'start', note: `From your ${lift.w} × ${lift.r}: ${w} lbs for ${lo}–${hi} reps.` };
+}
+
 /** Estimated 1-rep max (Epley), for the strength chart. */
 export const e1rm = (w: number, r: number) => (r <= 1 ? w : Math.round(w * (1 + r / 30)));

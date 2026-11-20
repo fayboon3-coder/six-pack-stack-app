@@ -149,9 +149,11 @@ export default function PlanDetails() {
               {m.options.map((o, j) => (
                 <View key={j} style={st.option}>
                   <FoodTiles name={o.name} detail={o.detail} ids={o.ids} height={200} style={st.tiles} />
+                  {o.mine && <Text style={st.yours}>YOUR MEAL</Text>}
                   <Text style={st.optName}>{o.name}</Text>
                   <Body style={{ fontSize: 13 }}>{o.detail}</Body>
                   <Text style={st.macro}>{o.kcal} cal · {o.protein} protein</Text>
+                  {!!o.note && <Text style={st.yourNote}>{o.note}</Text>}
                 </View>
               ))}
               </View>
@@ -163,9 +165,11 @@ export default function PlanDetails() {
       {tab === 'Eating out' && (plan.eat_out || []).map((e, k) => (
         <Card key={k}>
           <FoodPhoto source={mealImage(e.where, e.order)} />
+          {e.mine && <Text style={st.yours}>YOUR ORDER</Text>}
           <Text style={st.item}>{e.where}</Text>
           <Body style={{ fontSize: 14 }}>{e.order}</Body>
           <Text style={st.macro}>{e.kcal} cal · {e.protein} protein</Text>
+          {!!e.note && <Text style={st.yourNote}>{e.note}</Text>}
         </Card>
       ))}
 
@@ -204,6 +208,8 @@ const Num = ({ v, l }: { v: string; l: string }) => (
 );
 
 const st = StyleSheet.create({
+  yours: { alignSelf: 'flex-start', fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.1, color: '#12804f', backgroundColor: '#e6f4ec', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, overflow: 'hidden' },
+  yourNote: { fontFamily: F.semi, fontSize: 13, lineHeight: 18, color: '#12804f' },
   editFoods: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, borderWidth: 1.5, borderColor: C.red, backgroundColor: C.card, padding: 16 },
   editK: { fontFamily: F.xbold, fontSize: 11, letterSpacing: 1.4, textTransform: 'uppercase', color: C.red },
   editT: { fontFamily: F.black, fontSize: 15, color: C.ink },

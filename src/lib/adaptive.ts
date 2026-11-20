@@ -35,7 +35,7 @@ export async function applyAdapt(userId: string, profile: Profile, plan: Plan, t
   const entry = { at: isoDate(), from: num(plan.kcal), to };
   if (quiz) {
     const fresh = buildFreePlan(quiz, to);
-    next = { ...plan, kcal: fresh.kcal, protein: plan.protein, fat: fresh.fat, carbs: fresh.carbs, meals: fresh.meals, meal_note: fresh.meal_note, adapt: [...(plan.adapt || []), entry] };
+    next = { ...plan, kcal: fresh.kcal, protein: plan.protein, fat: fresh.fat, carbs: fresh.carbs, meals: fresh.meals, meal_note: fresh.meal_note, eat_out: fresh.eat_out, adapt: [...(plan.adapt || []), entry] };
   } else {
     next = { ...plan, kcal: to.toLocaleString('en-US'), adapt: [...(plan.adapt || []), entry] };
   }

@@ -21,6 +21,7 @@ import { FoodThumb } from '../../src/components/FoodTiles';
 import { Bar, CountUp, Drift, Marquee, MotionScroll, Press, Reveal } from '../../src/components/motion';
 import { FuelCard } from '../../src/components/Fuel';
 import { track } from '../../src/lib/track';
+import CustomizeCard from '../../src/components/CustomizeCard';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -105,6 +106,13 @@ export default function Meals() {
             </Reveal>
           ))}
         </View>
+
+        {/* Advanced customization: their own meals, orders and foods */}
+        {!isCoached(profile) && profile?.role !== 'coach' && (
+          <Reveal style={[st.gutter, { marginTop: 22 }]}>
+            <CustomizeCard tab="food" done={!!((profile?.quiz as any)?.my_meals?.length || (profile?.quiz as any)?.my_orders?.length)} />
+          </Reveal>
+        )}
 
         {/* Log anything else */}
         <Reveal style={[st.gutter, { marginTop: 22 }]}>

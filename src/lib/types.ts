@@ -27,10 +27,10 @@ export type Plan = {
   start?: string;
   end?: string;
   stack?: { product: string; why: string; dose: string; when: string; cost: string; buy?: string; buy_text?: string }[];
-  meals?: { slot: string; target: string; options: { name: string; detail: string; kcal: string; protein: string; ids?: string[] }[] }[];
+  meals?: { slot: string; target: string; options: { name: string; detail: string; kcal: string; protein: string; ids?: string[]; mine?: boolean; note?: string }[] }[];
   meal_note?: string;
   rules?: string[];
-  eat_out?: { where: string; order: string; kcal: string; protein: string }[];
+  eat_out?: { where: string; order: string; kcal: string; protein: string; note?: string; mine?: boolean }[];
   grocery?: { aisle: string; items: string }[];
   week1?: string[];
   phase1?: string;

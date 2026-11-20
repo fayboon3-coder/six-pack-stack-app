@@ -28,7 +28,14 @@ export type TrainCfg = {
   avoid: string[];
   extras: Extra[];
   newbie: boolean;
+  /** Moves they like (advanced customization): picked first for their movement wherever it fits. */
+  prefer?: string[];
+  /** What they lift now, per exercise: week 1 starts from these instead of a guess. */
+  lifts?: Record<string, Lift>;
 };
+
+/** A lift they can do today: weight in lbs for a number of reps. */
+export type Lift = { w: number; r: number };
 
 export type Pattern =
   | 'h_press' | 'incline' | 'v_press' | 'lateral' | 'triceps' | 'fly'
@@ -196,7 +203,9 @@ export function buildWeek(cfg: TrainCfg): BuiltDay[] {
         }
         continue;
       }
-      let pick = pool[k % pool.length];
+      // Moves they told us they like go first (in the order they picked them).
+      const fav = (cfg.prefer || []).map((id) => pool.find((c) => c[0] === id)).filter(Boolean) as Cand[];
+      let pick = fav[0] || pool[k % pool.length];
       // Their swap wins when it's allowed here.
       const sw = cfg.swaps[`${pat}:${pick[0]}`];
       const swc = sw ? opts.find((c) => c[0] === sw) : undefined;
@@ -217,6 +226,22 @@ export function buildTrain(cfg: TrainCfg) {
   const c: Record<string, string> = {};
   cfg.extras.forEach((e) => { c[e.id] = e.name; });
   return { d: week.map(({ t, x }) => ({ t, x })) as TrainDay[], e: cfg.newbie ? 0 : 1, cfg, c };
+}
+
+/** Every move someone could pick for a movement with their equipment (for the "moves you like" picker). */
+export function movesByPattern(equip: Equip, avoid: string[] = []) {
+  return (Object.keys(MOVES) as Pattern[]).map((p) => ({ pattern: p, label: PATTERN_LABEL[p], ids: optionsFor(p, equip, avoid).map((c) => c[0]) }))
+    .filter((g) => g.ids.length > 1);
+}
+
+/** Every exercise in their week once, in the order they first do it (for the "your weights" list). */
+export function movesInWeek(cfg: TrainCfg) {
+  const seen = new Set<string>();
+  const out: { id: string; target: string; day: string }[] = [];
+  buildWeek(cfg).forEach((d) => d.x.forEach(([id, target]) => {
+    if (seen.has(id)) return; seen.add(id); out.push({ id, target, day: d.t });
+  }));
+  return out;
 }
 
 /** Same-pattern swaps for one exercise in this config (current one excluded). */

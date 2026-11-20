@@ -24,11 +24,21 @@ import { exName } from '../src/lib/workoutMeta';
 import FormVideo from '../src/components/FormVideo';
 import { applySwap, resetSwap, type TrainCfg } from '../src/lib/training';
 import { canEditTraining, saveTraining } from '../src/lib/trainingSave';
-import { suggestNext } from '../src/lib/trend';
+import { suggestFromLift, suggestNext, type SetRec } from '../src/lib/trend';
 import { health } from '../src/lib/health';
 import { goBack } from '../src/lib/nav';
 
 type Entry = { w: string; r: string; done: boolean };
+
+const LOWER = /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/;
+/** Today's target: from their last session, or (first time) from the weight they told us they lift now. */
+function targetFor(id: string, target: string, last: (SetRec | undefined)[], week: number, lifts?: TrainCfg['lifts']) {
+  const lower = LOWER.test(id);
+  const hasLog = last.some((s) => s && s.reps != null);
+  return (!hasLog && suggestFromLift(target, lifts?.[id], lower)) || suggestNext(target, last, week, lower);
+}
+/** Fill reps in too when the target is a real number (not just "pick a weight"). */
+const hasReps = (s: { tag: string; weight: number | null } | null) => !!s && (s.tag !== 'start' || s.weight != null);
 const REST = 90;
 const ACC = 'setInputs';
 
@@ -98,9 +108,9 @@ export default function Workout() {
     const e = list[k];
     if (e.done) return update(k, { done: false });
     const p = prev[ex[0]]?.[k];
-    const sg = suggestNext(ex[1], prev[ex[0]] || [], week, /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/.test(ex[0]));
+    const sg = targetFor(ex[0], ex[1], prev[ex[0]] || [], week, plan.train.cfg?.lifts);
     const w = e.w || (sg?.weight != null ? String(sg.weight) : p?.weight != null ? String(p.weight) : '');
-    const r = e.r || (sg && sg.tag !== 'start' ? String(sg.reps) : p?.reps != null ? String(p.reps) : '');
+    const r = e.r || (sg && hasReps(sg) ? String(sg.reps) : p?.reps != null ? String(p.reps) : '');
     update(k, { done: true, w, r });
     setRest(REST);
     // Personal record: more weight than any set last time, or same top weight for more reps
@@ -138,8 +148,7 @@ export default function Workout() {
   const last = i === day.x.length - 1;
   const p0 = prev[ex[0]] || [];
   // Auto progression: today's target from last time (double progression, holds on re-set weeks).
-  const lower = /squat|deadlift|rdl|leg_press|lunge|hip_thrust|split/.test(ex[0]);
-  const sug = suggestNext(ex[1], p0, week, lower);
+  const sug = targetFor(ex[0], ex[1], p0, week, plan.train.cfg?.lifts);
   const beat = list.some((e, k) => e.done && p0[k]?.weight != null && Number(e.w) > Number(p0[k]!.weight));
 
   const finish = async () => {
@@ -255,7 +264,7 @@ export default function Workout() {
                     placeholder={sug?.weight != null ? String(sug.weight) : p?.weight != null ? String(p.weight) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} weight in pounds`} style={[st.input, { width: 74 }, k === nextUndone && { borderColor: '#e2433b' }]} />
                   <TextInput value={e.r} onChangeText={(t) => update(k, { r: t.replace(/\D/g, '') })} keyboardType="number-pad"
-                    placeholder={sug && sug.tag !== 'start' ? String(sug.reps) : p?.reps != null ? String(p.reps) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
+                    placeholder={sug && hasReps(sug) ? String(sug.reps) : p?.reps != null ? String(p.reps) : ''} placeholderTextColor="#1b244066" returnKeyType="done"
                     inputAccessoryViewID={ACC} accessibilityLabel={`Set ${k + 1} reps`} style={[st.input, { width: 64 }]} />
                   <Pressable accessibilityRole="checkbox" accessibilityState={{ checked: e.done }} accessibilityLabel={`Complete set ${k + 1}`} hitSlop={6}
                     onPress={() => { Keyboard.dismiss(); tick(k); }} style={[st.tick, e.done && { backgroundColor: C.red, borderWidth: 0 }]}>

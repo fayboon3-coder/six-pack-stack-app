@@ -19,7 +19,7 @@ import { readMeals, writeMeals, type MealDay } from '../../src/lib/mealsToday';
 import { mealTiles } from '../../src/lib/foodPhotos';
 import { mealImage } from '../../src/lib/meals';
 import { allWeighIns } from '../../src/lib/body';
-import { goalDate, ratePerWeek, suggestNext, trendSeries, type SetRec, type TrendPoint } from '../../src/lib/trend';
+import { goalDate, ratePerWeek, suggestFromLift, suggestNext, trendSeries, type SetRec, type TrendPoint } from '../../src/lib/trend';
 import { adaptFor } from '../../src/lib/adaptive';
 import { health } from '../../src/lib/health';
 import { checkinState, focusOf, loadCoaching, type ClientCheckin, type Review } from '../../src/lib/coaching';
@@ -120,7 +120,10 @@ export default function Today() {
   const nextDow = dowOf(days[t.index].t);
   const equip = plan.train.cfg?.equip ? EQUIP[plan.train.cfg.equip] : undefined;
   const hero = heroPhoto(meta.muscles[0], plan.train.cfg?.equip);
-  const sug = firstEx && prev ? suggestNext(days[t.index].x[0][1], prev, week, LOWER.test(firstEx)) : null;
+  // No history yet: start from the weight they said they lift (advanced customization).
+  const sug = firstEx && prev
+    ? ((!prev.some((x) => x && x.reps != null) && suggestFromLift(days[t.index].x[0][1], plan?.train.cfg?.lifts?.[firstEx], LOWER.test(firstEx))) || suggestNext(days[t.index].x[0][1], prev, week, LOWER.test(firstEx)))
+    : null;
 
   const kGoal = num(plan.kcal) || 2000, pGoal = proteinGoal(plan), sGoal = stepGoal(plan);
   const planned = days.length;

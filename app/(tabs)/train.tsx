@@ -12,6 +12,7 @@ import { dayMeta } from '../../src/lib/workoutMeta';
 import { isoDate, loggedDays } from '../../src/lib/logs';
 import { isLocked } from '../../src/lib/access';
 import { LockedWeek } from '../../src/components/Offers';
+import CustomizeCard from '../../src/components/CustomizeCard';
 import { canEditTraining } from '../../src/lib/trainingSave';
 import { trainingDows } from '../../src/lib/daily';
 import { CoachCard } from '../../src/components/Coach';
@@ -191,6 +192,11 @@ export default function Train() {
               </Reveal>
             );
           })}
+          {canEditTraining(profile) && (
+            <Reveal delay={100}>
+              <CustomizeCard tab="train" done={!!(plan.train.cfg?.prefer?.length || Object.keys(plan.train.cfg?.lifts || {}).length)} />
+            </Reveal>
+          )}
           {canEditTraining(profile) && (
             <Reveal delay={120}>
               <Press accessibilityRole="button" onPress={() => router.push('/training')} style={st.edit}>

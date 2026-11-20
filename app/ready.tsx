@@ -12,11 +12,14 @@ import { plain } from '../src/lib/program';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { track } from '../src/lib/track';
 import { exName } from '../src/lib/workoutMeta';
+import { canEditTraining } from '../src/lib/trainingSave';
+import { DumbbellIcon, ForkIcon } from '../src/components/icons';
 
 /**
- * "You're in": the first thing after the account is made, built like the landing page.
- * Their real plan up top (numbers, first workout, first meals, the 12 weeks), one action
- * all the way down: start week 1 (which leads to the free-trial offer for free users).
+ * "You're in": the first thing after the trial offer, built like the landing page.
+ * Now the advanced customization step: "Want your plan tailored exactly to you?" opens
+ * /customize (their workouts, moves, weights, meals and takeout). Skipping is one tap and
+ * still leaves the full plan below (numbers, first workout, first meals, the 12 weeks).
  */
 
 const L = {
@@ -87,6 +90,11 @@ export default function Ready() {
     track('ready_start', { where });
     router.replace('/'); // the trial offer was already shown right before this screen
   };
+  const canTrain = canEditTraining(profile);
+  const customize = (where: string, tab?: 'train' | 'food') => {
+    track('ready_customize', { where, tab: tab || '' });
+    router.push({ pathname: '/customize', params: { from: 'ready', ...(tab ? { tab } : {}) } });
+  };
   const hot = coachingFirst(profile);
   const first = plan.train.d[0];
   const moves = (first?.x || []).map((e) => exName(e[0], plan)).filter(Boolean);
@@ -107,20 +115,22 @@ export default function Ready() {
 
   return (
     <View style={{ flex: 1, backgroundColor: L.bg }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: (wide ? 40 : 110) + insets.bottom }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: (wide ? 40 : 140) + insets.bottom }}>
         {/* Hero */}
         <LinearGradient colors={['#141c33', '#141c33']} style={[s.hero, { paddingTop: insets.top + 28 }]}>
           <View style={[s.wrap, wide && { flexDirection: 'row', alignItems: 'center', gap: 40 }]}>
             <Rise style={{ flex: wide ? 1.1 : undefined, gap: 16 }}>
               <View style={s.pill}><View style={s.dot} /><Text style={s.pillT}>YOU'RE IN · WEEK 1 STARTS TODAY</Text></View>
               <Text style={[s.h1, wide && { fontSize: 52, lineHeight: 56 }]}>{plan.name}, you're in.</Text>
+              <Text style={s.h1b}>Now customize your plan to your exact routine.</Text>
               <Text style={s.lede}>{plain(plan.goal_long) || plan.goal_short}</Text>
               <View style={s.stats}>
                 <View style={s.stat}><Text style={s.statV}>{plan.kcal}</Text><Text style={s.statL}>CALORIES</Text></View>
                 <View style={s.stat}><Text style={s.statV}>{plan.protein}g</Text><Text style={s.statL}>PROTEIN</Text></View>
                 <View style={s.stat}><Text style={s.statV}>{days}x</Text><Text style={s.statL}>WORKOUTS</Text></View>
               </View>
-              {wide && <Pressable accessibilityRole="button" onPress={() => startWeek1('hero')} style={s.cta}><Text style={s.ctaT}>Start week 1  →</Text></Pressable>}
+              {wide && <Pressable accessibilityRole="button" onPress={() => customize('hero')} style={s.cta}><Text style={s.ctaT}>Customize my plan  →</Text></Pressable>}
+              {wide && <Pressable accessibilityRole="button" onPress={() => startWeek1('hero_skip')} hitSlop={8}><Text style={s.skipLight}>Skip, set this up later in the app</Text></Pressable>}
             </Rise>
             <Rise delay={150} style={[s.phones, wide ? { flex: 1, height: pw * 2.06 + 20 } : { height: pw * 2.06 * 0.7, marginTop: 24, marginHorizontal: 10 }]}>
               <View style={{ position: 'absolute', left: wide ? 10 : 0, top: 30 }}><Phone src={IMG.workout} width={pw * 0.92} tilt={-6} /></View>
@@ -131,6 +141,38 @@ export default function Ready() {
         </LinearGradient>
 
         <View style={[s.wrap, { gap: 26, marginTop: -26 }]}>
+          {/* Advanced customization */}
+          <Rise delay={200} style={[s.card, s.custom]}>
+            <Kicker t="Advanced customization" />
+            <Text style={s.h2}>Want your plan tailored exactly to you?</Text>
+            <Text style={s.customBody}>Tell me what you already do and I rebuild your plan around it, the same way I would if we sat down together. Your calories and protein stay locked in.</Text>
+            <View style={[{ gap: 10, marginTop: 8 }, wide && { flexDirection: 'row' }]}>
+              {canTrain && (
+                <Pressable accessibilityRole="button" onPress={() => customize('tile', 'train')} style={[s.tile, wide && { flex: 1 }]}>
+                  <View style={s.tileIcon}><DumbbellIcon color="#fff" size={20} /></View>
+                  <View style={{ flex: 1, gap: 3 }}>
+                    <Text style={s.tileT}>Training</Text>
+                    <Text style={s.tileS}>The workouts and moves you like, and the exact weights you lift now.</Text>
+                  </View>
+                  <Text style={s.tileArrow}>›</Text>
+                </Pressable>
+              )}
+              <Pressable accessibilityRole="button" onPress={() => customize('tile', 'food')} style={[s.tile, wide && { flex: 1 }]}>
+                <View style={[s.tileIcon, { backgroundColor: L.red }]}><ForkIcon color="#fff" size={20} /></View>
+                <View style={{ flex: 1, gap: 3 }}>
+                  <Text style={s.tileT}>Food</Text>
+                  <Text style={s.tileS}>The meals you eat, your takeout orders, and the foods you won't touch.</Text>
+                </View>
+                <Text style={s.tileArrow}>›</Text>
+              </Pressable>
+            </View>
+            <Pressable accessibilityRole="button" onPress={() => customize('card')} style={[s.cta, { alignSelf: 'stretch', marginTop: 10, minWidth: 0 }]}><Text style={s.ctaT}>Customize my plan  →</Text></Pressable>
+            <Pressable accessibilityRole="button" onPress={() => startWeek1('card_skip')} hitSlop={8} style={{ alignSelf: 'center', marginTop: 6 }}>
+              <Text style={s.skip}>Skip, set this up later in the app</Text>
+            </Pressable>
+            <Text style={s.skipNote}>Skipping still gives you the full plan below. You can customize any time from Train and Meals.</Text>
+          </Rise>
+
           {/* First week */}
           <Rise delay={250} style={s.card}>
             <Kicker t="Your first workout" />
@@ -190,7 +232,8 @@ export default function Ready() {
             </View>
           </Rise>
 
-          <Pressable accessibilityRole="button" onPress={() => startWeek1('bottom')} style={[s.cta, { alignSelf: 'stretch' }]}><Text style={s.ctaT}>Start week 1  →</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => customize('bottom')} style={[s.cta, { alignSelf: 'stretch' }]}><Text style={s.ctaT}>Customize my plan  →</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => startWeek1('bottom')} style={s.ghost}><Text style={s.ghostT}>Start week 1 with this plan</Text></Pressable>
 
           <View style={{ gap: 10 }}>
             <Kicker t={hot ? 'You said you want to start now' : 'Want me to do it with you?'} />
@@ -201,7 +244,8 @@ export default function Ready() {
 
       {!wide && (
         <View style={[s.sticky, { paddingBottom: 12 + insets.bottom }]}>
-          <Pressable accessibilityRole="button" onPress={() => startWeek1('sticky')} style={[s.cta, { alignSelf: 'stretch' }]}><Text style={s.ctaT}>Start week 1  →</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => customize('sticky')} style={[s.cta, { alignSelf: 'stretch' }]}><Text style={s.ctaT}>Customize my plan  →</Text></Pressable>
+          <Pressable accessibilityRole="button" onPress={() => startWeek1('sticky_skip')} hitSlop={6} style={{ alignSelf: 'center', marginTop: 8 }}><Text style={s.skip}>Skip, set this up later</Text></Pressable>
         </View>
       )}
     </View>
@@ -215,6 +259,19 @@ const s = StyleSheet.create({
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#2fd17f' },
   pillT: { fontFamily: F.xbold, fontSize: 11.5, letterSpacing: 1.2, color: '#7ff0b5' },
   h1: { fontFamily: F.black, fontSize: 40, lineHeight: 44, color: '#fff', letterSpacing: -1 },
+  h1b: { fontFamily: F.xbold, fontSize: 22, lineHeight: 27, color: '#fff', letterSpacing: -0.4, marginTop: -6 },
+  custom: { borderColor: '#141c33', borderWidth: 1.5 },
+  customBody: { fontFamily: F.medium, fontSize: 15.5, lineHeight: 22, color: L.body },
+  tile: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 18, backgroundColor: L.bg, borderWidth: 1, borderColor: L.line },
+  tileIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: '#141c33', alignItems: 'center', justifyContent: 'center' },
+  tileT: { fontFamily: F.black, fontSize: 17, color: L.ink },
+  tileS: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: L.body },
+  tileArrow: { fontFamily: F.black, fontSize: 26, color: L.muted, marginTop: -3 },
+  skip: { fontFamily: F.bold, fontSize: 14.5, color: L.ink, textDecorationLine: 'underline' },
+  skipLight: { fontFamily: F.bold, fontSize: 14.5, color: '#fff', textDecorationLine: 'underline', marginTop: 4 },
+  skipNote: { fontFamily: F.medium, fontSize: 12.5, lineHeight: 18, color: L.muted, textAlign: 'center' },
+  ghost: { height: 54, borderRadius: 27, borderWidth: 1.5, borderColor: L.line, backgroundColor: L.white, alignItems: 'center', justifyContent: 'center', marginTop: -12 },
+  ghostT: { fontFamily: F.bold, fontSize: 16, color: L.ink },
   lede: { fontFamily: F.medium, fontSize: 16.5, lineHeight: 24, color: '#c7cde0' },
   stats: { flexDirection: 'row', gap: 10, marginTop: 4 },
   stat: { flex: 1, backgroundColor: '#1c2542', borderWidth: 1, borderColor: '#2a3456', borderRadius: 16, paddingVertical: 12, alignItems: 'center', gap: 2 },

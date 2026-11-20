@@ -10,7 +10,9 @@
  */
 import { CAT_LABEL, FOOD_DB, foodById, type Food, type FoodCat } from '../data/foods';
 
-export type MealOption = { name: string; detail: string; kcal: string; protein: string; ids?: string[] };
+export type MealOption = { name: string; detail: string; kcal: string; protein: string; ids?: string[];
+  /** One of their own meals (advanced customization), and what was changed to make it fit. */
+  mine?: boolean; note?: string };
 export type MealSlot = { slot: string; target: string; options: MealOption[] };
 type Part = { food: Food; amt: number };
 

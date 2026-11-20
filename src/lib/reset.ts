@@ -25,7 +25,7 @@ export async function autoReset(userId: string, profile: Profile, plan: Plan, we
   const next: Plan = {
     ...plan,
     kcal: fresh.kcal, protein: fresh.protein, fat: fresh.fat, carbs: fresh.carbs,
-    meals: fresh.meals, meal_note: fresh.meal_note,
+    meals: fresh.meals, meal_note: fresh.meal_note, eat_out: fresh.eat_out,
     resets: [...(plan.resets || []), week],
   };
   const { error } = await supabase.from('plans').update({ data: next }).eq('user_id', userId).eq('active', true);

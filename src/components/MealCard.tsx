@@ -6,7 +6,7 @@ import { num } from '../lib/daily';
 import FoodTiles from './FoodTiles';
 import { Pop, Press } from './motion';
 
-export type MealOpt = { name: string; detail: string; kcal: string; protein: string; ids?: string[] };
+export type MealOpt = { name: string; detail: string; kcal: string; protein: string; ids?: string[]; mine?: boolean; note?: string };
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
 /**
@@ -40,6 +40,7 @@ export default function MealCard({ slot, opt, eaten, onToggle, onSwap, canSwap, 
         </Pop>
       </Pressable>
       <View style={st.body}>
+        {opt.mine && <Text style={st.yours}>YOUR MEAL</Text>}
         <Text style={st.name} numberOfLines={2}>{opt.name}</Text>
         {!compact && !!opt.detail && <Text style={st.detail} numberOfLines={2}>{opt.detail.replace(/\{#?([\d.]+)\}/g, '$1')}</Text>}
         <View style={st.row}>
@@ -71,6 +72,7 @@ const st = StyleSheet.create({
   done: { position: 'absolute', top: 12, right: 12, height: 28, paddingHorizontal: 11, borderRadius: 14, backgroundColor: E.green, flexDirection: 'row', alignItems: 'center', gap: 5 },
   doneT: { fontFamily: F.bold, fontSize: 12.5, color: '#fff' },
   body: { padding: 16, gap: 6 },
+  yours: { alignSelf: 'flex-start', fontFamily: F.xbold, fontSize: 10, letterSpacing: 1.1, color: '#12804f', backgroundColor: '#e6f4ec', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3, overflow: 'hidden', marginBottom: 4 },
   name: { fontFamily: F.xbold, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: E.ink },
   detail: { fontFamily: F.medium, fontSize: 13.5, lineHeight: 19, color: E.sub },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 6 },

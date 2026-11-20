@@ -3,7 +3,9 @@ import type { Plan, TrainDay } from './types';
 import SAMPLE from '../data/samplePlan.json';
 import { buildEatOut, buildGrocery, buildMenu } from './menu';
 import { buildFoodPlan, buildFoodGrocery } from './mealplan';
-import { LEGACY_LIKES, type Food } from '../data/foods';
+import { LEGACY_LIKES, QUICK_START, type Food } from '../data/foods';
+import { withMyMeals, withMyOrders, withoutNoFoods, type MyMeal, type MyOrder } from './customize';
+import { foodById } from '../data/foods';
 import { buildTrain, defaultCfg, type TrainCfg } from './training';
 
 /** Everything the quiz collects. Strings are the exact option labels (they go to Kit as-is). */
@@ -18,6 +20,8 @@ export type Quiz = {
   foods?: string[]; custom_foods?: Food[];
   /** Training split id and weekdays (0 = Sunday), from the split step. */
   split?: string; train_days?: number[]; train_cfg?: TrainCfg;
+  /** Advanced customization: meals they eat, takeout they order, foods they won't eat. */
+  my_meals?: MyMeal[]; my_orders?: MyOrder[]; no_foods?: string[];
   first_name: string; email: string; src?: string; done_at?: string;
 };
 
@@ -86,20 +90,44 @@ export function foodsOf(q: Pick<Quiz, 'foods' | 'likes' | 'custom_foods'>): stri
   return old.length ? [...new Set([...old, 'broccoli', 'salad_greens', 'salsa'])] : [];
 }
 
+/**
+ * Meals, groceries and eating-out for these numbers: their picked foods (minus anything they
+ * won't eat), with their own meals first in each slot and their own takeout orders first.
+ * Used by the quiz, the food editor, advanced customization and every calorie re-set.
+ */
+export function mealPlanFor(q: Partial<Quiz>, kcal: number, protein: number) {
+  const mine = q.my_meals || [];
+  let foodIds = withoutNoFoods(foodsOf(q as Quiz), q.no_foods);
+  if (!foodIds.length && mine.length) foodIds = withoutNoFoods(QUICK_START, q.no_foods);
+  const custom = q.custom_foods || [];
+  const fp = foodIds.length ? buildFoodPlan(kcal, protein, foodIds, custom) : null;
+  const useFoods = !!fp && fp.meals.every((m) => m.options.length > 0);
+  const pantry = foodIds.map((id) => custom.find((f) => f.id === id) || foodById(id)).filter(Boolean) as Food[];
+  const picked = (q.likes || []).length > 0 || (q.foods || []).length > 0;
+  const share = [0.22, 0.3, 0.13, 0.35];
+  const proteinShare = [0.23, 0.32, 0.17, 0.28];
+  const base = useFoods ? fp!.meals : picked ? buildMenu(kcal, protein, q.likes, q.spots) : (MEALS || []).map((m, k) => ({
+    ...m,
+    target: `about ${fmt(round(kcal * share[k], 50))} calories · ${round(protein * proteinShare[k], 5)} g protein`,
+    options: m.options.map(meal),
+  }));
+  const meals = withMyMeals(base, mine, kcal, protein, pantry);
+  const mealIds = [...new Set(mine.flatMap((m) => (m.items || []).map((x) => x.id)))];
+  const grocery = useFoods ? buildFoodGrocery(meals, [...new Set([...foodIds, ...mealIds])], custom)
+    : picked ? buildGrocery(q.likes) : SAMPLE.grocery.map((g) => ({ ...g, items: g.items.replace(' (no mushrooms)', '') }));
+  const eat_out = withMyOrders(picked ? buildEatOut(q.spots) : SAMPLE.eat_out, q.my_orders, kcal, protein);
+  return { meals, grocery, eat_out, picked: picked || useFoods, useFoods };
+}
+
 /** kcalOverride: the re-set's capped calories (weeks 4 and 8). */
 export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
   const t0 = targets(q);
   const t = kcalOverride ? { ...t0, kcal: kcalOverride, carbs: Math.max(50, round((kcalOverride - t0.protein * 4 - t0.fat * 9) / 4, 5)) } : t0;
-  const picked = (q.likes || []).length > 0 || (q.foods || []).length > 0;
-  const foodIds = foodsOf(q);
-  const fp = foodIds.length ? buildFoodPlan(t.kcal, t.protein, foodIds, q.custom_foods || []) : null;
-  const useFoods = !!fp && fp.meals.every((m) => m.options.length > 0);
+  const mp = mealPlanFor(q, t.kcal, t.protein);
   const p = projection(q);
   const tr = buildTraining(q);
   const name = q.first_name.trim().split(' ')[0] || 'You';
   const sessions = tr.sessions;
-  const share = [0.22, 0.3, 0.13, 0.35];
-  const proteinShare = [0.23, 0.32, 0.17, 0.28];
   const goalShort = p.build
     ? `STRONGER AND LEANER BY ${p.end12.toUpperCase()}`
     : p.weeks <= 12 ? `${p.g} LBS BY ${p.goalDate.toUpperCase()}` : `${p.at12} LBS BY ${p.end12.toUpperCase()}`;
@@ -123,12 +151,8 @@ export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
       { product: 'Whey protein (Optimum Nutrition Gold Standard)', why: `Only if food alone won't get you to ${t.protein} g of protein. One scoop closes the gap.`, dose: '1 scoop', when: 'When you are short on protein', cost: 'about $58', buy: 'https://www.vitacost.com/products/optimum-nutrition-gold-standard-100-whey-protein-french-vanilla-creme-5-lb-2-26-kg-27511' },
       { product: 'Black coffee', why: 'Caffeine is the part of most pre-workouts that actually works. Coffee does it for pennies.', dose: '1 cup', when: '30 min before training', cost: '$0 extra', buy_text: 'Your kitchen' },
     ],
-    meals: useFoods ? fp!.meals : picked ? buildMenu(t.kcal, t.protein, q.likes, q.spots) : (MEALS || []).map((m, k) => ({
-      ...m,
-      target: `about ${fmt(round(t.kcal * share[k], 50))} calories · ${round(t.protein * proteinShare[k], 5)} g protein`,
-      options: m.options.map(meal),
-    })),
-    ...(picked ? { food: 'picked' } : {}),
+    meals: mp.meals,
+    ...(mp.picked ? { food: 'picked' } : {}),
     meal_note: `Pick one option per meal. Any 4 picks land close to ${fmt(t.kcal)} calories and ${t.protein} g of protein.`,
     rules: [
       'Protein first at every meal.',
@@ -145,8 +169,8 @@ export function buildFreePlan(q: Quiz, kcalOverride?: number): Plan {
       'Weigh in every morning. Your trend and goal date show up after a week',
       'Sunday: do your check-in in the app',
     ],
-    eat_out: picked ? buildEatOut(q.spots) : SAMPLE.eat_out,
-    grocery: useFoods ? buildFoodGrocery(fp!.meals, foodIds, q.custom_foods || []) : picked ? buildGrocery(q.likes) : SAMPLE.grocery.map((g) => ({ ...g, items: g.items.replace(' (no mushrooms)', '') })),
+    eat_out: mp.eat_out,
+    grocery: mp.grocery,
     phase1: `Hit all ${sessions} sessions and your protein every day. Steps up to 8,000. Learn the moves.`,
     phase2: 'Add weight or reps every week. Week 4: your calories get re-set to your new weight.',
     phase3: 'Keep the weights heavy while you get leaner. Week 12: final photos and results.',

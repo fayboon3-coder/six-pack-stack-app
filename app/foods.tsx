@@ -10,8 +10,8 @@ import { BackIcon } from '../src/components/icons';
 import Backdrop from '../src/components/Backdrop';
 import { twoTone } from '../src/components/TwoTone';
 import FoodPicker from '../src/components/FoodPicker';
-import { foodsOf } from '../src/lib/quiz';
-import { buildFoodGrocery, buildFoodPlan, whatsMissing } from '../src/lib/mealplan';
+import { foodsOf, mealPlanFor } from '../src/lib/quiz';
+import { whatsMissing } from '../src/lib/mealplan';
 import { foodById, type Food } from '../src/data/foods';
 import { goBack } from '../src/lib/nav';
 
@@ -35,8 +35,9 @@ export default function Foods() {
     if (missing.length) return setMsg(`Add ${missing.join(', ')} so every meal has options.`);
     setBusy(true); setMsg('');
     const kcal = num(plan.kcal), protein = num(plan.protein);
-    const fp = buildFoodPlan(kcal, protein, ids, custom);
-    const next = { ...plan, meals: fp.meals, grocery: buildFoodGrocery(fp.meals, ids, custom), food: 'picked' as const };
+    // Same builder as the quiz: their own meals and takeout orders (advanced customization) stay in.
+    const mp = mealPlanFor({ ...quiz, foods: ids, custom_foods: custom }, kcal, protein);
+    const next = { ...plan, meals: mp.meals, grocery: mp.grocery, eat_out: mp.eat_out, food: 'picked' as const };
     const [{ error }] = await Promise.all([
       supabase.from('plans').update({ data: next }).eq('user_id', session.user.id).eq('active', true),
       supabase.from('profiles').update({ quiz: { ...quiz, foods: ids, custom_foods: custom } }).eq('id', session.user.id),
