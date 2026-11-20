@@ -1,0 +1,43 @@
+name: Ship an instant update to App Store users
+
+# For App Store builds made with "Build on GitHub's Mac and send to the App Store" (1.1.1 and later).
+# Sends the current app code to everyone on that version: they get it the next time they open the app,
+# no App Store review. Only for code changes; anything that adds a native module needs a new build.
+# Run by hand: Actions → "Ship an instant update to App Store users" → Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: What changed (one line)
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Tests
+        run: npm test
+      - name: Set up Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - name: Link the Expo project
+        run: eas init --non-interactive --force
+      - name: Same runtime as the App Store build
+        run: |
+          node -e "const fs=require('fs');const p='app.json';const j=JSON.parse(fs.readFileSync(p));j.expo.runtimeVersion={policy:'appVersion'};fs.writeFileSync(p,JSON.stringify(j,null,2));"
+          eas update:configure --platform ios --non-interactive || true
+      - name: Publish to the production channel
+        env:
+          MSG: ${{ github.event.inputs.message }}
+          EXPO_PUBLIC_RC_IOS_KEY: appl_xOHRUlMqBXvuSrpVovMIdFVYfLw
+        run: eas update --channel production --message "$(printf '%s' "$MSG" | head -n 1 | cut -c 1-120)" --non-interactive --platform ios
