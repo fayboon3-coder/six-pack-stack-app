@@ -17,7 +17,11 @@ export default function AuthCallback() {
     if (!code) return;
     supabase.auth.exchangeCodeForSession(String(code)).then(({ error }) => {
       if (error) setErr('That link expired or was already used. Send a new one.');
-      else router.replace('/');
+      else {
+        let to = '/';
+        try { to = window.localStorage.getItem('sps:after-login') || '/'; window.localStorage.removeItem('sps:after-login'); } catch {}
+        router.replace(to as any);
+      }
     });
   }, [code, router]);
 

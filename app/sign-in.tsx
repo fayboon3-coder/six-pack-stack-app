@@ -35,6 +35,23 @@ export default function SignIn() {
     if (mode === 'up' && !res.data.session) setNote('Check your email to confirm your account, then sign in here.');
   };
 
+  // Most people never set a password (the plan quiz saves the account with one tap), so a sign-in link is the main way back in on a new browser.
+  const sendLink = async () => {
+    setErr(''); setNote('');
+    const e = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return setErr('Enter the email you built your plan with.');
+    setBusy(true);
+    const origin = Platform.OS === 'web' && typeof window !== 'undefined' ? window.location.origin : 'https://boonfay.com';
+    const { error } = await supabase.auth.signInWithOtp({ email: e, options: { shouldCreateUser: false, emailRedirectTo: `${origin}/app/auth` } });
+    setBusy(false);
+    if (error) {
+      const m = error.message.toLowerCase();
+      if (m.includes('signup') || m.includes('not found') || m.includes('not allowed')) return setErr("There's no plan with that email yet. Build your free plan first.");
+      return setErr(error.message);
+    }
+    setNote(`Check your email. We sent a sign-in link to ${e}. Tap it and you're in.`);
+  };
+
   const reset = async () => {
     setErr(''); setNote('');
     const e = email.trim().toLowerCase();
@@ -72,6 +89,11 @@ export default function SignIn() {
               textContentType={mode === 'up' ? 'newPassword' : 'password'} placeholder={mode === 'up' ? 'At least 8 characters' : 'Your password'}
               placeholderTextColor="#1b244099" style={st.input} returnKeyType="go" onSubmitEditing={submit} />
             <Button title={mode === 'in' ? 'Sign in' : 'Create account'} onPress={submit} loading={busy} />
+            {mode === 'in' && (
+              <Pressable accessibilityRole="button" onPress={sendLink} disabled={busy} style={st.linkBtn}>
+                <Text style={st.linkBtnText}>No password? Email me a sign-in link</Text>
+              </Pressable>
+            )}
             {!!err && <Text style={st.err} accessibilityLiveRegion="polite">{err}</Text>}
             {!!note && <Text style={st.note} accessibilityLiveRegion="polite">{note}</Text>}
             <Pressable accessibilityRole="button" onPress={() => { setMode(mode === 'in' ? 'up' : 'in'); setErr(''); setNote(''); }} style={st.link}>
@@ -94,6 +116,8 @@ export default function SignIn() {
 }
 
 const st = StyleSheet.create({
+  linkBtn: { minHeight: 52, borderRadius: 14, borderWidth: 1.5, borderColor: C.line, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
+  linkBtnText: { fontFamily: F.bold, fontSize: 15, color: C.ink, textAlign: 'center' },
   wrap: { paddingHorizontal: 22, paddingTop: 4 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.red },
   brand: { fontFamily: F.xbold, fontSize: 12, letterSpacing: 2, textTransform: 'uppercase', color: C.ink },

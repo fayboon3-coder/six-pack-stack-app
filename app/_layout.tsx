@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useSegments, usePathname, useGlobalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import LoadingScreen from '../src/components/LoadingScreen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
@@ -31,8 +31,13 @@ function Gate() {
     const open = ['sign-in', 'auth', 'welcome', 'quiz', 'lead', 'btl', 'coaching-application', 'coaching', 'stack-check', 'verdict'].includes(seg || '');
     if (!session && !open) {
       const q = Object.entries(params).filter(([, v]) => typeof v === 'string').map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`).join('&');
-      if (pathname && pathname !== '/') pending.current = pathname + (q ? `?${q}` : '');
-      router.replace('/welcome');
+      if (pathname && pathname !== '/') {
+        pending.current = pathname + (q ? `?${q}` : '');
+        // Kept across a page reload too, so a sign-in link from email lands back on this page.
+        try { if (Platform.OS === 'web') window.localStorage.setItem('sps:after-login', pending.current); } catch {}
+      }
+      // Came from a link (an email button): go straight to sign-in, not the new-user welcome.
+      router.replace(pending.current ? '/sign-in' : '/welcome');
     }
     if (!session && seg === 'quiz') pending.current = null; // building a new plan: the plan flow decides where to go
     if (session && (seg === 'sign-in' || (seg === 'welcome' && profile?.role !== 'coach'))) {
