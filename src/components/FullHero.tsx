@@ -1,6 +1,7 @@
 import React from 'react';
-import { Image, ImageSourcePropType, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAppWidth } from '../lib/frame';
 import { C, F } from '../lib/theme';
 import { twoTone } from './TwoTone';
 
@@ -8,7 +9,7 @@ import { twoTone } from './TwoTone';
 export default function FullHero({ image, pills, title, lede, ratio = 0.92 }: {
   image: ImageSourcePropType; pills?: { text: string; tone?: 'red' | 'green' }[]; title: string; lede?: string; ratio?: number;
 }) {
-  const { width } = useWindowDimensions();
+  const width = useAppWidth();
   const w = Math.min(width, 640);
   const h = Math.round(w * ratio);
   return (

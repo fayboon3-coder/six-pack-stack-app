@@ -1,7 +1,8 @@
 import React from 'react';
 import Thumb from './Thumb';
-import { Image, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAppWidth } from '../lib/frame';
 import { C, F } from '../lib/theme';
 import { ClockIcon, DumbbellIcon, LayersIcon, PlayIcon } from './icons';
 import { DayMeta, MUSCLE_COLOR, thumb } from '../lib/workoutMeta';
@@ -15,7 +16,7 @@ export default function WorkoutPreview({ meta: w, badge, cta, done, onPress, max
   meta: DayMeta; badge: string; cta: string; done?: boolean; onPress: () => void; maxRows?: number; cover?: number;
 }) {
   const coverItem = w.items[Math.min(cover, w.items.length - 1)] || w.items[0];
-  const { width } = useWindowDimensions();
+  const width = useAppWidth();
   const cw = Math.min(width, 520) - 40;
   const ih = Math.round(cw * 9 / 16);
   const shown = w.items.slice(0, maxRows);

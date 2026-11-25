@@ -1,5 +1,6 @@
 import React from 'react';
-import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View, ViewStyle, useWindowDimensions } from 'react-native';
+import { Image, ImageSourcePropType, Pressable, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { useAppWidth } from '../lib/frame';
 import { C, F } from '../lib/theme';
 import { PlayIcon } from './icons';
 
@@ -12,7 +13,7 @@ export default function HeroCard({ image, badge, title, subtitle, cta, onPress, 
   imageRatio?: number; style?: ViewStyle; children?: React.ReactNode;
 }) {
   const long = title.length > 18;
-  const { width } = useWindowDimensions();
+  const width = useAppWidth();
   const w = Math.min(width, 520) - 40;
   const h = Math.round(w / imageRatio);
   return (

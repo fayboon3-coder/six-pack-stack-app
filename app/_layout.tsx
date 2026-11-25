@@ -13,9 +13,13 @@ import { C } from '../src/lib/theme';
 import Splash from '../src/components/Splash';
 import PreviewBar from '../src/components/PreviewBar';
 import { track } from '../src/lib/track';
+import { DesktopFrame } from '../src/lib/frame';
+
+// Pages laid out for a full desktop window (two-column offer pages). Everything else sits in the centered app column.
+const FULL_WIDTH = ['trial', 'ready', 'coaching'];
 
 function Gate() {
-  const { session, loading, profile } = useAuth();
+  const { session, loading, profile, isCoachAccount, viewAs } = useAuth();
   useEffect(() => { track('app_open', {}, { once: true }); }, []);
   const segments = useSegments();
   const router = useRouter();
@@ -53,14 +57,19 @@ function Gate() {
     }
   }, [session, loading, segments, router, profile, pathname]);
 
+  // Boon's own back office stays full width; anyone else (and Boon previewing as a user) gets the app column.
+  const framed = !FULL_WIDTH.includes((segments[0] as string) || '') && !(isCoachAccount && !viewAs);
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: C.bg }}>
-        <LoadingScreen title="Loading your| plan" />
-      </View>
+      <DesktopFrame enabled>
+        <View style={{ flex: 1, backgroundColor: C.bg }}>
+          <LoadingScreen title="Loading your| plan" />
+        </View>
+      </DesktopFrame>
     );
   }
   return (
+    <DesktopFrame enabled={framed}>
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: C.bg } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="welcome" />
@@ -91,6 +100,7 @@ function Gate() {
       <Stack.Screen name="log-food" />
       <Stack.Screen name="scan" />
     </Stack>
+    </DesktopFrame>
   );
 }
 
