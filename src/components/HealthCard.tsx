@@ -37,7 +37,7 @@ export default function HealthCard({ compact }: { compact?: boolean }) {
           <Text style={st.t}>Apple Health</Text>
           <Text style={st.s}>{on ? 'Connected. Steps, weight, sleep and workouts sync on their own.' : 'Sync steps (with your watch), weight, sleep and workouts. Your weigh-ins and workouts save back to Health.'}</Text>
         </View>
-        {!on && <Pressable accessibilityRole="button" onPress={connect} style={st.btn}><Text style={st.btnT}>Connect</Text></Pressable>}
+        {!on && <Pressable accessibilityRole="button" onPress={connect} style={st.btn}><Text style={st.btnT}>Continue</Text></Pressable>}
       </View>
       {on && !compact && today && (
         <View style={st.stats}>

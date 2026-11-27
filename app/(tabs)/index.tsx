@@ -353,7 +353,7 @@ export default function Today() {
                   <View style={st.heart}><Svg width={22} height={22} viewBox="0 0 24 24"><Path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z" fill={E.red} /></Svg></View>
                   <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={st.mK}>APPLE HEALTH</Text>
-                    <Text style={st.miniT} numberOfLines={2}>Connect for steps, sleep and weight</Text>
+                    <Text style={st.miniT} numberOfLines={2}>Sync steps, sleep and weight</Text>
                   </View>
                 </Pressable>
               ) : (
